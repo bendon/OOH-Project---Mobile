@@ -1,13 +1,13 @@
 [versions]
-agp = "8.5.0"
-kotlin = "1.9.0"
+agp = "8.4.2"
+kotlin = "2.0.21"
 core-ktx = "1.12.0"
 junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
 lifecycle-runtime-ktx = "2.7.0"
-activity-compose = "1.8.2"
-compose-bom = "2024.01.00"
+activity-compose = "1.10.0"
+compose-bom = "2025.02.00"
 navigation-common-ktx = "2.8.5"
 navigation-compose = "2.8.5"
 maps-compose = "2.15.0"
@@ -16,6 +16,7 @@ camerax = "1.2.3"
 mlkit = "17.0.0"
 mlkit-text = "16.0.0"
 play-services-location = "21.0.1"
+kotlinSerialization = "1.7.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -44,8 +45,10 @@ androidx-camera-view = { group = "androidx.camera", name = "camera-view", versio
 google-mlkit-object-detection = { group = "com.google.mlkit", name = "object-detection", version.ref = "mlkit" }
 google-mlkit-text-recognition = { group = "com.google.mlkit", name = "text-recognition", version.ref = "mlkit-text" }
 google-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "play-services-location" }
-
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinSerialization" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

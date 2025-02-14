@@ -6,8 +6,6 @@ import com.edgetech.bbscout.screens.HistoryScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
@@ -18,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -34,13 +31,29 @@ import com.edgetech.bbscout.data.BillboardRepository
 import com.edgetech.bbscout.screens.BillboardCapture
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.setValue
+import com.diracks.app.app.app_state.rememberBBScoutAppState
+import com.edgetech.bbscout.features.navigation.DirackAppNavigation
+import com.edgetech.bbscout.features.onboarding_screen.OnboardingScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
+            val appState = rememberBBScoutAppState(
+               // windowSizeClass = calculateWindowSizeClass(this),
+                //networkMonitor = networkMonitor,
+                // dashboardNavController = rememberNavController(),
+//                timeZoneMonitor = timeZoneMonitor,
+//                appType = if (checkIfIsOnPatientApp()) MyrekodAppType.MYREKOD_APP else MyrekodAppType.CHV_APP,
+//                userAccountAppState = UserAccountAppState().copy(
+//                    appId = getApplicationPackagedName()
+//                ),
+//                activity = this
+            )
             BBScoutTheme {
-                AppContent()
+                DirackAppNavigation(appState = appState)
             }
         }
     }
@@ -56,6 +69,9 @@ sealed class Screen(val route: String, val icon: ImageVector, val label: String)
 private fun AppContent() {
     val navController = rememberNavController()
     val screens = listOf(Screen.Map, Screen.Capture, Screen.History)
+
+    val context = LocalContext.current
+    var captures by remember { mutableStateOf<List<BillboardCapture>>(emptyList()) }
 
     Scaffold(
         bottomBar = {
@@ -90,9 +106,9 @@ private fun AppContent() {
             composable(Screen.Map.route) { MapScreen() }
             composable(Screen.Capture.route) { CaptureScreen() }
             composable(Screen.History.route) {
-                val repository = remember { BillboardRepository(context = LocalContext.current) }
+                val repository = remember { BillboardRepository(context = context) }
                 val scope = rememberCoroutineScope()
-                var captures by remember { mutableStateOf<List<BillboardCapture>>(emptyList()) }
+
 
                 // Load captures when screen is shown
                 LaunchedEffect(Unit) {

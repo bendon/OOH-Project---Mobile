@@ -3,16 +3,19 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
+    alias(libs.plugins.compose.compiler)
+    id("kotlin-parcelize")
 }
 
 android {
     namespace = "com.edgetech.bbscout"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.edgetech.bbscout"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
         val properties = project.properties
@@ -46,9 +49,9 @@ android {
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.2"
-    }
+//    composeOptions {
+//       // kotlinCompilerExtensionVersion = "1.5.2"
+//    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -73,6 +76,8 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.google.maps.compose)
     implementation(libs.google.play.services.maps)
+
+    implementation(libs.kotlinx.serialization.json)
 
     // CameraX dependencies
     implementation(libs.androidx.camera.core)
