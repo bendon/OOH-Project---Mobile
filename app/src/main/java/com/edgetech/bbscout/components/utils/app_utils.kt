@@ -1,6 +1,8 @@
 package com.edgetech.bbscout.components.utils
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
 import android.util.Log
 import com.google.android.datatransport.BuildConfig
 
@@ -12,3 +14,7 @@ fun logD(message: String, e: java.lang.Exception? = null, location: String? = nu
 @SuppressLint("LogNotTimber")
 fun Any.log(message: String? = "", e: java.lang.Exception? = null) = if (isDebug)
     Log.e(this.javaClass.simpleName, "$message\n${e?.localizedMessage ?: ""}") else null
+
+fun getApplicationPackagedName(): String {
+    return "com.edgetech.bbscout"
+}

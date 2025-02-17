@@ -20,6 +20,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.components.utils.getPreference
+import com.edgetech.bbscout.features.capture_start.CaptureCheckPermission
 import com.edgetech.bbscout.features.dashboard.BBScoutDashboard
 import com.edgetech.bbscout.features.dashboard.HomeDashboard
 import com.edgetech.bbscout.features.onboarding_screen.OnboardingScreen
@@ -78,7 +79,7 @@ fun BBScoutDashboardNavigation(
         composable(
             route = DashboardScreenOption.CAPTURE.name
         ) {
-
+            CaptureCheckPermission(appState)
         }
 
         composable(
