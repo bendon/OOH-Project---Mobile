@@ -1,11 +1,13 @@
 package com.edgetech.bbscout
 
+import android.os.Build
 import com.edgetech.bbscout.screens.MapScreen
 import com.edgetech.bbscout.screens.CaptureScreen
 import com.edgetech.bbscout.screens.HistoryScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
@@ -33,10 +35,11 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.setValue
 import com.diracks.app.app.app_state.rememberBBScoutAppState
-import com.edgetech.bbscout.features.navigation.DirackAppNavigation
-import com.edgetech.bbscout.features.onboarding_screen.OnboardingScreen
+import com.edgetech.bbscout.features.capture.BillboardDetectorScreen
+import com.edgetech.bbscout.features.capture.ui.CaptureBillboardScreen
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -53,7 +56,10 @@ class MainActivity : ComponentActivity() {
 //                activity = this
             )
             BBScoutTheme {
-                DirackAppNavigation(appState = appState)
+                //BillboardDetectorScreen()
+                CaptureBillboardScreen(null)
+                // CameraMLApp()
+                //DirackAppNavigation(appState = appState)
             }
         }
     }
