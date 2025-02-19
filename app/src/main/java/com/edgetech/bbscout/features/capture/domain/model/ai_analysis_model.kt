@@ -4,10 +4,12 @@ import android.graphics.Bitmap
 import com.google.mlkit.vision.objects.DetectedObject
 
 
-data class BillboardData(
+data class BillboardExtractedInfo(
     val fullImage: Bitmap? = null,
     val billboardImage: Bitmap? = null,
     val detectedObjects: DetectedObjectWithLabels? = null,
+    val qrCode: List<String>? = null,
+    val rawText: String? = null,
     val imageLabels: List<ImageLabel>? = null,
     val entityInfos: List<EntityInfo>? = null
 )

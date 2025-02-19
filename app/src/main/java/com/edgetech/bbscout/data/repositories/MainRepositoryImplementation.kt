@@ -12,21 +12,26 @@ class MainRepositoryImplementation @Inject constructor(
     private val bbScoutDao: BBScoutDao
 ) : MainRepository {
     override suspend fun addEntryRecord(entryRecord: EntryRecord): SimpleResource<Long> {
-        try  {
+        try {
             val entryId = bbScoutDao.insertEntityRecord(entryRecord.entryEntity)
             coroutineScope {
                 listOf(launch {
-                    if (entryRecord.location != null){
+                    if (entryRecord.location != null) {
                         bbScoutDao.insertUserLocation(entryRecord.location.copy(entryId = entryId))
                     }
                 }, launch {
-                    if (entryRecord.otherData.isNotEmpty()){
+                    if (entryRecord.otherData.isNotEmpty()) {
                         bbScoutDao.insertOtherData(entryRecord.otherData.map { it.copy(entryId = entryId) })
                     }
-                }).joinAll()
+                },
+                    launch {
+                        if (entryRecord.billboardData != null) {
+                            bbScoutDao.insertBillboardDataEntity(entryRecord.billboardData.copy(entryId = entryId))
+                        }
+                    }).joinAll()
             }
-            return  SimpleResource.Success(entryId)
-        } catch (e: Exception){
+            return SimpleResource.Success(entryId)
+        } catch (e: Exception) {
             return SimpleResource.Error(e.message ?: "Unknown Error")
         }
     }
@@ -35,7 +40,7 @@ class MainRepositoryImplementation @Inject constructor(
         try {
             val entries = bbScoutDao.getAllEntryRecords()
             return SimpleResource.Success(entries)
-        } catch (e: Exception){
+        } catch (e: Exception) {
             return SimpleResource.Error(e.message ?: "Unknown Error")
         }
     }

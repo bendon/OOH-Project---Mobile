@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.edgetech.bbscout.data.data.local.dto.EntryRecord
+import com.edgetech.bbscout.data.data.local.enities.BillboardDataEntity
 import com.edgetech.bbscout.data.data.local.enities.EntryEntity
 import com.edgetech.bbscout.data.data.local.enities.OtherDataEntity
 import com.edgetech.bbscout.data.data.local.enities.UserLocationEntity
@@ -22,10 +23,13 @@ interface BBScoutDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUserLocation(location: UserLocationEntity): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertBillboardDataEntity(billboard: BillboardDataEntity): Long
+
     @Query("SELECT * FROM EntryEntity")
     suspend fun getAllEntryRecords(): List<EntryRecord>
 
-    @Query("SELECT * FROM EntryEntity WHERE id = :entryId")
+    @Query("SELECT * FROM EntryEntity WHERE id = :entryId ORDER BY createdAt DESC")
     suspend fun getEntryRecordsById(entryId: Long): List<EntryRecord>
 
     @Query("DELETE FROM EntryEntity WHERE id = :entryId")
