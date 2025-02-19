@@ -7,7 +7,7 @@ import com.google.mlkit.vision.objects.DetectedObject
 data class BillboardExtractedInfo(
     val fullImage: Bitmap? = null,
     val billboardImage: Bitmap? = null,
-    val detectedObjects: DetectedObjectWithLabels? = null,
+    val detectedObjects: List<DetectedObjectWithLabels>? = null,
     val qrCode: List<String>? = null,
     val rawText: String? = null,
     val imageLabels: List<ImageLabel>? = null,
@@ -43,7 +43,7 @@ data class ObjectLabel(
 
 data class ImageLabel(
     val label: String,
-    val confidence: String
+    val confidence: Float
 )
 
 data class EntityInfo(

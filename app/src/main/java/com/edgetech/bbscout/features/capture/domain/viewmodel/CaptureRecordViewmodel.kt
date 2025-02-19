@@ -69,6 +69,12 @@ class CaptureRecordViewmodel @Inject constructor(
             is CaptureRecordEventSink.GetRecentCaptures -> {
                 getRecentCaptures(eventSink)
             }
+
+            CaptureRecordEventSink.ResetState -> {
+                _captureUiEvent.update {
+                    CaptureRecordUiEvent.Empty
+                }
+            }
         }
     }
 

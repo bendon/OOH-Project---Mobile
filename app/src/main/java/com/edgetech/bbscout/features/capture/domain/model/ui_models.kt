@@ -61,7 +61,7 @@ sealed class CaptureRecordEventSink : AppEventSink {
 
     data object GetRecentCaptures : CaptureRecordEventSink()
 
-
+   data object ResetState : CaptureRecordEventSink()
 }
 
 

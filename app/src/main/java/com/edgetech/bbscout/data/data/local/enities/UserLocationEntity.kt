@@ -7,13 +7,12 @@ import com.google.android.gms.maps.model.LatLng
 
 @Entity
 data class UserLocationEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long,
-    val entryId: Long,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val entryId: Long = 0,
     var locationId: String? = null,
     var latitude: Double? = null,
     var longitude: Double? = null,
     var locationPrecision: Double? = null,
-    var locationLatLng: LatLng? = null,
     var locationName: String? = null,
     var locationCountry: String? = null,
     var locationCity: String? = null,

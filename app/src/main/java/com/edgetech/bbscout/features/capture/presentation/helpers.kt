@@ -1,4 +1,4 @@
-package com.edgetech.bbscout.features.capture.ui
+package com.edgetech.bbscout.features.capture.presentation
 
 import android.annotation.SuppressLint
 import android.content.Context

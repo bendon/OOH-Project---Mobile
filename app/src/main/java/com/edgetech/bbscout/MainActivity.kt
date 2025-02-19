@@ -1,13 +1,11 @@
 package com.edgetech.bbscout
 
-import android.os.Build
 import com.edgetech.bbscout.screens.MapScreen
 import com.edgetech.bbscout.screens.CaptureScreen
 import com.edgetech.bbscout.screens.HistoryScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
@@ -35,16 +33,19 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.setValue
 import com.diracks.app.app.app_state.rememberBBScoutAppState
-import com.edgetech.bbscout.features.capture.BillboardDetectorScreen
-import com.edgetech.bbscout.features.capture.ui.CaptureBillboardScreen
+import com.edgetech.bbscout.features.capture.presentation.camera_capture.CaptureBillboardScreen
+import com.edgetech.bbscout.features.navigation.DirackAppNavigation
+import com.example.core.core.utils.components.LocationAwareActivity
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : LocationAwareActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         setContent {
             val appState = rememberBBScoutAppState(
                // windowSizeClass = calculateWindowSizeClass(this),
@@ -59,9 +60,9 @@ class MainActivity : ComponentActivity() {
             )
             BBScoutTheme {
                 //BillboardDetectorScreen()
-                CaptureBillboardScreen(null)
+               // CaptureBillboardScreen(null)
                 // CameraMLApp()
-                //DirackAppNavigation(appState = appState)
+                DirackAppNavigation(appState = appState)
             }
         }
     }

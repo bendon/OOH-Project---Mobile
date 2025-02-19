@@ -15,11 +15,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.components.utils.getPreference
+import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
+import com.edgetech.bbscout.features.capture.presentation.camera_capture.CaptureBillboardScreen
+import com.edgetech.bbscout.features.capture.presentation.review_data.EditRecordScreen
+import com.edgetech.bbscout.features.capture.presentation.review_data.OnDataAdded
 import com.edgetech.bbscout.features.capture_start.CaptureCheckPermission
 import com.edgetech.bbscout.features.dashboard.BBScoutDashboard
 import com.edgetech.bbscout.features.dashboard.HomeDashboard
@@ -39,6 +45,8 @@ fun DirackAppNavigation(
 
     val hasShownOnboarding = getPreference(context, "ONBOARDING_SHOWN", Boolean::class.java )
 
+    val captureRecordViewmodel = viewModel<CaptureRecordViewmodel>()
+
     NavHost(
         modifier = modifier,
         navController = navController!!,
@@ -50,6 +58,26 @@ fun DirackAppNavigation(
 
         composable<AppDestinations.OnboardingPage>{
             OnboardingScreen(appState = appState)
+        }
+
+        composable<AppDestinations.CameraCapture> {
+            CaptureBillboardScreen(
+                appState,
+                captureRecordViewmodel
+            )
+        }
+
+        composable<AppDestinations.EditCapture> {
+            val args = it.toRoute<AppDestinations.EditCapture>()
+            EditRecordScreen(
+                appState,
+                captureRecordViewmodel,
+                args.id
+            )
+        }
+
+        composable<AppDestinations.BillboardAdded> {
+            OnDataAdded(appState)
         }
 
     }
@@ -113,5 +141,17 @@ sealed interface AppDestinations {
 
     @Serializable
     data object Dashboard : AppDestinations
+
+    @Serializable
+    data object CameraCapture : AppDestinations
+
+    @Serializable
+    data class CaptureDetail(val id: Long?) : AppDestinations
+
+    @Serializable
+    data class EditCapture(val id: Long?) : AppDestinations
+
+    @Serializable
+    data object BillboardAdded :  AppDestinations
 
 }

@@ -1,8 +1,7 @@
-package com.edgetech.bbscout.features.capture.ui
+package com.edgetech.bbscout.features.capture.presentation.camera_capture
 
 import android.graphics.Bitmap
 import android.util.Log
-import android.util.Size
 import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
@@ -42,14 +40,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.components.utils.log
 import com.edgetech.bbscout.features.capture.detectBillboardWithText
+import com.edgetech.bbscout.features.capture.domain.model.BillboardExtractedInfo
+import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
+import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
 import com.edgetech.bbscout.features.capture.domain.model.DetectedObjectWithLabels
 import com.edgetech.bbscout.features.capture.domain.model.EntityInfo
-import com.google.android.gms.tasks.Tasks
+import com.edgetech.bbscout.features.capture.domain.model.ImageLabel
+import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
+import com.edgetech.bbscout.features.capture.presentation.extractEntities
+import com.edgetech.bbscout.features.capture.presentation.setupZoomListener
+import com.edgetech.bbscout.features.navigation.AppDestinations
 import com.google.mlkit.nl.entityextraction.EntityExtraction
 import com.google.mlkit.nl.entityextraction.EntityExtractorOptions
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
@@ -69,11 +72,25 @@ import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
+@Composable
+fun CaptureBillboardScreen(
+    appState: BBScoutAppState?,
+    captureRecordViewmodel: CaptureRecordViewmodel
+){
+    CaptureBillboardMain(
+        appState,
+        captureRecordViewmodel.uiModel
+    )
+}
+
+
 
 @OptIn(ExperimentalGetImage::class)
 @Composable
-fun CaptureBillboardScreen(
-    appState: BBScoutAppState?
+fun CaptureBillboardMain(
+    appState: BBScoutAppState?,
+    captureRecordUiModel: CaptureRecordUiModel
+
 ) {
     val context = LocalContext.current
     val previewView = remember { PreviewView(context) }
@@ -85,7 +102,7 @@ fun CaptureBillboardScreen(
 
     // Analysis results states
     var detectedObjects by remember { mutableStateOf<List<DetectedObjectWithLabels>>(emptyList()) }
-    var imageLabels by remember { mutableStateOf<List<String>>(emptyList()) }
+    var imageLabels by remember { mutableStateOf<List<ImageLabel>>(emptyList()) }
     var barcodes by remember { mutableStateOf<List<String>>(emptyList()) }
     var recognizedText by remember { mutableStateOf("") }
     var entities by remember { mutableStateOf<List<EntityInfo>>(emptyList()) }
@@ -185,7 +202,7 @@ fun CaptureBillboardScreen(
                         .addOnCompleteListener { ob ->
                             imageLabeler.process(inputImage)
                                 .addOnSuccessListener { labels ->
-                                    imageLabels = labels.map { "${it.text} (${it.confidence})" }
+                                    imageLabels =  labels.map { ImageLabel(label = it.text, confidence = it.confidence) }
                                 }
                                 .addOnCompleteListener {
                                     // Process with barcode scanner
@@ -269,7 +286,24 @@ fun CaptureBillboardScreen(
                         .fillMaxWidth()
                 )
                 FloatingActionButton(
-                    onClick = { },
+                    onClick = {
+                        if (croppedBitmap != null) {
+                            captureRecordUiModel.captureEventSink(
+                                CaptureRecordEventSink.OnCaptureEvent(
+                                    BillboardExtractedInfo(
+                                        fullImage = lastCapturedBitmap,
+                                        billboardImage = croppedBitmap,
+                                        detectedObjects = detectedObjects,
+                                        imageLabels = imageLabels,
+                                        qrCode = barcodes,
+                                        rawText = recognizedText,
+                                        entityInfos = entities
+                                    )
+                                )
+                            )
+                            appState?.navController?.navigate(AppDestinations.EditCapture(null))
+                        }
+                    },
                     modifier = Modifier.padding(top = 16.dp)
                 ) {
                     Icon(

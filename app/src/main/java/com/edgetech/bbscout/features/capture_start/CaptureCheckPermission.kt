@@ -251,7 +251,7 @@ fun CaptureCheckPermission(
                             }
 
                             CheckPermissionType.ALL_GRANTED -> {
-
+                                appState?.navController?.navigate(AppDestinations.CameraCapture)
                             }
                         }
                     },

@@ -41,7 +41,7 @@ import com.edgetech.bbscout.screens.ReviewScreen
 @Composable
 fun CaptureScreen() {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     val cameraExecutor = remember { Executors.newSingleThreadExecutor() }
 
     // Camera states
