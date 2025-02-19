@@ -37,9 +37,11 @@ import androidx.compose.runtime.setValue
 import com.diracks.app.app.app_state.rememberBBScoutAppState
 import com.edgetech.bbscout.features.capture.BillboardDetectorScreen
 import com.edgetech.bbscout.features.capture.ui.CaptureBillboardScreen
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @RequiresApi(Build.VERSION_CODES.P)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
