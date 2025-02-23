@@ -11,6 +11,8 @@ import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -22,16 +24,48 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.diracks.app.app.app_state.BBScoutAppState
+import com.edgetech.bbscout.data.data.local.dto.EntryRecord
+import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
+import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
+import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
+import com.edgetech.bbscout.features.capture.presentation.capture_listing.BillboardListingItem
+import com.edgetech.bbscout.features.navigation.AppDestinations
 import com.edgetech.bbscout.features.navigation.DashboardScreenOption
 import com.edgetech.bbscout.ui.theme.BBScoutTheme
 
 
+@Composable
+fun HomeDashboard(
+    appState: BBScoutAppState?,
+    captureRecordViewmodel: CaptureRecordViewmodel = hiltViewModel(),
+){
+    HomeDashboard(
+        appState = appState,
+        captureRecordUiModel = captureRecordViewmodel.uiModel
+    )
+}
+
 
 @Composable
 fun HomeDashboard(
-    appState: BBScoutAppState?
+    appState: BBScoutAppState?,
+    captureRecordUiModel: CaptureRecordUiModel,
 ) {
+
+    val capturesUiState by captureRecordUiModel.captureUiState.collectAsState()
+
+    val recentEntries = capturesUiState.allCaptures.take(5)
+
+    LaunchedEffect(true) {
+        captureRecordUiModel.captureEventSink(
+            CaptureRecordEventSink.OnGetAllCaptures
+        )
+        captureRecordUiModel.captureEventSink(
+            CaptureRecordEventSink.GetRecentCaptures
+        )
+    }
 
         Column(
             modifier = Modifier
@@ -42,15 +76,15 @@ fun HomeDashboard(
 
         ) {
             HeaderSectionI()
-            HeaderSection()
+            HeaderSection(numberOfCaptures = capturesUiState.allCaptures.size)
             Spacer(modifier = Modifier.height(16.dp))
             ChallengeCard()
             Spacer(modifier = Modifier.height(16.dp))
-            QuickActions()
+            QuickActions(appState)
+//            Spacer(modifier = Modifier.height(16.dp))
+//            NearbyBillboards()
             Spacer(modifier = Modifier.height(16.dp))
-            NearbyBillboards()
-            Spacer(modifier = Modifier.height(16.dp))
-            RecentActivity()
+            RecentActivity(recentEntries, appState)
         }
     }
 
@@ -74,14 +108,15 @@ fun HeaderSectionI() {
 
 @Composable
 fun HeaderSection(
-    modifier: Modifier = Modifier.padding(top = 32.dp)
+    modifier: Modifier = Modifier.padding(top = 32.dp),
+    numberOfCaptures: Int,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = "127 Captures", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-        Text(text = "96% Accuracy", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4CAF50))
+        Text(text = "${numberOfCaptures} Captures", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        //Text(text = "96% Accuracy", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4CAF50))
        // Text(text = "Level 12", fontSize = 18.sp, fontWeight = FontWeight.Bold)
     }
 }
@@ -102,15 +137,15 @@ fun ChallengeCard() {
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
-                Text(text = "Map 5 billboards in Downtown area", fontSize = 14.sp)
+                Text(text = "Map your first 5 billboards.", fontSize = 14.sp)
                 Spacer(modifier = Modifier.height(8.dp))
                 //  TextButton(onClick = {}) {
-                Text(
-                    "View Challenge",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.primary
-                )
+//                Text(
+//                    "View Challenge",
+//                    fontSize = 14.sp,
+//                    fontWeight = FontWeight.Medium,
+//                    color = MaterialTheme.colorScheme.primary
+//                )
                 // }
             }
             //Icon(Icons.Outlined.WarningAmber, contentDescription = null)
@@ -119,7 +154,7 @@ fun ChallengeCard() {
 }
 
 @Composable
-fun QuickActions() {
+fun QuickActions(appState: BBScoutAppState?) {
     Column {
         Text(text = "Quick action", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         Row(
@@ -129,7 +164,9 @@ fun QuickActions() {
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Button(
-                onClick = {},
+                onClick = {
+                    appState?.dashboardNavController?.navigate(DashboardScreenOption.CAPTURE.name)
+                },
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.weight(1f)
             ) {
@@ -138,7 +175,9 @@ fun QuickActions() {
                 Text("New Capture")
             }
             OutlinedButton(
-                onClick = {},
+                onClick = {
+                    appState?.dashboardNavController?.navigate(DashboardScreenOption.HISTORY.name)
+                },
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.weight(1f)
             ) {
@@ -193,10 +232,18 @@ fun BillboardItem(name: String, details: String) {
 }
 
 @Composable
-fun RecentActivity() {
+fun RecentActivity(recentCaptures: List<EntryRecord>, appState: BBScoutAppState?) {
     Column {
         Text(text = "Recent Activity", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-        BillboardItem("Capture Verified", "Broadway & 5th • 2h ago")
+        recentCaptures.forEach { item ->
+            BillboardListingItem(
+                item,
+                onTap = {
+                    appState?.navController?.navigate(AppDestinations.CaptureDetail(item.entryEntity.id))
+                }
+            )
+        }
+
     }
 }
 

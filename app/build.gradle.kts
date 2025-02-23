@@ -1,3 +1,5 @@
+import com.android.manifmerger.Actions.load
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -7,6 +9,10 @@ plugins {
     alias(libs.plugins.devtoolsKsp)
     alias(libs.plugins.daggerHilt)
 }
+
+//val localProperties = java.util.Properties().apply {
+//    load(rootProject.file("local.properties").inputStream())
+//}
 
 android {
     namespace = "com.edgetech.bbscout"
@@ -31,6 +37,12 @@ android {
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
+
+        buildFeatures {
+            buildConfig = true
+        }
+
+       // buildConfigField("String", "GEMINI_API_KEY", "${properties.getOrDefault("gemini_api", "")}")
 
     }
 
@@ -99,6 +111,10 @@ dependencies {
     implementation(libs.mlkit.barcode.scanning)
     implementation(libs.google.mlkit.text.recognition)
     implementation(libs.mlkit.entity.extraction)
+
+    //gemini-ai
+    implementation(libs.google.gemini.ai)
+
     implementation("com.google.mlkit:object-detection:17.0.0")
     implementation("com.google.mlkit:text-recognition:16.0.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")

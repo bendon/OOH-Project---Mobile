@@ -1,5 +1,6 @@
 package com.edgetech.bbscout.features.capture.domain.model
 
+import android.graphics.Bitmap
 import com.edgetech.bbscout.components.domain_util.AppBasicUiEvent
 import com.edgetech.bbscout.components.domain_util.AppEventSink
 import com.edgetech.bbscout.data.data.local.dto.EntryRecord
@@ -22,7 +23,10 @@ data class CaptureRecordUiState(
     val isLoading: Boolean = false,
     val allCaptures: List<EntryRecord> = emptyList(),
     val recentCaptures: List<EntryRecord> = emptyList(),
-    val billboardData: BillboardExtractedInfo? = null
+    val billboardData: BillboardExtractedInfo? = null,
+    val selectedRecord: EntryRecord? = null,
+    val selectedRecordMainImage: Bitmap? = null,
+    val selectedRecordBillboardImage: Bitmap? = null,
 )
 
 sealed class CaptureRecordUiEvent {
@@ -61,7 +65,9 @@ sealed class CaptureRecordEventSink : AppEventSink {
 
     data object GetRecentCaptures : CaptureRecordEventSink()
 
-   data object ResetState : CaptureRecordEventSink()
+    data object ResetState : CaptureRecordEventSink()
+
+    data class OnGetCapture(val captureId: Long): CaptureRecordEventSink()
 }
 
 

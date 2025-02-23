@@ -2,14 +2,19 @@ package com.edgetech.bbscout.components.di
 
 import android.app.Application
 import androidx.room.Room
+import com.edgetech.bbscout.components.file_saver.FileSaver
+import com.edgetech.bbscout.components.file_saver.FileSaverImpl
 import com.edgetech.bbscout.data.data.local.BBScoutDao
 import com.edgetech.bbscout.data.data.local.utils.BBScoutDatabase
+import com.edgetech.bbscout.data.data.remote.gen_ai.llm.FulltextAndImageInference
+import com.edgetech.bbscout.data.data.remote.gen_ai.llm.GeminiInference
 import com.edgetech.bbscout.data.repositories.MainRepository
 import com.edgetech.bbscout.data.repositories.MainRepositoryImplementation
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Singleton
 
 @Module
@@ -32,6 +37,16 @@ object AppModule {
     @Singleton
     fun provideMainRepository(bbScoutDao: BBScoutDao): MainRepository =
         MainRepositoryImplementation(bbScoutDao)
+
+    @Provides
+    @Singleton
+    fun provideRemoteInference(): FulltextAndImageInference =
+        GeminiInference()
+
+    @Provides
+    @Singleton
+    fun provideFileSaver(app: Application, @IoDispatcher ioDispatcher: CoroutineDispatcher): FileSaver = FileSaverImpl(app.baseContext, ioDispatcher)
+
 
 
 }

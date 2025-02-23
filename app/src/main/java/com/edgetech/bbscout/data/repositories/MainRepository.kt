@@ -8,4 +8,6 @@ interface MainRepository {
     suspend fun addEntryRecord(entryRecord: EntryRecord): SimpleResource<Long>
 
     suspend fun getAllEntries(): SimpleResource<List<EntryRecord>>
+
+    suspend fun getCaptureRecord(entry: Long): SimpleResource<EntryRecord?>
 }

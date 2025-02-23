@@ -24,6 +24,8 @@ import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.components.utils.getPreference
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
 import com.edgetech.bbscout.features.capture.presentation.camera_capture.CaptureBillboardScreen
+import com.edgetech.bbscout.features.capture.presentation.capture_detail.CaptureDetailScreen
+import com.edgetech.bbscout.features.capture.presentation.capture_listing.CapturesListingScreen
 import com.edgetech.bbscout.features.capture.presentation.review_data.EditRecordScreen
 import com.edgetech.bbscout.features.capture.presentation.review_data.OnDataAdded
 import com.edgetech.bbscout.features.capture_start.CaptureCheckPermission
@@ -76,6 +78,15 @@ fun DirackAppNavigation(
             )
         }
 
+        composable<AppDestinations.CaptureDetail> {
+            val args = it.toRoute<AppDestinations.CaptureDetail>()
+            CaptureDetailScreen(
+                args.id,
+                appState
+            )
+
+        }
+
         composable<AppDestinations.BillboardAdded> {
             OnDataAdded(appState)
         }
@@ -113,7 +124,7 @@ fun BBScoutDashboardNavigation(
         composable(
             route = DashboardScreenOption.HISTORY.name
         ) {
-
+            CapturesListingScreen(appState)
         }
         composable(
             route = DashboardScreenOption.SETTINGS.name
@@ -146,7 +157,7 @@ sealed interface AppDestinations {
     data object CameraCapture : AppDestinations
 
     @Serializable
-    data class CaptureDetail(val id: Long?) : AppDestinations
+    data class CaptureDetail(val id: Long) : AppDestinations
 
     @Serializable
     data class EditCapture(val id: Long?) : AppDestinations

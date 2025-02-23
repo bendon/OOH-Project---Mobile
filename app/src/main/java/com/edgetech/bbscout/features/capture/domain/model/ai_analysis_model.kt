@@ -11,7 +11,11 @@ data class BillboardExtractedInfo(
     val qrCode: List<String>? = null,
     val rawText: String? = null,
     val imageLabels: List<ImageLabel>? = null,
-    val entityInfos: List<EntityInfo>? = null
+    val entityInfos: List<EntityInfo>? = null,
+    val brandName: String? = null,
+    val brandCampaign: String? = null,
+    val brandSlogan: String? = null,
+
 )
 
 

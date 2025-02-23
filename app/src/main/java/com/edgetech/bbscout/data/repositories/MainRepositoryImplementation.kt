@@ -45,5 +45,14 @@ class MainRepositoryImplementation @Inject constructor(
         }
     }
 
+    override suspend fun getCaptureRecord(entry: Long): SimpleResource<EntryRecord?> {
+        try {
+            val entries = bbScoutDao.getEntryRecordsById(entry)
+            return SimpleResource.Success(entries.firstOrNull())
+        } catch (e: Exception) {
+            return SimpleResource.Error(e.message ?: "Unknown Error")
+        }
+    }
+
 
 }

@@ -28,7 +28,7 @@ interface BBScoutDao {
     suspend fun insertBillboardDataEntity(billboard: BillboardDataEntity): Long
 
     @Transaction
-    @Query("SELECT * FROM EntryEntity")
+    @Query("SELECT * FROM EntryEntity ORDER BY createdAt DESC")
     suspend fun getAllEntryRecords(): List<EntryRecord>
 
     @Transaction
