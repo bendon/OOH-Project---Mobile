@@ -6,6 +6,7 @@ import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageCapture
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -28,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +47,7 @@ import com.edgetech.bbscout.components.utils.log
 import com.edgetech.bbscout.features.capture.detectBillboardWithText
 import com.edgetech.bbscout.features.capture.domain.model.BillboardExtractedInfo
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
+import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiEvent
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
 import com.edgetech.bbscout.features.capture.domain.model.DetectedObjectWithLabels
 import com.edgetech.bbscout.features.capture.domain.model.EntityInfo
@@ -52,6 +55,7 @@ import com.edgetech.bbscout.features.capture.domain.model.ImageLabel
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
 import com.edgetech.bbscout.features.capture.presentation.extractEntities
 import com.edgetech.bbscout.features.capture.presentation.setupZoomListener
+import com.edgetech.bbscout.features.capture.presentation.takePhoto
 import com.edgetech.bbscout.features.navigation.AppDestinations
 import com.google.mlkit.nl.entityextraction.EntityExtraction
 import com.google.mlkit.nl.entityextraction.EntityExtractorOptions
@@ -95,7 +99,7 @@ fun CaptureBillboardMain(
 
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     val coroutineScope = rememberCoroutineScope()
-
+    val imageCapture = remember { ImageCapture.Builder().build() }
     val cameraExecutor = remember { Executors.newSingleThreadExecutor() }
 
     // Analysis results states
@@ -108,39 +112,19 @@ fun CaptureBillboardMain(
     var croppedBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
     // Create ML Kit analyzers
-    val objectDetector = remember {
-        val options = ObjectDetectorOptions.Builder()
-            .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
-            .enableMultipleObjects()
-            .enableClassification()
-            .build()
-        ObjectDetection.getClient(options)
+
+
+    val uiEvent by captureRecordUiModel.captureUiEvent.collectAsState()
+
+    if (uiEvent is CaptureRecordUiEvent.CaptureAdded){
+        appState?.navController?.navigate(AppDestinations.ReviewBillboardData)
+        captureRecordUiModel.captureEventSink(
+            CaptureRecordEventSink.ResetState
+        )
     }
 
 
 
-    val barcodeScanner = remember {
-        val options = BarcodeScannerOptions.Builder()
-            .setBarcodeFormats(
-                Barcode.FORMAT_QR_CODE,
-                Barcode.FORMAT_EAN_13,
-                Barcode.FORMAT_EAN_8,
-                Barcode.FORMAT_UPC_A,
-                Barcode.FORMAT_UPC_E
-            )
-            .build()
-        BarcodeScanning.getClient(options)
-    }
-
-    val textRecognizer = remember {
-        TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-    }
-
-    val entityExtractor = remember {
-        val options = EntityExtractorOptions.Builder(EntityExtractorOptions.ENGLISH)
-            .build()
-        EntityExtraction.getClient(options)
-    }
 
 
     // Setup camera
@@ -153,85 +137,9 @@ fun CaptureBillboardMain(
             }
         }
 
-        val preview = Preview.Builder().build().also {
-            it.setSurfaceProvider(previewView.surfaceProvider)
-        }
-        val imageAnalysis = ImageAnalysis.Builder()
-            //.setTargetResolution(Size(640, 480))
-            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-            .build()
-        val frameInterval = 2000L // 5 seconds in milliseconds
-        var lastAnalyzedTimestamp = 0L
-
-        imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
-            val rotationDegrees = imageProxy.imageInfo.rotationDegrees
-            val image = imageProxy.image
-
-            val currentTimestamp = System.currentTimeMillis()
-
-            if (image != null && currentTimestamp - lastAnalyzedTimestamp >= frameInterval) {
-                val inputImage = InputImage.fromMediaImage(image, rotationDegrees)
-
-                try {
-                    objectDetector.process(inputImage)
-                        .addOnSuccessListener { objects ->
-                            Log.d("ObjectDetection", "Objects detected: ${objects.size}")
-                            detectedObjects =
-                                objects.map { DetectedObjectWithLabels.fromDetectedObject(it) }
-                            lastCapturedBitmap = imageProxy.toBitmap()
-                            coroutineScope.launch(Dispatchers.IO) {
-                                val (detectedBitmap, isCleared, message) = detectBillboardWithText(
-                                    objects,
-                                    lastCapturedBitmap!!,
-                                    rotationDegrees,
-                                    textRecognizer
-                                )
-                                withContext(Dispatchers.Main) {
-                                    detectedBitmap?.let {
-                                        croppedBitmap = it
-                                    }
-                                }
-                            }
-                        }.addOnFailureListener {
-                             Log.e("ObjectDetection", "Error detecting objects", it)
-                        }
-                        .addOnCompleteListener { ob ->
-                            barcodeScanner.process(inputImage)
-                                .addOnSuccessListener { codes ->
-                                    barcodes = codes.mapNotNull { it.displayValue }
-                                }
-                                .addOnCompleteListener {
-                                    // Process with text recognizer
-                                    textRecognizer.process(inputImage)
-                                        .addOnSuccessListener { visionText ->
-                                            recognizedText = visionText.text
-
-                                            // Extract entities from recognized text
-                                            coroutineScope.launch {
-                                                extractEntities(
-                                                    entityExtractor,
-                                                    visionText.text
-                                                ) { result ->
-                                                    entities = result
-                                                }
-                                            }
-                                        }
-                                        .addOnCompleteListener {
-                                            imageProxy.close()
-                                        }
-                                }
-                        }
-
-                } catch (e: Exception) {
-                    Log.e("TAG", "Object detection failed", e)
-                    imageProxy.close()
-                } finally {
-                    //imageProxy.close()
-                }
-
-                lastAnalyzedTimestamp = currentTimestamp
-            } else {
-                imageProxy.close()
+        val preview = Preview.Builder().build().also {p ->
+            withContext(Dispatchers.Main) {
+                p.setSurfaceProvider(previewView.surfaceProvider)
             }
         }
 
@@ -243,7 +151,7 @@ fun CaptureBillboardMain(
                 lifecycleOwner,
                 cameraSelector,
                 preview,
-                imageAnalysis
+                imageCapture
             )
             setupZoomListener(context, camera, previewView)
         } catch (exc: Exception) {
@@ -276,22 +184,22 @@ fun CaptureBillboardMain(
                 )
                 FloatingActionButton(
                     onClick = {
-                        if (croppedBitmap != null) {
-                            captureRecordUiModel.captureEventSink(
-                                CaptureRecordEventSink.OnCaptureEvent(
-                                    BillboardExtractedInfo(
-                                        fullImage = lastCapturedBitmap,
-                                        billboardImage = croppedBitmap,
-                                        detectedObjects = detectedObjects,
-                                        imageLabels = imageLabels,
-                                        qrCode = barcodes,
-                                        rawText = recognizedText,
-                                        entityInfos = entities
-                                    )
+                        takePhoto(
+                            context = context,
+                            imageCapture = imageCapture,
+                            executor = cameraExecutor,
+                            onImageCaptured = { uri ->
+                                captureRecordUiModel.captureEventSink(
+                                    CaptureRecordEventSink.OnCaptureEvent(BillboardExtractedInfo(
+                                        fileUri = uri.path
+                                    ))
                                 )
-                            )
-                            appState?.navController?.navigate(AppDestinations.EditCapture(null))
-                        }
+                            },
+                            onError = { error ->
+
+                            }
+                        )
+
                     },
                     modifier = Modifier.padding(top = 16.dp)
                 ) {

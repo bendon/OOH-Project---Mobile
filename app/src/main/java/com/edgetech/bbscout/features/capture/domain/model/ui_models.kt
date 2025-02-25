@@ -7,6 +7,7 @@ import com.edgetech.bbscout.data.data.local.dto.EntryRecord
 import com.edgetech.bbscout.data.data.local.enities.BillboardDataEntity
 import com.edgetech.bbscout.data.data.local.enities.UserLocationEntity
 import com.edgetech.bbscout.data.utils.BBScoutException
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -27,6 +28,7 @@ data class CaptureRecordUiState(
     val selectedRecord: EntryRecord? = null,
     val selectedRecordMainImage: Bitmap? = null,
     val selectedRecordBillboardImage: Bitmap? = null,
+    val selectedLocation: UserLocationEntity? = null,
 )
 
 sealed class CaptureRecordUiEvent {
@@ -35,6 +37,8 @@ sealed class CaptureRecordUiEvent {
     data class Error(val exception: BBScoutException, val eventSink : AppEventSink) : CaptureRecordUiEvent()
 
     object Empty : CaptureRecordUiEvent()
+
+    data object CaptureAdded : CaptureRecordUiEvent()
 
 }
 
@@ -68,6 +72,8 @@ sealed class CaptureRecordEventSink : AppEventSink {
     data object ResetState : CaptureRecordEventSink()
 
     data class OnGetCapture(val captureId: Long): CaptureRecordEventSink()
+
+    data class OnSetLocation(val location: LatLng) : CaptureRecordEventSink()
 }
 
 

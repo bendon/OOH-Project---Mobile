@@ -1,6 +1,7 @@
 package com.edgetech.bbscout.features.capture.domain.model
 
 import android.graphics.Bitmap
+import com.edgetech.bbscout.data.data.local.enities.UserLocationEntity
 import com.google.mlkit.vision.objects.DetectedObject
 
 
@@ -15,6 +16,11 @@ data class BillboardExtractedInfo(
     val brandName: String? = null,
     val brandCampaign: String? = null,
     val brandSlogan: String? = null,
+    val fileUri: String? = null,
+    val billboardType: String? = null,
+    val billboardOwner: String? = null,
+    val billboardWidth: String? = null,
+    val billboardLength: String? = null,
 
 )
 

@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.navOptions
 import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.components.location.GetLocationInfo
+import com.edgetech.bbscout.components.utils.ifEmptySetNull
 import com.edgetech.bbscout.components.utils.logD
 import com.edgetech.bbscout.data.data.local.enities.BillboardDataEntity
 import com.edgetech.bbscout.data.data.local.enities.UserLocationEntity
@@ -80,12 +81,14 @@ import com.google.maps.android.compose.rememberCameraPositionState
 fun EditRecordScreen(
     appState: BBScoutAppState?,
     captureRecordViewmodel: CaptureRecordViewmodel,
-    recordId: Long?
+    recordId: Long?,
+    recordType: RecordType
 ) {
     EditRecordMain(
         appState = appState,
         captureRecordUiModel = captureRecordViewmodel.uiModel,
-        recordId = recordId
+        recordId = recordId,
+        recordType
     )
 }
 
@@ -95,7 +98,8 @@ fun EditRecordScreen(
 fun EditRecordMain(
     appState: BBScoutAppState?,
     captureRecordUiModel: CaptureRecordUiModel,
-    recordId: Long?
+    recordId: Long?,
+    recordType: RecordType
 ) {
 
     val context = LocalActivity.current as LocationAwareActivity
@@ -105,19 +109,7 @@ fun EditRecordMain(
 
     val captureRecordUiEvent by captureRecordUiModel.captureUiEvent.collectAsState()
 
-    var selectedLocation by rememberSaveable {
-        mutableStateOf<LatLng?>(null)
-    }
 
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(selectedLocation ?: LatLng(-0.0236, 37.9062), 5f)
-    }
-
-    var isGettingCurrentLocation by rememberSaveable {
-        mutableStateOf(false)
-    }
-
-    val currentLocation by context.appLocation.observeAsState()
 
     var campaignBrand by rememberSaveable {
         mutableStateOf("")
@@ -145,38 +137,20 @@ fun EditRecordMain(
     }
 
 
-    var locationInfo by remember {
-        mutableStateOf<UserLocationEntity?>(null)
-    }
-
-    if (recordId == null) {
-        //campaignDescription = currentData?.rawText ?: ""
-        campaignBrand = currentData?.brandName ?: ""
-        println("All brand data:  ${currentData?.brandName} ${currentData?.brandCampaign} ${currentData?.brandSlogan} ${currentData?.rawText}")
-        if (currentData?.brandCampaign.isNullOrEmpty() && currentData?.brandSlogan.isNullOrEmpty()) {
-            campaignDescription = currentData?.rawText ?: ""
-        } else {
-            campaignDescription = "${currentData?.brandCampaign} \n${currentData?.brandSlogan}"
+    LaunchedEffect(
+        recordId
+    ) {
+        if (recordId == null) {
+            campaignBrand = currentData?.brandName.ifEmptySetNull() ?: ""
+            campaignDescription = currentData?.brandCampaign.ifEmptySetNull() ?: ""
+            billboardType = currentData?.billboardType.ifEmptySetNull() ?: ""
+            billboardOwner = currentData?.billboardOwner.ifEmptySetNull() ?: ""
+            billboardWidth = currentData?.billboardWidth.ifEmptySetNull() ?: ""
+            billboardLength = currentData?.billboardLength.ifEmptySetNull() ?: ""
         }
     }
 
-    LaunchedEffect(true) {
-        context.getLocation()
-    }
 
-    if (currentLocation != null || isGettingCurrentLocation) {
-        isGettingCurrentLocation = false
-        LaunchedEffect(currentLocation) {
-            selectedLocation = currentLocation?.toLatLng()
-            selectedLocation?.let {
-                cameraPositionState.position = CameraPosition.fromLatLngZoom(it, 15f)
-                GetLocationInfo.getLocationInfo(context, it) { loc ->
-                    locationInfo = loc
-                }
-
-            }
-        }
-    }
 
 
     if (captureRecordUiEvent is CaptureRecordUiEvent.CaptureRecordCreated) {
@@ -223,183 +197,80 @@ fun EditRecordMain(
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
             ) {
-                Text(
-                    text = "Full image",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-                if (currentData?.fullImage != null) {
 
-                    Surface(
-                        shape = MaterialTheme.shapes.small,
-                        modifier = Modifier
-                            .height(200.dp)
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                    ) {
-                        Image(
-                            bitmap = currentData.fullImage.asImageBitmap(),
-                            contentDescription = "Cropped Billboard",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.FillBounds
-                        )
-                    }
-                }
-                Text(
-                    text = "Billboard image",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-                if (currentData?.billboardImage != null) {
-                    Surface(
-                        shape = MaterialTheme.shapes.small,
-                        modifier = Modifier
-                            .height(200.dp)
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                    ) {
-                        Image(
-                            bitmap = currentData?.billboardImage!!.asImageBitmap(),
-                            contentDescription = "Cropped Billboard",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.FillBounds
-                        )
-                    }
-                }
+                if (recordType == RecordType.CAMPAIGN) {
 
-
-                Text(
-                    text = "Campaign information",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .fillMaxWidth(),
-                    value = campaignBrand,
-                    onValueChange = { campaignBrand = it },
-                    label = { Text("Campaign brand") }
-                )
-
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .fillMaxWidth(),
-                    value = campaignDescription,
-                    onValueChange = { campaignDescription = it },
-                    label = { Text("Campaign description") })
-
-                Text(
-                    text = "Billboard information",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .fillMaxWidth(),
-                    value = billboardType,
-                    onValueChange = { billboardType = it },
-                    label = { Text("Billboard type") })
-
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .fillMaxWidth(),
-                    value = billboardOwner,
-                    onValueChange = { billboardOwner = it },
-                    label = { Text("Billboard owner") })
-
-                Row(
-                    modifier = Modifier.padding(vertical = 8.dp)
-                ) {
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 2.dp),
-                        value = billboardWidth,
-                        onValueChange = { billboardWidth = it },
-                        label = { Text("Width (m)") })
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(start = 2.dp),
-                        value = billboardLength,
-                        onValueChange = { billboardLength = it },
-                        label = { Text("Height (m)") })
-                }
-
-                //check qr code
-
-                if (!currentData?.qrCode.isNullOrEmpty()) {
                     Text(
-                        text = "QR code",
+                        text = "Campaign information",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(top = 16.dp)
                     )
-                    currentData?.qrCode?.forEach {
-                        Text(text = it, modifier = Modifier.padding(vertical = 6.dp))
-                    }
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .fillMaxWidth(),
+                        value = campaignBrand,
+                        onValueChange = { campaignBrand = it },
+                        label = { Text("Campaign brand") }
+                    )
+
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .fillMaxWidth(),
+                        value = campaignDescription,
+                        onValueChange = { campaignDescription = it },
+                        label = { Text("Campaign description") })
                 }
+                if (recordType == RecordType.BILLBOARD_INFO) {
+                    Text(
+                        text = "Billboard information",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .fillMaxWidth(),
+                        value = billboardType,
+                        onValueChange = { billboardType = it },
+                        label = { Text("Billboard type") })
 
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .fillMaxWidth(),
+                        value = billboardOwner,
+                        onValueChange = { billboardOwner = it },
+                        label = { Text("Billboard owner") })
 
-                //check other info
-                if (!currentData?.entityInfos.isNullOrEmpty()) {
-                    Text(text = "Other information", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                    currentData?.entityInfos?.forEach {
-                        Text(
-                            text = "${it.type}: ${it.text}",
-                            modifier = Modifier.padding(vertical = 6.dp)
-                        )
-                    }
-                }
-
-                Text(
-                    text = "Billboard location",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-
-                Surface(
-                    shape = MaterialTheme.shapes.small,
-                    color = MaterialTheme.colorScheme.surface,
-                    border = BorderStroke(width = 1.dp, color = Color.LightGray),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .padding(vertical = 8.dp)
-                ) {
-                    GoogleMap(
-                        modifier = Modifier.fillMaxSize(),
-                        cameraPositionState = cameraPositionState
+                    Row(
+                        modifier = Modifier.padding(vertical = 8.dp)
                     ) {
-                        if (selectedLocation != null) {
-                            Marker(
-                                state = MarkerState(position = selectedLocation!!),
-                                title = "Your location",
-                                snippet = "Location"
-                            )
-                        }
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 2.dp),
+                            value = billboardWidth,
+                            onValueChange = { billboardWidth = it },
+                            label = { Text("Width (m)") })
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(start = 2.dp),
+                            value = billboardLength,
+                            onValueChange = { billboardLength = it },
+                            label = { Text("Height (m)") })
                     }
                 }
-                Text(
-                    locationInfo?.locationCity ?: "",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
+                //check qr c
 
-                Text(
-                    locationInfo?.subAdminArea ?: locationInfo?.mainAdminArea ?: "",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
+
+
+
+
             }
             Row(
                 modifier = Modifier
@@ -407,33 +278,37 @@ fun EditRecordMain(
                     .padding(top = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                OutlinedButton(
-                    onClick = {
-                        appState?.navController?.navigateUp()
-                    },
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Retake photo")
-                }
+//                OutlinedButton(
+//                    onClick = {
+//                        appState?.navController?.navigateUp()
+//                    },
+//                    shape = RoundedCornerShape(10.dp),
+//                    modifier = Modifier.weight(1f)
+//                ) {
+//                    Text("Retake photo")
+//                }
                 Button(
                     onClick = {
                         captureRecordUiModel.captureEventSink(
-                            CaptureRecordEventSink.OnSaveCapture(
-                                billboardData = BillboardDataEntity(
-                                    type = billboardType,
-                                    owner = billboardOwner,
-                                    width = billboardWidth.toDoubleOrNull() ?: 0.0,
-                                    height = billboardLength.toDoubleOrNull() ?: 0.0,
-                                ),
-                                location = locationInfo,
-                                brandName = campaignBrand,
-                                campaignDescription = campaignDescription,
-                                qrCode = currentData?.qrCode ?: emptyList(),
-                                entityInfos = currentData?.entityInfos ?: emptyList(),
-
+                            CaptureRecordEventSink.OnCaptureEvent(
+                                billboardData = currentData?.copy(
+                                    brandName = campaignBrand.ifEmptySetNull() ?: currentData.brandName,
+                                    brandCampaign = campaignDescription.ifEmptySetNull() ?: currentData.brandCampaign,
+                                    billboardType = billboardType.ifEmptySetNull() ?: currentData.billboardType,
+                                    billboardOwner = billboardOwner.ifEmptySetNull() ?: currentData.billboardOwner,
+                                    billboardWidth = billboardWidth.ifEmptySetNull() ?: currentData.billboardWidth,
+                                    billboardLength = billboardLength.ifEmptySetNull() ?: currentData.billboardLength
+                                ) ?: BillboardExtractedInfo(
+                                    brandName = campaignBrand.ifEmptySetNull() ?: currentData?.brandName,
+                                    brandCampaign = campaignDescription.ifEmptySetNull() ?: currentData?.brandCampaign,
+                                    billboardType = billboardType.ifEmptySetNull() ?: currentData?.billboardType,
+                                    billboardOwner = billboardOwner.ifEmptySetNull() ?: currentData?.billboardOwner,
+                                    billboardWidth = billboardWidth.ifEmptySetNull() ?: currentData?.billboardWidth,
+                                    billboardLength = billboardLength.ifEmptySetNull() ?: currentData?.billboardLength
                                 )
+                            )
                         )
+                        appState?.navController?.navigateUp()
                     },
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.weight(1f)

@@ -28,6 +28,8 @@ import com.edgetech.bbscout.features.capture.presentation.capture_detail.Capture
 import com.edgetech.bbscout.features.capture.presentation.capture_listing.CapturesListingScreen
 import com.edgetech.bbscout.features.capture.presentation.review_data.EditRecordScreen
 import com.edgetech.bbscout.features.capture.presentation.review_data.OnDataAdded
+import com.edgetech.bbscout.features.capture.presentation.review_data.RecordType
+import com.edgetech.bbscout.features.capture.presentation.review_data.ReviewRecordScreen
 import com.edgetech.bbscout.features.capture_start.CaptureCheckPermission
 import com.edgetech.bbscout.features.dashboard.BBScoutDashboard
 import com.edgetech.bbscout.features.dashboard.HomeDashboard
@@ -76,7 +78,8 @@ fun DirackAppNavigation(
             EditRecordScreen(
                 appState,
                 captureRecordViewmodel,
-                args.id
+                args.id,
+                args.recordType
             )
         }
 
@@ -91,6 +94,10 @@ fun DirackAppNavigation(
 
         composable<AppDestinations.BillboardAdded> {
             OnDataAdded(appState)
+        }
+
+        composable<AppDestinations.ReviewBillboardData> {
+            ReviewRecordScreen(appState, captureRecordViewmodel, null)
         }
 
     }
@@ -163,7 +170,10 @@ sealed interface AppDestinations {
     data class CaptureDetail(val id: Long) : AppDestinations
 
     @Serializable
-    data class EditCapture(val id: Long?) : AppDestinations
+    data class EditCapture(val id: Long?, val recordType: RecordType) : AppDestinations
+
+    @Serializable
+    data object ReviewBillboardData : AppDestinations
 
     @Serializable
     data object BillboardAdded :  AppDestinations

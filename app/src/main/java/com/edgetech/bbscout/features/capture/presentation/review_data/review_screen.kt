@@ -311,7 +311,7 @@ fun ReviewRecordMain(
                                 modifier = Modifier.padding(end = 16.dp)
                             )
                             Text(
-                                text = currentData?.billboardHeight.ifEmptySetNull() ?: "N/A",
+                                text = currentData?.billboardLength.ifEmptySetNull() ?: "N/A",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )

@@ -7,8 +7,14 @@ import android.graphics.Matrix
 import android.util.Log
 import android.view.ScaleGestureDetector
 import androidx.camera.core.Camera
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
 import androidx.camera.view.PreviewView
+import com.edgetech.bbscout.components.utils.toLong
 import com.edgetech.bbscout.features.capture.BillboardDetectionResult
+import com.edgetech.bbscout.features.capture.detectBillboardWithText
+import com.edgetech.bbscout.features.capture.domain.model.DetectedObjectWithLabels
 import com.edgetech.bbscout.features.capture.domain.model.EntityInfo
 import com.google.android.gms.tasks.Tasks
 import com.google.mlkit.common.model.DownloadConditions
@@ -20,7 +26,11 @@ import com.google.mlkit.nl.entityextraction.MoneyEntity
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.objects.DetectedObject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.time.LocalDateTime
+import java.util.concurrent.Executor
 import kotlin.math.max
 import kotlin.math.min
 
@@ -221,3 +231,122 @@ fun setupZoomListener(context: Context, camera: Camera, previewView: PreviewView
         return@setOnTouchListener true
     }
 }
+
+fun takePhoto(
+    context: Context,
+    imageCapture: ImageCapture,
+    executor: Executor,
+    onImageCaptured: (android.net.Uri) -> Unit,
+    onError: (ImageCaptureException) -> Unit
+) {
+    // Create timestamped output file
+
+
+    // Create output options
+    val outputOptions = ImageCapture.OutputFileOptions
+        .Builder(
+            File.createTempFile(
+                "JPEG_${LocalDateTime.now().toLong()}_", /* prefix */
+                ".jpg", /* suffix */
+                context.filesDir /* directory */
+            )
+        )
+        .build()
+
+    // Take the picture
+    imageCapture.takePicture(
+        outputOptions,
+        executor,
+        object : ImageCapture.OnImageSavedCallback {
+            override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                output.savedUri?.let { uri ->
+                    onImageCaptured(uri)
+                }
+            }
+
+            override fun onError(exception: ImageCaptureException) {
+                onError(exception)
+            }
+        }
+    )
+}
+
+
+//val imageAnalysis = ImageAnalysis.Builder()
+//    //.setTargetResolution(Size(640, 480))
+//    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+//    .build()
+//val frameInterval = 2000L // 5 seconds in milliseconds
+//var lastAnalyzedTimestamp = 0L
+//
+//imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
+//    val rotationDegrees = imageProxy.imageInfo.rotationDegrees
+//    val image = imageProxy.image
+//
+//    val currentTimestamp = System.currentTimeMillis()
+//
+//    if (image != null && currentTimestamp - lastAnalyzedTimestamp >= frameInterval) {
+//        val inputImage = InputImage.fromMediaImage(image, rotationDegrees)
+//
+//        try {
+//            objectDetector.process(inputImage)
+//                .addOnSuccessListener { objects ->
+//                    Log.d("ObjectDetection", "Objects detected: ${objects.size}")
+//                    detectedObjects =
+//                        objects.map { DetectedObjectWithLabels.fromDetectedObject(it) }
+//                    lastCapturedBitmap = imageProxy.toBitmap()
+//                    coroutineScope.launch(Dispatchers.IO) {
+//                        val (detectedBitmap, isCleared, message) = detectBillboardWithText(
+//                            objects,
+//                            lastCapturedBitmap!!,
+//                            rotationDegrees,
+//                            textRecognizer
+//                        )
+//                        withContext(Dispatchers.Main) {
+//                            detectedBitmap?.let {
+//                                croppedBitmap = it
+//                            }
+//                        }
+//                    }
+//                }.addOnFailureListener {
+//                    Log.e("ObjectDetection", "Error detecting objects", it)
+//                }
+//                .addOnCompleteListener { ob ->
+//                    barcodeScanner.process(inputImage)
+//                        .addOnSuccessListener { codes ->
+//                            barcodes = codes.mapNotNull { it.displayValue }
+//                        }
+//                        .addOnCompleteListener {
+//                            // Process with text recognizer
+//                            textRecognizer.process(inputImage)
+//                                .addOnSuccessListener { visionText ->
+//                                    recognizedText = visionText.text
+//
+//                                    // Extract entities from recognized text
+//                                    coroutineScope.launch {
+//                                        extractEntities(
+//                                            entityExtractor,
+//                                            visionText.text
+//                                        ) { result ->
+//                                            entities = result
+//                                        }
+//                                    }
+//                                }
+//                                .addOnCompleteListener {
+//                                    imageProxy.close()
+//                                }
+//                        }
+//                }
+//
+//        } catch (e: Exception) {
+//            Log.e("TAG", "Object detection failed", e)
+//            imageProxy.close()
+//        } finally {
+//            //imageProxy.close()
+//        }
+//
+//        lastAnalyzedTimestamp = currentTimestamp
+//    } else {
+//        imageProxy.close()
+//    }
+//}

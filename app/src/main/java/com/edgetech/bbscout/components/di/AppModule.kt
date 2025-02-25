@@ -4,6 +4,8 @@ import android.app.Application
 import androidx.room.Room
 import com.edgetech.bbscout.components.file_saver.FileSaver
 import com.edgetech.bbscout.components.file_saver.FileSaverImpl
+import com.edgetech.bbscout.components.location.GetLocationInfo
+import com.edgetech.bbscout.components.location.GetLocationInfoImplementation
 import com.edgetech.bbscout.data.data.local.BBScoutDao
 import com.edgetech.bbscout.data.data.local.utils.BBScoutDatabase
 import com.edgetech.bbscout.data.data.remote.gen_ai.llm.FulltextAndImageInference
@@ -47,6 +49,9 @@ object AppModule {
     @Singleton
     fun provideFileSaver(app: Application, @IoDispatcher ioDispatcher: CoroutineDispatcher): FileSaver = FileSaverImpl(app.baseContext, ioDispatcher)
 
+    @Provides
+    @Singleton
+    fun provideGetLocationInfo(app: Application): GetLocationInfo = GetLocationInfoImplementation(app.baseContext)
 
 
 }

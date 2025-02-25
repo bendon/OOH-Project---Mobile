@@ -6,6 +6,7 @@ import com.edgetech.bbscout.components.di.DefaultDispatcher
 import com.edgetech.bbscout.components.di.IoDispatcher
 import com.edgetech.bbscout.components.di.MainDispatcher
 import com.edgetech.bbscout.components.file_saver.FileSaver
+import com.edgetech.bbscout.components.location.GetLocationInfo
 import com.edgetech.bbscout.components.utils.toLong
 import com.edgetech.bbscout.data.data.local.dto.EntryRecord
 import com.edgetech.bbscout.data.data.local.enities.BillboardDataEntity
@@ -38,6 +39,7 @@ class CaptureRecordViewmodel @Inject constructor(
     private val repository: MainRepository,
     private val llmInference: FulltextAndImageInference,
     private val fileSaver: FileSaver,
+    private val locationInfo: GetLocationInfo,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher
 ) : ViewModel() {
@@ -47,7 +49,7 @@ class CaptureRecordViewmodel @Inject constructor(
     )
     private val _captureUiEvent = MutableStateFlow<CaptureRecordUiEvent>(CaptureRecordUiEvent.Empty)
 
-   // private var _billboardData: BillboardExtractedInfo? = null
+    // private var _billboardData: BillboardExtractedInfo? = null
 
 
     val uiModel = CaptureRecordUiModel(
@@ -86,14 +88,24 @@ class CaptureRecordViewmodel @Inject constructor(
             is CaptureRecordEventSink.OnGetCapture -> {
                 getCapture(eventSink)
             }
+
+            is CaptureRecordEventSink.OnSetLocation -> {
+                locationInfo.getLocationInfo(eventSink.location) { loc ->
+                    _captureUiState.update {
+                        it.copy(
+                            selectedLocation = loc
+                        )
+                    }
+                }
+            }
         }
     }
 
     private fun getCapture(eventSink: CaptureRecordEventSink.OnGetCapture) {
-        viewModelScope.launch(ioDispatcher){
+        viewModelScope.launch(ioDispatcher) {
             var mainFilePath: String? = null
             var billboardFilePath: String? = null
-            repository.getCaptureRecord(eventSink.captureId).onSuccess {  data ->
+            repository.getCaptureRecord(eventSink.captureId).onSuccess { data ->
                 mainFilePath = data?.entryEntity?.mainFileUri
                 billboardFilePath = data?.entryEntity?.billboardFileUri
                 _captureUiState.update {
@@ -108,27 +120,27 @@ class CaptureRecordViewmodel @Inject constructor(
             }
             listOf(
                 launch {
-                if (!mainFilePath.isNullOrEmpty()){
-                    fileSaver.getBitmapFromPath(mainFilePath!!).onSuccess { bit ->
-                        _captureUiState.update {
-                            it.copy(
-                                selectedRecordMainImage = bit
-                            )
+                    if (!mainFilePath.isNullOrEmpty()) {
+                        fileSaver.getBitmapFromPath(mainFilePath!!).onSuccess { bit ->
+                            _captureUiState.update {
+                                it.copy(
+                                    selectedRecordMainImage = bit
+                                )
+                            }
                         }
                     }
-                }
-            }, launch {
-                if (!billboardFilePath.isNullOrEmpty()){
-                    fileSaver.getBitmapFromPath(billboardFilePath!!).onSuccess { bit ->
-                        _captureUiState.update {
-                            it.copy(
-                                selectedRecordBillboardImage = bit
-                            )
+                }, launch {
+                    if (!billboardFilePath.isNullOrEmpty()) {
+                        fileSaver.getBitmapFromPath(billboardFilePath!!).onSuccess { bit ->
+                            _captureUiState.update {
+                                it.copy(
+                                    selectedRecordBillboardImage = bit
+                                )
+                            }
                         }
                     }
-                }
 
-            }).joinAll()
+                }).joinAll()
         }
     }
 
@@ -156,14 +168,18 @@ class CaptureRecordViewmodel @Inject constructor(
             var mainFile: File? = null
             var billboardFile: File? = null
 
-            if (_captureUiState.value.billboardData?.fullImage != null){
-                fileSaver.saveFile(_captureUiState.value.billboardData?.fullImage!!, "full").onSuccess {
-                    mainFile = it
-                }
+            if (_captureUiState.value.billboardData?.fullImage != null) {
+                fileSaver.saveFile(_captureUiState.value.billboardData?.fullImage!!, "full")
+                    .onSuccess {
+                        mainFile = it
+                    }
             }
 
-            if (_captureUiState.value.billboardData?.billboardImage != null){
-                fileSaver.saveFile(_captureUiState.value.billboardData?.billboardImage!!, "billboard").onSuccess {
+            if (_captureUiState.value.billboardData?.billboardImage != null) {
+                fileSaver.saveFile(
+                    _captureUiState.value.billboardData?.billboardImage!!,
+                    "billboard"
+                ).onSuccess {
                     billboardFile = it
                 }.onError { ex ->
 
@@ -173,7 +189,8 @@ class CaptureRecordViewmodel @Inject constructor(
             val newEntry = EntryRecord(
                 entryEntity = EntryEntity(
                     brand = eventSink.brandName,
-                    rawText = _captureUiState.value.billboardData?.brandCampaign ?: _captureUiState.value.billboardData?.rawText,
+                    rawText = _captureUiState.value.billboardData?.brandCampaign
+                        ?: _captureUiState.value.billboardData?.rawText,
                     mainFileUri = mainFile?.path,
                     billboardFileUri = billboardFile?.path,
                     augmentedText = eventSink.advertDescription,
@@ -182,12 +199,17 @@ class CaptureRecordViewmodel @Inject constructor(
                 ),
                 otherData = (eventSink.qrCode?.map { OtherDataEntity(type = "QrCode", value = it) }
                     ?: emptyList()) +
-                        (eventSink.entityInfos?.map { OtherDataEntity(type = it.type, value = it.text) }
+                        (eventSink.entityInfos?.map {
+                            OtherDataEntity(
+                                type = it.type,
+                                value = it.text
+                            )
+                        }
                             ?: emptyList()),
                 location = eventSink.location,
                 billboardData = eventSink.billboardData
             )
-            repository.addEntryRecord(newEntry).onSuccess {result ->
+            repository.addEntryRecord(newEntry).onSuccess { result ->
                 _captureUiEvent.update {
                     CaptureRecordUiEvent.CaptureRecordCreated(result ?: 0)
                 }
@@ -217,17 +239,33 @@ class CaptureRecordViewmodel @Inject constructor(
 
     private fun onCapture(eventSink: CaptureRecordEventSink.OnCaptureEvent) {
         viewModelScope.launch(ioDispatcher) {
-           llmInference.getCampaignInfo(eventSink.billboardData.fullImage, "").onSuccess { campaign ->
 
-               _captureUiState.update {
-                   it.copy(
-                       billboardData =  it.billboardData?.copy(
-                           brandName = campaign?.brand,
-                           brandSlogan = campaign?.slogan,
-                           brandCampaign = campaign?.campaignTheme
-                       )
-                   )
-               }
+            val fileBitMap = fileSaver.getBitmapFromPath(eventSink.billboardData.fileUri!!)
+
+            if (fileBitMap.data != null) {
+                _captureUiState.update {
+                    it.copy(
+                        billboardData = eventSink.billboardData.copy(
+                            fullImage = fileBitMap.data
+                        )
+                    )
+                }
+                _captureUiEvent.update {
+                    CaptureRecordUiEvent.CaptureAdded
+                }
+                llmInference.getCampaignInfo(eventSink.billboardData.fullImage, "")
+                    .onSuccess { campaign ->
+
+                        _captureUiState.update {
+                            it.copy(
+                                billboardData = it.billboardData?.copy(
+                                    brandName = campaign?.brand,
+                                    brandSlogan = campaign?.slogan,
+                                    brandCampaign = campaign?.campaignTheme
+                                )
+                            )
+                        }
+                    }
             }
 
         }
