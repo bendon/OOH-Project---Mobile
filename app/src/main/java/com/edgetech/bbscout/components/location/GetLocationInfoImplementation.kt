@@ -1,0 +1,83 @@
+package com.edgetech.bbscout.components.location
+
+import android.content.Context
+import android.location.Geocoder
+import android.os.Build
+import com.edgetech.bbscout.data.data.local.enities.UserLocationEntity
+import com.google.android.gms.maps.model.LatLng
+import java.util.Locale
+import javax.inject.Inject
+
+/**
+ * Warning: Do not pass this to the viewmodel as
+ * it hold a reference to the application context
+ *
+ */
+class GetLocationInfoImplementation @Inject constructor(
+    private val context: Context
+) : GetLocationInfo {
+
+    override fun getLocationInfo(latLng: LatLng, onResult: (UserLocationEntity) -> Unit) {
+        val location = UserLocationEntity(latitude = latLng.latitude, longitude = latLng.longitude)
+        onResult(location)
+        try{
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Geocoder(context, Locale.getDefault()).getFromLocation(
+                    latLng.latitude,
+                    latLng.longitude,
+                    4
+                ) { address ->
+                    location.latitude = latLng.latitude
+                    location.longitude = latLng.longitude
+                    location.locationName =
+                        address.get(0)?.featureName ?: address.get(0)?.getAddressLine(0)
+                    location.locationCity = address.get(0)?.locality
+                    location.locationCountry = address.get(0)?.countryName
+                    location.mainAdminArea = address.get(0)?.adminArea
+                    location.subAdminArea = address.get(0)?.subAdminArea
+                    location.building = address.get(0)?.premises
+                    onResult(location)
+
+                }
+            } else {
+
+
+                /**
+                 * The following us crashing on certain phones with low internet connection
+                 *
+                 */
+
+                try {
+
+
+                    val address = Geocoder(context, Locale.getDefault()).getFromLocation(
+                        latLng.latitude,
+                        latLng.longitude,
+                        4
+                    )
+                    location.latitude = latLng.latitude
+                    location.longitude = latLng.longitude
+                    location.locationName =
+                        address?.get(0)?.featureName ?: address?.get(0)?.getAddressLine(0)
+                    location.locationCity = address?.get(0)?.locality
+                    location.locationCountry = address?.get(0)?.countryName
+                    location.mainAdminArea = address?.get(0)?.adminArea
+                    location.subAdminArea = address?.get(0)?.subAdminArea
+                    location.building = address?.get(0)?.premises
+                    onResult(location)
+
+                }catch (_: Exception){
+
+                }
+
+
+            }
+        } catch (_: Exception){
+
+        }
+    }
+
+
+
+
+}
