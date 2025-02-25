@@ -66,7 +66,7 @@ fun BillboardListingItem(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "${item.location?.locationName ?: item.location?.subAdminArea ?: ""} ${item.location?.mainAdminArea ?: item.location?.locationCity ?: ""}",
+                    text = "${item.location?.locationName ?: item.location?.subAdminArea ?: ""} • ${item.location?.mainAdminArea ?: item.location?.locationCity ?: ""}",
                     fontSize = 14.sp,
                     color = Color.Gray
                 )

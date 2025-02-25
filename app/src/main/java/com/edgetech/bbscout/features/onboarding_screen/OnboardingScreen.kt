@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -19,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.R
+import com.edgetech.bbscout.components.utils.setPreference
 import com.edgetech.bbscout.features.dashboard.BBScoutDashboard
 import com.edgetech.bbscout.features.navigation.AppDestinations
 import com.edgetech.bbscout.ui.theme.mainBlue
@@ -28,6 +30,9 @@ import kotlinx.coroutines.launch
 fun OnboardingScreen(
     appState: BBScoutAppState?
 ) {
+
+    val context = LocalContext.current
+
     val pages = listOf(
         OnboardingPage(
             title = "Welcome to Billboard Hunter",
@@ -47,6 +52,12 @@ fun OnboardingScreen(
     )
 
     val pagerState = rememberPagerState(pageCount = { pages.size })
+
+    LaunchedEffect(pagerState.currentPage) {
+        if (pagerState.currentPage == pages.size - 1){
+            setPreference(context, "ONBOARDING_SHOWN", true)
+        }
+    }
 
     Column(
         modifier = Modifier

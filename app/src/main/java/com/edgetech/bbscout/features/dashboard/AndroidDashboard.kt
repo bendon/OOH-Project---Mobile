@@ -40,10 +40,12 @@ import com.edgetech.bbscout.ui.theme.BBScoutTheme
 fun HomeDashboard(
     appState: BBScoutAppState?,
     captureRecordViewmodel: CaptureRecordViewmodel = hiltViewModel(),
+    onPageTap: (DashboardScreenOption) -> Unit = {},
 ){
     HomeDashboard(
         appState = appState,
-        captureRecordUiModel = captureRecordViewmodel.uiModel
+        captureRecordUiModel = captureRecordViewmodel.uiModel,
+        onPageTap = onPageTap
     )
 }
 
@@ -52,6 +54,7 @@ fun HomeDashboard(
 fun HomeDashboard(
     appState: BBScoutAppState?,
     captureRecordUiModel: CaptureRecordUiModel,
+    onPageTap: (DashboardScreenOption) -> Unit = {},
 ) {
 
     val capturesUiState by captureRecordUiModel.captureUiState.collectAsState()
@@ -69,7 +72,6 @@ fun HomeDashboard(
 
         Column(
             modifier = Modifier
-
                 .fillMaxSize()
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
@@ -80,7 +82,7 @@ fun HomeDashboard(
             Spacer(modifier = Modifier.height(16.dp))
             ChallengeCard()
             Spacer(modifier = Modifier.height(16.dp))
-            QuickActions(appState)
+            QuickActions(appState, onPageTap = onPageTap)
 //            Spacer(modifier = Modifier.height(16.dp))
 //            NearbyBillboards()
             Spacer(modifier = Modifier.height(16.dp))
@@ -154,7 +156,7 @@ fun ChallengeCard() {
 }
 
 @Composable
-fun QuickActions(appState: BBScoutAppState?) {
+fun QuickActions(appState: BBScoutAppState?,onPageTap: (DashboardScreenOption) -> Unit = {},) {
     Column {
         Text(text = "Quick action", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         Row(
@@ -165,7 +167,7 @@ fun QuickActions(appState: BBScoutAppState?) {
         ) {
             Button(
                 onClick = {
-                    appState?.dashboardNavController?.navigate(DashboardScreenOption.CAPTURE.name)
+                    onPageTap(DashboardScreenOption.CAPTURE)
                 },
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.weight(1f)
@@ -176,7 +178,7 @@ fun QuickActions(appState: BBScoutAppState?) {
             }
             OutlinedButton(
                 onClick = {
-                    appState?.dashboardNavController?.navigate(DashboardScreenOption.HISTORY.name)
+                    onPageTap(DashboardScreenOption.HISTORY)
                 },
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.weight(1f)

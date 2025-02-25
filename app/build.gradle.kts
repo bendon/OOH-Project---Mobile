@@ -107,7 +107,7 @@ dependencies {
 
     // ML Kit and Location Services
     implementation(libs.google.mlkit.`object`.detection)
-    implementation(libs.mlkit.image.labeling)
+   // implementation(libs.mlkit.image.labeling)
     implementation(libs.mlkit.barcode.scanning)
     implementation(libs.google.mlkit.text.recognition)
     implementation(libs.mlkit.entity.extraction)
@@ -115,8 +115,8 @@ dependencies {
     //gemini-ai
     implementation(libs.google.gemini.ai)
 
-    implementation("com.google.mlkit:object-detection:17.0.0")
-    implementation("com.google.mlkit:text-recognition:16.0.0")
+    //implementation("com.google.mlkit:object-detection:17.0.0")
+    //implementation("com.google.mlkit:text-recognition:16.0.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")
 
     //For the History DataStore

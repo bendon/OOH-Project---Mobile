@@ -69,7 +69,11 @@ fun BBScoutDashboard(
     ) {
         BBScoutDashboardNavigation(
             appState = appState,
-            modifier = Modifier.padding(it)
+            modifier = Modifier.padding(it),
+            onPageTap = { screen ->
+                selectedPage = screen
+                appState?.dashboardNavController?.navigate(screen.name)
+            }
         )
     }
 

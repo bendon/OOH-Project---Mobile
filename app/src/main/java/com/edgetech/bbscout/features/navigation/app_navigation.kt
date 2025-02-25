@@ -49,6 +49,8 @@ fun DirackAppNavigation(
 
     val captureRecordViewmodel = viewModel<CaptureRecordViewmodel>()
 
+
+
     NavHost(
         modifier = modifier,
         navController = navController!!,
@@ -98,7 +100,8 @@ fun DirackAppNavigation(
 @Composable
 fun BBScoutDashboardNavigation(
     appState: BBScoutAppState?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onPageTap: (DashboardScreenOption) -> Unit = {},
 ){
 
     appState?.dashboardNavController = rememberNavController()
@@ -112,7 +115,7 @@ fun BBScoutDashboardNavigation(
         composable(
             route = DashboardScreenOption.HOME.name
         ) {
-            HomeDashboard(appState)
+            HomeDashboard(appState, onPageTap = onPageTap)
         }
 
         composable(

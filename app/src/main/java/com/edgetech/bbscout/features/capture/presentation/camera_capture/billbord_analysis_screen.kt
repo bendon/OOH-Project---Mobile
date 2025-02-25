@@ -59,8 +59,6 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.label.ImageLabeling
-import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.google.mlkit.vision.text.TextRecognition
@@ -119,9 +117,7 @@ fun CaptureBillboardMain(
         ObjectDetection.getClient(options)
     }
 
-    val imageLabeler = remember {
-        ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
-    }
+
 
     val barcodeScanner = remember {
         val options = BarcodeScannerOptions.Builder()
@@ -200,35 +196,28 @@ fun CaptureBillboardMain(
                              Log.e("ObjectDetection", "Error detecting objects", it)
                         }
                         .addOnCompleteListener { ob ->
-                            imageLabeler.process(inputImage)
-                                .addOnSuccessListener { labels ->
-                                    imageLabels =  labels.map { ImageLabel(label = it.text, confidence = it.confidence) }
+                            barcodeScanner.process(inputImage)
+                                .addOnSuccessListener { codes ->
+                                    barcodes = codes.mapNotNull { it.displayValue }
                                 }
                                 .addOnCompleteListener {
-                                    // Process with barcode scanner
-                                    barcodeScanner.process(inputImage)
-                                        .addOnSuccessListener { codes ->
-                                            barcodes = codes.mapNotNull { it.displayValue }
+                                    // Process with text recognizer
+                                    textRecognizer.process(inputImage)
+                                        .addOnSuccessListener { visionText ->
+                                            recognizedText = visionText.text
+
+                                            // Extract entities from recognized text
+                                            coroutineScope.launch {
+                                                extractEntities(
+                                                    entityExtractor,
+                                                    visionText.text
+                                                ) { result ->
+                                                    entities = result
+                                                }
+                                            }
                                         }
                                         .addOnCompleteListener {
-                                            // Process with text recognizer
-                                            textRecognizer.process(inputImage)
-                                                .addOnSuccessListener { visionText ->
-                                                    recognizedText = visionText.text
-
-                                                    // Extract entities from recognized text
-                                                    coroutineScope.launch {
-                                                        extractEntities(
-                                                            entityExtractor,
-                                                            visionText.text
-                                                        ) { result ->
-                                                            entities = result
-                                                        }
-                                                    }
-                                                }
-                                                .addOnCompleteListener {
-                                                    imageProxy.close()
-                                                }
+                                            imageProxy.close()
                                         }
                                 }
                         }
