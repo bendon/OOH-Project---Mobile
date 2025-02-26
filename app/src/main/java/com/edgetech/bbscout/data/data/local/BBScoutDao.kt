@@ -6,10 +6,12 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.edgetech.bbscout.data.data.local.dto.EntryRecord
+import com.edgetech.bbscout.data.data.local.enities.AuthEntity
 import com.edgetech.bbscout.data.data.local.enities.BillboardDataEntity
 import com.edgetech.bbscout.data.data.local.enities.EntryEntity
 import com.edgetech.bbscout.data.data.local.enities.OtherDataEntity
 import com.edgetech.bbscout.data.data.local.enities.UserLocationEntity
+import kotlinx.coroutines.flow.Flow
 
 
 @Dao
@@ -44,4 +46,12 @@ interface BBScoutDao {
     @Query("DELETE FROM UserLocationEntity WHERE entryId = :entryId")
     suspend fun deleteUserLocationById(entryId: Long)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAuthResponse(authEntity: AuthEntity)
+
+    @Query("SELECT * FROM AuthEntity WHERE authId LIKE 1 LIMIT 1")
+    suspend fun getAuth(): AuthEntity
+
+    @Query("DELETE FROM AuthEntity WHERE authId = 1")
+    fun deleteAuthObject()
 }

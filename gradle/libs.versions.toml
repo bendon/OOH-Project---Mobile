@@ -26,6 +26,7 @@ roomVersion = "2.6.1"
 hiltNavigation = "1.2.0"
 material = "1.12.0"
 gemini-ai = "0.9.0"
+retrofit = "2.11.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -67,8 +68,9 @@ dagger-hilt-compile = { group = "com.google.dagger", name = "hilt-android-compil
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomVersion" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomVersion" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomVersion" }
-
 google-gemini-ai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "gemini-ai" }
+square-retrofit = {group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit"}
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
