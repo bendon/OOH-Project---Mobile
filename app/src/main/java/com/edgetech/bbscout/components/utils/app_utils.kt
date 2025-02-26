@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.util.Log
-import com.google.android.datatransport.BuildConfig
+import com.edgetech.bbscout.BuildConfig
 
 
 val isDebug: Boolean get() = BuildConfig.DEBUG

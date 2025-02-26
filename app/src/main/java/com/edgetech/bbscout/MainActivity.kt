@@ -1,7 +1,6 @@
 package com.edgetech.bbscout
 
 import com.edgetech.bbscout.screens.MapScreen
-import com.edgetech.bbscout.screens.CaptureScreen
 import com.edgetech.bbscout.screens.HistoryScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -113,7 +112,7 @@ private fun AppContent() {
             modifier = Modifier.padding(paddingValues)
         ) {
             composable(Screen.Map.route) { MapScreen() }
-            composable(Screen.Capture.route) { CaptureScreen() }
+           // composable(Screen.Capture.route) { CaptureScreen() }
             composable(Screen.History.route) {
                 val repository = remember { BillboardRepository(context = context) }
                 val scope = rememberCoroutineScope()

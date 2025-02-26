@@ -70,6 +70,7 @@ androidx-room-compiler = { group = "androidx.room", name = "room-compiler", vers
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomVersion" }
 google-gemini-ai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "gemini-ai" }
 square-retrofit = {group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit"}
+square-retrofit-converter-gson = {group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit"}
 
 
 [plugins]

@@ -54,7 +54,7 @@ fun CapturesListingMain(
                 BillboardListingItem(
                     item,
                     onTap = {
-                        appState?.navController?.navigate(AppDestinations.CaptureDetail(item.entryEntity.id))
+                        appState?.navController?.navigate(AppDestinations.CaptureDetail(item.entryEntity.remoteId ?: ""))
                     }
                 )
             }

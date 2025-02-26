@@ -63,7 +63,7 @@ class MainRepositoryImplementation @Inject constructor(
                 bbScoutApi.createBillboard(newBillboard)
             }
             if (billBoardResponse.data != null){
-                val newCampaign = campaign.copy(billboard = null, billboardId = billBoardResponse.data!!.billboardId)
+                val newCampaign = campaign.copy(billboard = null, billboardId = billBoardResponse.data!!.id)
                 val campaignResponse = repoHelper.apiDbRequestOrFail {
                     bbScoutApi.createCampaign(newCampaign)
                 }

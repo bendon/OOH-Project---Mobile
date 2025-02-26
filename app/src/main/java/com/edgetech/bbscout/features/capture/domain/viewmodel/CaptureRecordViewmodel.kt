@@ -198,7 +198,7 @@ class CaptureRecordViewmodel @Inject constructor(
             val captureFile = _captureUiState.value.billboardData?.fileUri
             if (!captureFile.isNullOrEmpty()) {
                 uploadImage(File(captureFile)).onSuccess {
-                    fullImageId = it?.fileUrl
+                    fullImageId = it?.id
                 }.onError {ex ->
                     _captureUiEvent.update {
                         CaptureRecordUiEvent.Error(ex ?: BBScoutException(), eventSink)

@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.components.ui.StatusDialog
 import com.edgetech.bbscout.components.ui.WarningIcon
 import com.edgetech.bbscout.features.auth.domain.model.AuthEventSink
@@ -40,18 +41,18 @@ import com.edgetech.bbscout.features.navigation.AppDestinations
 @Composable
 fun SettingsScreen(
     authViewModel: AuthViewmodel,
-    navController: NavController
+    appState: BBScoutAppState?,
 ){
     SettingsMain(
         authUiModel = authViewModel.uiModel,
-        navController = navController
+        appState = appState
     )
 }
 
 @Composable
 fun SettingsMain(
     authUiModel: AuthUiModel,
-    navController: NavController
+    appState: BBScoutAppState?
 ){
 
     val authUiState by authUiModel.authUiState.collectAsState()
@@ -89,14 +90,16 @@ fun SettingsMain(
     }
 
     if (authUiEvent is AuthUiEvent.LogoutSuccessful){
-        navController.navigate(AppDestinations.Login)
+        showLogOutWarning = false
+        appState?.navController?.navigate(AppDestinations.Login)
+        authEventSink(AuthEventSink.ResetState)
     } else if (authUiEvent is AuthUiEvent.Error){
-
+        authEventSink(AuthEventSink.ResetState)
     }
 
     Scaffold {
         Column(
-            modifier = Modifier.padding(it),
+            modifier = Modifier.padding(it).padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 

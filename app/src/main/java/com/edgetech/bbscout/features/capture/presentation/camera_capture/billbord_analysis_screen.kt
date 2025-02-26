@@ -44,7 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.components.utils.log
-import com.edgetech.bbscout.features.capture.detectBillboardWithText
+
 import com.edgetech.bbscout.features.capture.domain.model.BillboardExtractedInfo
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiEvent
@@ -53,7 +53,6 @@ import com.edgetech.bbscout.features.capture.domain.model.DetectedObjectWithLabe
 import com.edgetech.bbscout.features.capture.domain.model.EntityInfo
 import com.edgetech.bbscout.features.capture.domain.model.ImageLabel
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
-import com.edgetech.bbscout.features.capture.presentation.extractEntities
 import com.edgetech.bbscout.features.capture.presentation.setupZoomListener
 import com.edgetech.bbscout.features.capture.presentation.takePhoto
 import com.edgetech.bbscout.features.navigation.AppDestinations

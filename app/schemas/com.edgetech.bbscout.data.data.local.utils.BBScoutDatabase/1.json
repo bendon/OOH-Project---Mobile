@@ -2,17 +2,23 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "01cf78edf49799f2b963808a4d407fd6",
+    "identityHash": "8b2a00a2b467d90ad66d8124bdfdfcc0",
     "entities": [
       {
         "tableName": "EntryEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userId` TEXT, `brand` TEXT, `mainFileUri` TEXT, `billboardFileUri` TEXT, `rawText` TEXT, `augmentedText` TEXT, `advertDescription` TEXT, `createdAt` INTEGER, `updatedAt` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `remoteId` TEXT, `userId` TEXT, `brand` TEXT, `mainFileUri` TEXT, `billboardFileUri` TEXT, `remoteFileId` TEXT, `remoteFileUrl` TEXT, `rawText` TEXT, `augmentedText` TEXT, `advertDescription` TEXT, `createdAt` INTEGER, `updatedAt` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "remoteId",
+            "columnName": "remoteId",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "userId",
@@ -35,6 +41,18 @@
           {
             "fieldPath": "billboardFileUri",
             "columnName": "billboardFileUri",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "remoteFileId",
+            "columnName": "remoteFileId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "remoteFileUrl",
+            "columnName": "remoteFileUrl",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -75,7 +93,17 @@
             "id"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_EntryEntity_remoteId",
+            "unique": true,
+            "columnNames": [
+              "remoteId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_EntryEntity_remoteId` ON `${TABLE_NAME}` (`remoteId`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
@@ -310,7 +338,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '01cf78edf49799f2b963808a4d407fd6')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8b2a00a2b467d90ad66d8124bdfdfcc0')"
     ]
   }
 }

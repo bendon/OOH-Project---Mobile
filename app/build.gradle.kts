@@ -8,7 +8,7 @@ plugins {
     id("kotlin-parcelize")
     alias(libs.plugins.devtoolsKsp)
     alias(libs.plugins.daggerHilt)
-    id("com.google.gms.google-services")
+   // id("com.google.gms.google-services")
 }
 
 //val localProperties = java.util.Properties().apply {
@@ -114,7 +114,11 @@ dependencies {
    // implementation(libs.mlkit.barcode.scanning)
    // implementation(libs.google.mlkit.text.recognition)
    // implementation(libs.mlkit.entity.extraction)
+
     implementation(libs.square.retrofit)
+    implementation(libs.square.retrofit.converter.gson)
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+    implementation("com.squareup.okhttp3:okhttp:4.9.0")
 
     //gemini-ai
     implementation(libs.google.gemini.ai)

@@ -34,18 +34,23 @@ data class EntryRecord(
     companion object {
 
         fun toCampaignResponse(entryRecord: EntryRecord) = CampaignResponse(
-            billboard = BillboardResponse(
-                height = entryRecord.billboardData?.height,
-                width = entryRecord.billboardData?.width,
-                type = entryRecord.billboardData?.type,
-                image_id = entryRecord.entryEntity.remoteFileId,
-                location = entryRecord.location?.locationName,
-                latitude = entryRecord.location?.latitude,
-                longitude = entryRecord.location?.longitude
-            ),
+                billboard = BillboardResponse(
+                    height = entryRecord.billboardData?.height ?: 0.0,
+                    width = entryRecord.billboardData?.width ?: 0.0,
+                    type = entryRecord.billboardData?.type ?: "traditional",
+                    unit = "centimeters",
+                    price = 0.0,
+                    imageId = entryRecord.entryEntity.remoteFileId,
+                    location = entryRecord.location?.locationName,
+                    latitude = entryRecord.location?.latitude,
+                    longitude = entryRecord.location?.longitude,
+                    description = "",
+                    accuracy = 1.0
+
+                ),
             imageId = entryRecord.entryEntity.remoteFileId,
             location = entryRecord.location?.locationName,
-            campaignDescription = entryRecord.entryEntity.augmentedText,
+            campaignDescription = entryRecord.entryEntity.augmentedText ?: "a billboard",
             clientFirstName = entryRecord.entryEntity.brand,
         )
 

@@ -51,9 +51,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.diracks.app.app.app_state.BBScoutAppState
+import com.edgetech.bbscout.components.ui.ErrorShowDialog
+import com.edgetech.bbscout.components.ui.MainLoadingButton
 import com.edgetech.bbscout.components.utils.ifEmptySetNull
 import com.edgetech.bbscout.data.data.local.enities.UserLocationEntity
+import com.edgetech.bbscout.data.data.remote.bbscout_api.model.api_exception.UnAuthenticatedException
+import com.edgetech.bbscout.features.auth.domain.model.AuthEventSink
+import com.edgetech.bbscout.features.auth.domain.model.AuthUiEvent
+import com.edgetech.bbscout.features.auth.domain.model.EmptyCredentialsException
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
+import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiEvent
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
 import com.edgetech.bbscout.features.navigation.AppDestinations
@@ -91,6 +98,8 @@ fun ReviewRecordMain(
     val captureRecordUiState by captureRecordUiModel.captureUiState.collectAsState()
     val currentData = captureRecordUiState.billboardData
 
+    val currentBillBoadUiEvent by captureRecordUiModel.captureUiEvent.collectAsState()
+
     var selectedLocation by rememberSaveable {
         mutableStateOf<LatLng?>(null)
     }
@@ -123,6 +132,44 @@ fun ReviewRecordMain(
                 )
             }
         }
+    }
+
+    if (currentBillBoadUiEvent is CaptureRecordUiEvent.CaptureRecordCreated){
+        LaunchedEffect(true) {
+            appState?.navController?.popBackStack(AppDestinations.Dashboard, false)
+        }
+        captureRecordUiModel.captureEventSink(
+            CaptureRecordEventSink.ResetState
+        )
+
+    } else if(currentBillBoadUiEvent is CaptureRecordUiEvent.Error){
+        val request = (currentBillBoadUiEvent as CaptureRecordUiEvent.Error)
+        ErrorShowDialog(
+            showErrorMessage = true,
+            customError = mapOf(
+
+            ),
+            error = request.exception,
+            event = request.eventSink,
+            onDismiss = {
+                captureRecordUiModel.captureEventSink(
+                    CaptureRecordEventSink.ResetState
+                )
+            },
+            onPositive = { eventSink, ex ->
+                captureRecordUiModel.captureEventSink(
+                    CaptureRecordEventSink.ResetState
+                )
+//                if (ex !is EmptyCredentialsException && eventSink != null){
+//                    authUiModel.authEventSink(eventSink as AuthEventSink)
+//                } else {
+//                    authUiModel.authEventSink(
+//                        AuthEventSink.ResetState
+//                    )
+//                }
+            }
+
+        )
     }
 
     Scaffold(
@@ -460,13 +507,14 @@ fun ReviewRecordMain(
                 ) {
                     Text("Retake photo")
                 }
-                Button(
-                    onClick = {
-
+                MainLoadingButton(
+                    onTap = {
+                        captureRecordUiModel.captureEventSink(
+                            CaptureRecordEventSink.OnSaveCapture()
+                        )
                     },
-                    shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.weight(1f),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                   pIsLoading = captureRecordUiState.isLoading
                 ) {
                     Icon(Icons.Default.CheckCircleOutline, contentDescription = "Capture")
                     Spacer(modifier = Modifier.width(8.dp))

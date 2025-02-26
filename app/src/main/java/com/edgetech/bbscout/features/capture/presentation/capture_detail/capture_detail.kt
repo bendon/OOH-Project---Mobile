@@ -58,7 +58,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun CaptureDetailScreen(
-    captureId: Long,
+    captureId: String,
     appState: BBScoutAppState?,
     captureRecordViewmodel: CaptureRecordViewmodel = hiltViewModel()
 ) {
@@ -72,7 +72,7 @@ fun CaptureDetailScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CaptureDetailMain(
-    captureId: Long,
+    captureId: String,
     appState: BBScoutAppState?,
     captureRecordUiModel: CaptureRecordUiModel
 ) {
@@ -80,7 +80,7 @@ fun CaptureDetailMain(
     val captureUiState by captureRecordUiModel.captureUiState.collectAsState()
 
     var selectedCapture: EntryRecord? = null
-    if (captureUiState.selectedRecord?.entryEntity?.id == captureId) {
+    if (captureUiState.selectedRecord?.entryEntity?.remoteId == captureId) {
         selectedCapture = captureUiState.selectedRecord
     }
 
@@ -386,5 +386,5 @@ fun CaptureDetailMain(
 @Preview
 @Composable
 fun CaptureDetailMainPreview() {
-    CaptureDetailMain(0, null, CaptureRecordUiModel())
+    CaptureDetailMain("", null, CaptureRecordUiModel())
 }

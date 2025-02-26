@@ -54,8 +54,10 @@ fun LoadingScreenMain(
 
     if (uiEvent is AuthUiEvent.LoginSuccessful){
         navController.navigate(AppDestinations.Dashboard)
+        authUiModel.authEventSink(AuthEventSink.ResetState)
     } else if (uiEvent is AuthUiEvent.Error){
         navController.navigate(AppDestinations.Login)
+        authUiModel.authEventSink(AuthEventSink.ResetState)
     }
 
     Scaffold {
@@ -66,7 +68,7 @@ fun LoadingScreenMain(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .padding(vertical = 32.dp)
+                    .padding(vertical = 32.dp, horizontal = 24.dp)
             )
         }
     }

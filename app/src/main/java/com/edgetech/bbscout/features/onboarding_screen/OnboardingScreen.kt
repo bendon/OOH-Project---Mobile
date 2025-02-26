@@ -118,7 +118,7 @@ fun OnboardingScreen(
                         }
 
                     } else {
-                        appState?.navController?.navigate(AppDestinations.Dashboard)
+                        appState?.navController?.navigate(AppDestinations.Login)
                     }
                 },
                 modifier = Modifier.padding(16.dp),

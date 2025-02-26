@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -61,7 +62,7 @@ fun DirackAppNavigation(
     NavHost(
         modifier = modifier,
         navController = navController!!,
-        startDestination = if (hasShownOnboarding == true) AppDestinations.Dashboard else AppDestinations.OnboardingPage
+        startDestination = if (hasShownOnboarding == true) AppDestinations.Loading else AppDestinations.OnboardingPage
     ){
         composable<AppDestinations.Dashboard>{
             BBScoutDashboard(appState = appState)
@@ -126,7 +127,7 @@ fun BBScoutDashboardNavigation(
 
     appState?.dashboardNavController = rememberNavController()
     val navController = appState?.dashboardNavController
-
+    val authViewModel = hiltViewModel<AuthViewmodel>()
     NavHost(
         modifier = modifier,
         navController = navController!!,
@@ -152,7 +153,7 @@ fun BBScoutDashboardNavigation(
         composable(
             route = DashboardScreenOption.SETTINGS.name
         ) {
-            SettingsScreen(authViewModel = viewModel<AuthViewmodel>(), navController)
+            SettingsScreen(authViewModel = authViewModel, appState)
         }
 
     }
@@ -180,7 +181,7 @@ sealed interface AppDestinations {
     data object CameraCapture : AppDestinations
 
     @Serializable
-    data class CaptureDetail(val id: Long) : AppDestinations
+    data class CaptureDetail(val id: String) : AppDestinations
 
     @Serializable
     data class EditCapture(val id: Long?, val recordType: RecordType) : AppDestinations

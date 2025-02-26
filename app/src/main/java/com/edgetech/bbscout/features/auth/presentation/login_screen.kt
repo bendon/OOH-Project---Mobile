@@ -8,10 +8,12 @@ import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -33,11 +35,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.edgetech.bbscout.R
 import com.edgetech.bbscout.components.ui.ButtonContent
 import com.edgetech.bbscout.components.ui.ErrorShowDialog
 import com.edgetech.bbscout.components.ui.MainLoadingButton
@@ -145,11 +149,19 @@ fun LoginScreenMain(
 
     Scaffold {
         Column(
-            modifier = Modifier.padding(it),
+            modifier = Modifier.padding(it).padding(horizontal = 16.dp).imePadding(),
         ) {
-            Text(text = "Welcome to BBScout!", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(vertical = 16.dp))
-            Spacer(modifier = Modifier.weight(1f))
-            Text(text = "Login", style = MaterialTheme.typography.headlineMedium,)
+
+            Image(
+                painter = painterResource(R.drawable.bbscout),
+                null,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(vertical = 32.dp, horizontal = 24.dp)
+            )
+            Text(text = "Welcome to BBScout!", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(vertical = 16.dp))
+            Text(text = "Login", style = MaterialTheme.typography.headlineLarge,)
             OutlinedTextField(
                 value = credentialAddress,
                 keyboardOptions =  KeyboardOptions(
@@ -211,7 +223,7 @@ fun LoginScreenMain(
                 )
             }
 
-            Text("Or", modifier = Modifier.align(Alignment.CenterHorizontally).padding(vertical = 24.dp))
+            Text("Or", modifier = Modifier.align(Alignment.CenterHorizontally).padding(vertical = 16.dp))
             NonLoadingSecButton (
                 modifier = Modifier
                     .fillMaxWidth()
@@ -226,7 +238,7 @@ fun LoginScreenMain(
             ) {
                 ButtonContent(
                     "Login with Google",
-                    Color.White,
+                    MaterialTheme.colorScheme.primary,
                 )
             }
         }

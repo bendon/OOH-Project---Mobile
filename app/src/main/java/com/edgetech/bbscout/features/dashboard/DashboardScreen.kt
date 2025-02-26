@@ -1,5 +1,7 @@
 package com.edgetech.bbscout.features.dashboard
 
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,6 +43,11 @@ import com.edgetech.bbscout.ui.theme.BBScoutTheme
 fun BBScoutDashboard(
     appState: BBScoutAppState?
 ){
+
+    val activity = LocalActivity.current
+    BackHandler {
+        activity?.finish()
+    }
 
     var selectedPage by rememberSaveable {
         mutableStateOf<DashboardScreenOption>(DashboardScreenOption.HOME)
