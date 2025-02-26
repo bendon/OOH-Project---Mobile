@@ -34,8 +34,8 @@ interface BBScoutDao {
     suspend fun getAllEntryRecords(): List<EntryRecord>
 
     @Transaction
-    @Query("SELECT * FROM EntryEntity WHERE id = :entryId ORDER BY createdAt DESC")
-    suspend fun getEntryRecordsById(entryId: Long): List<EntryRecord>
+    @Query("SELECT * FROM EntryEntity WHERE remoteId = :entryId ORDER BY createdAt DESC")
+    suspend fun getEntryRecordsById(entryId: String): List<EntryRecord>
 
     @Query("DELETE FROM EntryEntity WHERE id = :entryId")
     suspend fun deleteEntryRecordById(entryId: Long)

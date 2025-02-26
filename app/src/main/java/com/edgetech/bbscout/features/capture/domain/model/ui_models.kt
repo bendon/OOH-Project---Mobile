@@ -32,7 +32,7 @@ data class CaptureRecordUiState(
 )
 
 sealed class CaptureRecordUiEvent {
-    data class CaptureRecordCreated(val entryId: Long) : CaptureRecordUiEvent()
+    data class CaptureRecordCreated(val entry: EntryRecord?) : CaptureRecordUiEvent()
 
     data class Error(val exception: BBScoutException, val eventSink : AppEventSink) : CaptureRecordUiEvent()
 
@@ -71,7 +71,7 @@ sealed class CaptureRecordEventSink : AppEventSink {
 
     data object ResetState : CaptureRecordEventSink()
 
-    data class OnGetCapture(val captureId: Long): CaptureRecordEventSink()
+    data class OnGetCapture(val captureId: String): CaptureRecordEventSink()
 
     data class OnSetLocation(val location: LatLng) : CaptureRecordEventSink()
 }

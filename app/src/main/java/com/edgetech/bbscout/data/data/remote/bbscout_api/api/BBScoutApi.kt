@@ -1,6 +1,7 @@
 package com.edgetech.bbscout.data.data.remote.bbscout_api.api
 
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.AccountResponse
+import com.edgetech.bbscout.data.data.remote.bbscout_api.model.AccountResponseList
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.ApiResponsePage
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.AuthResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.BillboardResponse
@@ -31,7 +32,7 @@ interface BBScoutApi {
     suspend fun getProfile(): Response<UserResponse>
 
     @GET("/en/accounts")
-    suspend fun getAccounts(): Response<List<AccountResponse>>
+    suspend fun getAccounts(): Response<AccountResponseList>
 
     @POST("/en/sl/change/password")
     suspend fun changePassword(@Body request: ChangePasswordRequest): Response<AuthResponse>
@@ -43,7 +44,7 @@ interface BBScoutApi {
     suspend fun getBillboard(@Path("id") id: String): Response<BillboardResponse>
 
     @POST("/en/sl/billboard/campaign")
-    suspend fun createCampaign(@Body request: CampaignResponse): Response<BillboardResponse>
+    suspend fun createCampaign(@Body request: CampaignResponse): Response<CampaignResponse>
 
     @POST("/en/sl/billboard")
     suspend fun createBillboard(@Body request: BillboardResponse): Response<BillboardResponse>

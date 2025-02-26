@@ -1,5 +1,6 @@
 package com.edgetech.bbscout.features.capture.domain.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.edgetech.bbscout.components.di.DefaultDispatcher
@@ -12,9 +13,11 @@ import com.edgetech.bbscout.data.data.local.dto.EntryRecord
 import com.edgetech.bbscout.data.data.local.enities.BillboardDataEntity
 import com.edgetech.bbscout.data.data.local.enities.EntryEntity
 import com.edgetech.bbscout.data.data.local.enities.OtherDataEntity
+import com.edgetech.bbscout.data.data.remote.bbscout_api.model.FileResponse
 import com.edgetech.bbscout.data.data.remote.gen_ai.llm.FulltextAndImageInference
 import com.edgetech.bbscout.data.repositories.MainRepository
 import com.edgetech.bbscout.data.utils.BBScoutException
+import com.edgetech.bbscout.data.utils.SimpleResource
 import com.edgetech.bbscout.data.utils.onError
 import com.edgetech.bbscout.data.utils.onSuccess
 import com.edgetech.bbscout.features.capture.domain.model.BillboardExtractedInfo
@@ -29,6 +32,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.time.LocalDate
 import javax.inject.Inject
@@ -165,35 +170,51 @@ class CaptureRecordViewmodel @Inject constructor(
 
         viewModelScope.launch(ioDispatcher) {
 
-            var mainFile: File? = null
-            var billboardFile: File? = null
+//            var mainFile: File? = null
+//            var billboardFile: File? = null
+//
+//            if (_captureUiState.value.billboardData?.fullImage != null) {
+//                fileSaver.saveFile(_captureUiState.value.billboardData?.fullImage!!, "full")
+//                    .onSuccess {
+//                        mainFile = it
+//                    }
+//            }
+//
+//            if (_captureUiState.value.billboardData?.billboardImage != null) {
+//                fileSaver.saveFile(
+//                    _captureUiState.value.billboardData?.billboardImage!!,
+//                    "billboard"
+//                ).onSuccess {
+//                    billboardFile = it
+//                }.onError { ex ->
+//
+//                }
+//            }
 
-            if (_captureUiState.value.billboardData?.fullImage != null) {
-                fileSaver.saveFile(_captureUiState.value.billboardData?.fullImage!!, "full")
-                    .onSuccess {
-                        mainFile = it
+
+            var fullImageId: String? = null
+            val captureFile = _captureUiState.value.billboardData?.fileUri
+            if (!captureFile.isNullOrEmpty()) {
+                uploadImage(File(captureFile)).onSuccess {
+                    fullImageId = it?.fileUrl
+                }.onError {ex ->
+                    _captureUiEvent.update {
+                        CaptureRecordUiEvent.Error(ex ?: BBScoutException(), eventSink)
                     }
-            }
-
-            if (_captureUiState.value.billboardData?.billboardImage != null) {
-                fileSaver.saveFile(
-                    _captureUiState.value.billboardData?.billboardImage!!,
-                    "billboard"
-                ).onSuccess {
-                    billboardFile = it
-                }.onError { ex ->
-
+                    return@launch
                 }
             }
 
+
             val newEntry = EntryRecord(
                 entryEntity = EntryEntity(
-                    brand = eventSink.brandName,
+                    brand = _captureUiState.value.billboardData?.brandName,
                     rawText = _captureUiState.value.billboardData?.brandCampaign
                         ?: _captureUiState.value.billboardData?.rawText,
-                    mainFileUri = mainFile?.path,
-                    billboardFileUri = billboardFile?.path,
-                    augmentedText = eventSink.advertDescription,
+                    //mainFileUri = mainFile?.path,
+                    //billboardFileUri = billboardFile?.path,
+                    remoteFileId = fullImageId,
+                    augmentedText = _captureUiState.value.billboardData?.brandCampaign,
                     createdAt = LocalDate.now().toLong(),
                     updatedAt = LocalDate.now().toLong(),
                 ),
@@ -206,12 +227,23 @@ class CaptureRecordViewmodel @Inject constructor(
                             )
                         }
                             ?: emptyList()),
-                location = eventSink.location,
-                billboardData = eventSink.billboardData
+                location = _captureUiState.value.selectedLocation,
+                billboardData = BillboardDataEntity(
+                    height = _captureUiState.value.billboardData?.billboardLength?.toDoubleOrNull(),
+                    width = _captureUiState.value.billboardData?.billboardWidth?.toDoubleOrNull(),
+                    type = _captureUiState.value.billboardData?.billboardType,
+                    owner = _captureUiState.value.billboardData?.billboardOwner
+                )
             )
             repository.addEntryRecord(newEntry).onSuccess { result ->
                 _captureUiEvent.update {
-                    CaptureRecordUiEvent.CaptureRecordCreated(result ?: 0)
+                    CaptureRecordUiEvent.CaptureRecordCreated(result)
+                }
+                _captureUiState.update {
+                    it.copy(
+                        selectedLocation = null,
+                        billboardData = null
+                    )
                 }
             }.onError { ex ->
                 _captureUiEvent.update {
@@ -219,6 +251,14 @@ class CaptureRecordViewmodel @Inject constructor(
                 }
             }
         }
+    }
+
+    private suspend fun uploadImage(file: File): SimpleResource<FileResponse>{
+        val multipartBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart("file", "file", file.asRequestBody())
+            .build()
+        return repository.uploadFile(multipartBody)
     }
 
     private fun onGetAllCaptures(eventSink: CaptureRecordEventSink.OnGetAllCaptures) {

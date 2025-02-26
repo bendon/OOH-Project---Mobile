@@ -10,3 +10,5 @@ data class AccountResponse(
     val userId: String? = null,
     val accountId : String? = null
 ) : ApiResponse
+
+class AccountResponseList: ArrayList<AccountResponse>(), ApiResponse

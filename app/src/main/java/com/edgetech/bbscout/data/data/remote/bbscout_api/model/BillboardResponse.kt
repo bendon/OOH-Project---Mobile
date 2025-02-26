@@ -14,6 +14,7 @@ data class BillboardResponse(
     val latitude: Double? = null,
     val location: String? = null,
     val longitude: Double? = null,
+    val campaign: CampaignResponse? = null,
     val organizationId: String? = null,
     val price: Double? = null,
     val staff: UserResponse? = null,
