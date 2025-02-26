@@ -1,8 +1,6 @@
 package com.edgetech.bbscout.features.capture.domain.model
 
 import android.graphics.Bitmap
-import com.edgetech.bbscout.data.data.local.enities.UserLocationEntity
-import com.google.mlkit.vision.objects.DetectedObject
 
 
 data class BillboardExtractedInfo(
@@ -31,17 +29,17 @@ data class DetectedObjectWithLabels(
     val labels: List<ObjectLabel>
 ){
     companion object {
-        fun fromDetectedObject(data: DetectedObject): DetectedObjectWithLabels {
-            return DetectedObjectWithLabels(
-                trackingId = data.trackingId,
-                labels = data.labels.map {
-                    ObjectLabel(
-                        it.text,
-                        it.confidence
-                    )
-                }
-            )
-        }
+//        fun fromDetectedObject(data: DetectedObject): DetectedObjectWithLabels {
+//            return DetectedObjectWithLabels(
+//                trackingId = data.trackingId,
+//                labels = data.labels.map {
+//                    ObjectLabel(
+//                        it.text,
+//                        it.confidence
+//                    )
+//                }
+//            )
+//        }
     }
 }
 

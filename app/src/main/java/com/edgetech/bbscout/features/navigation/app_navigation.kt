@@ -22,6 +22,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.components.utils.getPreference
+import com.edgetech.bbscout.features.auth.domain.viewmodel.AuthViewmodel
+import com.edgetech.bbscout.features.auth.presentation.LoadingScreen
+import com.edgetech.bbscout.features.auth.presentation.LoginScreen
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
 import com.edgetech.bbscout.features.capture.presentation.camera_capture.CaptureBillboardScreen
 import com.edgetech.bbscout.features.capture.presentation.capture_detail.CaptureDetailScreen
@@ -50,6 +53,7 @@ fun DirackAppNavigation(
     val hasShownOnboarding = getPreference(context, "ONBOARDING_SHOWN", Boolean::class.java )
 
     val captureRecordViewmodel = viewModel<CaptureRecordViewmodel>()
+    val authViewModel = viewModel<AuthViewmodel>()
 
 
 
@@ -98,6 +102,14 @@ fun DirackAppNavigation(
 
         composable<AppDestinations.ReviewBillboardData> {
             ReviewRecordScreen(appState, captureRecordViewmodel, null)
+        }
+
+        composable<AppDestinations.Login> {
+            LoginScreen(authViewModel, navController)
+        }
+
+        composable<AppDestinations.Loading> {
+            LoadingScreen(authViewModel, navController)
         }
 
     }
@@ -177,5 +189,11 @@ sealed interface AppDestinations {
 
     @Serializable
     data object BillboardAdded :  AppDestinations
+
+    @Serializable
+    data object Login : AppDestinations
+
+    @Serializable
+    data object Loading : AppDestinations
 
 }

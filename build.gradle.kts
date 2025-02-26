@@ -6,3 +6,9 @@ plugins {
     alias(libs.plugins.devtoolsKsp) apply false
     alias(libs.plugins.daggerHilt) apply  false
 }
+
+buildscript {
+    dependencies {
+        classpath("com.google.gms:google-services:4.4.0")
+    }
+}

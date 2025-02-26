@@ -57,16 +57,6 @@ import com.edgetech.bbscout.features.capture.presentation.extractEntities
 import com.edgetech.bbscout.features.capture.presentation.setupZoomListener
 import com.edgetech.bbscout.features.capture.presentation.takePhoto
 import com.edgetech.bbscout.features.navigation.AppDestinations
-import com.google.mlkit.nl.entityextraction.EntityExtraction
-import com.google.mlkit.nl.entityextraction.EntityExtractorOptions
-import com.google.mlkit.vision.barcode.BarcodeScannerOptions
-import com.google.mlkit.vision.barcode.BarcodeScanning
-import com.google.mlkit.vision.barcode.common.Barcode
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.objects.ObjectDetection
-import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

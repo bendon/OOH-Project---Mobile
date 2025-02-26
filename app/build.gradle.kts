@@ -8,6 +8,7 @@ plugins {
     id("kotlin-parcelize")
     alias(libs.plugins.devtoolsKsp)
     alias(libs.plugins.daggerHilt)
+    id("com.google.gms.google-services")
 }
 
 //val localProperties = java.util.Properties().apply {
@@ -92,6 +93,8 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.runtime.livedata)
     implementation(libs.google.maps.compose)
+
+    implementation ("com.google.android.gms:play-services-auth:20.7.0")
 
     implementation(libs.google.material)
 
