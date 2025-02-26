@@ -5,6 +5,7 @@ import com.edgetech.bbscout.data.data.local.enities.AuthEntity
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.AccountResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.AccountResponseList
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.AuthResponse
+import com.edgetech.bbscout.data.data.remote.bbscout_api.model.ChangePasswordRequest
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.FileResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.LoginRequest
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.UserResponse
@@ -32,6 +33,8 @@ interface MainRepository {
     suspend fun getProfile(): SimpleResource<UserResponse>
 
     suspend fun getAccounts(): SimpleResource<AccountResponseList>
+
+    suspend fun changePassword(request: ChangePasswordRequest): SimpleResource<AuthResponse>
 
     suspend fun switchAccount(request: AccountResponse): SimpleResource<AuthResponse>
 
