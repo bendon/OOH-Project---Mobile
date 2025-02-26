@@ -110,7 +110,11 @@ class AuthViewmodel @Inject constructor(
         }
         var loginIsSuccessful = false
         var authResponse: AuthResponse? = null
+
         viewModelScope.launch(ioDispatcher) {
+            _uiState.update {
+                it.copy(isLoading = true)
+            }
             repository.login(
                 LoginRequest(
                     email = eventSink.email,
@@ -127,6 +131,9 @@ class AuthViewmodel @Inject constructor(
             if (loginIsSuccessful) {
                 login(authResponse, eventSink)
             }
+            _uiState.update {
+                it.copy(isLoading = false)
+            }
 
         }
     }
@@ -135,6 +142,9 @@ class AuthViewmodel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             var loginIsSuccessful = false
             var authResponse: AuthResponse? = null
+            _uiState.update {
+                it.copy(isLoading = true)
+            }
             repository.loginWithGoogle(
                 LoginRequest(
                     token = eventSink.token
@@ -149,6 +159,9 @@ class AuthViewmodel @Inject constructor(
             }
             if (loginIsSuccessful) {
                 login(authResponse, eventSink)
+            }
+            _uiState.update {
+                it.copy(isLoading = false)
             }
         }
     }
@@ -215,9 +228,14 @@ class AuthViewmodel @Inject constructor(
 
     private fun getAccountInfo(eventSink: AuthEventSink.GetAccountInfo) {
         viewModelScope.launch(ioDispatcher){
-            repository.getProfile().onSuccess {
+            repository.getProfile().onSuccess { user ->
                 _uiEvent.update {
                     AuthUiEvent.LoginSuccessful("")
+                }
+                _uiState.update {
+                    it.copy(
+                        user = user
+                    )
                 }
             }.onError { ex ->
                 _uiEvent.update {

@@ -37,6 +37,7 @@ import com.edgetech.bbscout.features.capture_start.CaptureCheckPermission
 import com.edgetech.bbscout.features.dashboard.BBScoutDashboard
 import com.edgetech.bbscout.features.dashboard.HomeDashboard
 import com.edgetech.bbscout.features.onboarding_screen.OnboardingScreen
+import com.edgetech.bbscout.features.settings.presentation.SettingsScreen
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
@@ -151,7 +152,7 @@ fun BBScoutDashboardNavigation(
         composable(
             route = DashboardScreenOption.SETTINGS.name
         ) {
-
+            SettingsScreen(authViewModel = viewModel<AuthViewmodel>(), navController)
         }
 
     }

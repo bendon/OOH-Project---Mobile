@@ -191,7 +191,9 @@ class CaptureRecordViewmodel @Inject constructor(
 //                }
 //            }
 
-
+            _captureUiState.update {
+                it.copy(isLoading = true)
+            }
             var fullImageId: String? = null
             val captureFile = _captureUiState.value.billboardData?.fileUri
             if (!captureFile.isNullOrEmpty()) {
@@ -249,6 +251,9 @@ class CaptureRecordViewmodel @Inject constructor(
                 _captureUiEvent.update {
                     CaptureRecordUiEvent.Error(ex ?: BBScoutException("Unknown Error"), eventSink)
                 }
+            }
+            _captureUiState.update {
+                it.copy(isLoading = false)
             }
         }
     }

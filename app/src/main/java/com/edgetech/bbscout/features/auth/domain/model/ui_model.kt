@@ -1,6 +1,7 @@
 package com.edgetech.bbscout.features.auth.domain.model
 
 import com.edgetech.bbscout.components.domain_util.AppEventSink
+import com.edgetech.bbscout.data.data.remote.bbscout_api.model.UserResponse
 import com.edgetech.bbscout.data.utils.BBScoutException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,6 +15,7 @@ data class AuthUiModel(
 
 data class AuthUiState(
     val isLoading: Boolean = false,
+    val user : UserResponse? = null
 )
 
 sealed class AuthUiEvent {
