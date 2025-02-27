@@ -5,27 +5,48 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.OutputTransformation
+import androidx.compose.foundation.text.input.TextFieldBuffer
+import androidx.compose.foundation.text.input.insert
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.outlined.AlternateEmail
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldLabelPosition
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,10 +57,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.edgetech.bbscout.R
 import com.edgetech.bbscout.components.ui.ButtonContent
@@ -63,7 +90,7 @@ import com.google.android.gms.common.api.ApiException
 fun LoginScreen(
     authViewmodel: AuthViewmodel,
     navController: NavController
-){
+) {
     LoginScreenMain(
         authUiModel = authViewmodel.uiModel,
         navController = navController
@@ -75,24 +102,20 @@ fun LoginScreen(
 fun LoginScreenMain(
     authUiModel: AuthUiModel,
     navController: NavController
-){
+) {
 
     val activity = LocalActivity.current
     BackHandler {
         activity?.finish()
     }
 
-    var credentialAddress by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    var passwordVisible by rememberSaveable { mutableStateOf(false) }
-
     val uiState by authUiModel.authUiState.collectAsState()
     val uiEvent by authUiModel.authUiEvent.collectAsState()
 
-    val isLoading = uiState.isLoading
 
-    val context = LocalContext.current
-    var token by rememberSaveable  { mutableStateOf<String?>(null) }
+    var selectedTab by rememberSaveable { mutableStateOf(0) }
+    val tabs = listOf("Login", "Sign Up")
+    var token by rememberSaveable { mutableStateOf<String?>(null) }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -121,13 +144,14 @@ fun LoginScreenMain(
         authUiModel.authEventSink(
             AuthEventSink.ResetState
         )
-    } else if (uiEvent is AuthUiEvent.Error){
+    } else if (uiEvent is AuthUiEvent.Error) {
         val request = (uiEvent as AuthUiEvent.Error)
         ErrorShowDialog(
             showErrorMessage = true,
-            customError = mapOf(UnAuthenticatedException() to "Wrong credentials",
+            customError = mapOf(
+                UnAuthenticatedException() to "Wrong credentials",
                 EmptyCredentialsException to "Please provide an email and password"
-                ),
+            ),
             error = request.exception,
             event = request.eventSink,
             onDismiss = {
@@ -136,7 +160,7 @@ fun LoginScreenMain(
                 )
             },
             onPositive = { eventSink, ex ->
-                if (ex !is EmptyCredentialsException && eventSink != null){
+                if (ex !is EmptyCredentialsException && eventSink != null) {
                     authUiModel.authEventSink(eventSink as AuthEventSink)
                 } else {
                     authUiModel.authEventSink(
@@ -150,7 +174,10 @@ fun LoginScreenMain(
 
     Scaffold {
         Column(
-            modifier = Modifier.padding(it).padding(horizontal = 16.dp).imePadding(),
+            modifier = Modifier
+                .padding(it)
+                .padding(horizontal = 16.dp)
+                .imePadding(),
         ) {
 
             Image(
@@ -161,91 +188,294 @@ fun LoginScreenMain(
                     .fillMaxWidth()
                     .padding(vertical = 32.dp, horizontal = 24.dp)
             )
-            Text(text = "Welcome to BBScout!", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(vertical = 16.dp))
-            Text(text = "Login", style = MaterialTheme.typography.headlineLarge,)
-            OutlinedTextField(
-                value = credentialAddress,
-                keyboardOptions =  KeyboardOptions(
-                    keyboardType = KeyboardType.Text
-                ),
-                onValueChange = { credentialAddress = it },
-                label = {
-                    Text(
-                        "Email Address"
-                    )
-                },
-                singleLine = true,
-                modifier = Modifier
-                    .padding(vertical = 4.dp)
-                    .fillMaxWidth()
+            Text(text = "Welcome to BBScout", fontSize = 24.sp)
+            Text(
+                text = "The smart way to track billboard advertising",
+                fontSize = 14.sp,
+                color = Color.Gray
             )
-
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                label = { Text("Password") },
-                singleLine = true,
-                modifier = Modifier
-                    .padding(vertical = 4.dp)
-                    .fillMaxWidth(),
-                trailingIcon = {
-                    val image = if (passwordVisible)
-                        Icons.Filled.Visibility
-                    else Icons.Filled.VisibilityOff
-
-                    val description ="Toggle password visibility"
-
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(imageVector = image, description)
-                    }
+            Spacer(modifier = Modifier.height(16.dp))
+            TabRow(selectedTabIndex = selectedTab, containerColor = MaterialTheme.colorScheme.background) {
+                tabs.forEachIndexed { index, title ->
+                    Tab(
+                        selected = selectedTab == index,
+                        onClick = { selectedTab = index },
+                        text = { Text(title) }
+                    )
                 }
-            )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
 
-            MainLoadingButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                pIsLoading = isLoading,
-                disableOnTap = false,
-                loadOnTap = false,
-                onTap = {
-                        authUiModel.authEventSink(
-                            AuthEventSink.LoginWithEmailAndPassword(
-                                credentialAddress,
-                                password
-                            )
-                        )
-                },
-            ) {
-                ButtonContent(
-                    "Login",
-                    Color.White,
+            if (selectedTab == 0) {
+                LoginScreenContent(
+                    authUiModel, launcher
                 )
+            } else {
+                SignUpScreen(authUiModel, launcher)
             }
 
-            Text("Or", modifier = Modifier.align(Alignment.CenterHorizontally).padding(vertical = 16.dp))
-            NonLoadingSecButton (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 24.dp),
-                disableOnTap = false,
-                onTap = {
-                    launchGoogleSignIn(
-                        context,
-                        launcher
-                    )
-                },
-            ) {
-                ButtonContent(
-                    "Login with Google",
-                    MaterialTheme.colorScheme.primary,
-                )
-            }
         }
     }
 
 }
+
+
+@Composable
+fun LoginScreenContent(
+    authUiModel: AuthUiModel,
+    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>
+) {
+    var email = rememberTextFieldState()
+    var password = rememberTextFieldState()
+
+    var passwordVisible by rememberSaveable { mutableStateOf(false) }
+
+    val uiState by authUiModel.authUiState.collectAsState()
+    val isLoading = uiState.isLoading
+    val context = LocalContext.current
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text("Email Address", modifier = Modifier
+            .padding(vertical = 6.dp)
+            .align(Alignment.Start))
+        OutlinedTextField(
+            state = email,
+            placeholder = { Text("Enter your email") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            contentPadding = PaddingValues(14.dp),
+            leadingIcon = {
+                Icon(
+                    Icons.Outlined.AlternateEmail,
+                    contentDescription = null,
+                )
+            }
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text("Password", modifier = Modifier
+            .padding(vertical = 6.dp)
+            .align(Alignment.Start))
+        OutlinedTextField(
+            state = password,
+            placeholder = { Text("Enter your password") },
+            outputTransformation = if (passwordVisible) null else PasswordTransformation(),
+            trailingIcon = {
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(
+                        if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                        contentDescription = null
+                    )
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            contentPadding = PaddingValues(14.dp),
+            leadingIcon = {
+                Icon(
+                    Icons.Outlined.Lock,
+                    contentDescription = null
+                )
+            }
+        )
+        MainLoadingButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+            pIsLoading = isLoading,
+            disableOnTap = false,
+            loadOnTap = false,
+            onTap = {
+                authUiModel.authEventSink(
+                    AuthEventSink.LoginWithEmailAndPassword(
+                        email.text.toString(),
+                        password.text.toString()
+                    )
+                )
+            },
+        ) {
+            ButtonContent(
+                "Login",
+                Color.White,
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(vertical = 8.dp)
+        ) {
+            HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.surface, modifier = Modifier.weight(1f) )
+            Text(
+                "Or continue with", modifier = Modifier
+                    .padding(horizontal = 8.dp)
+            )
+            HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.surface, modifier = Modifier.weight(1f)  )
+        }
+        NonLoadingSecButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp),
+            disableOnTap = false,
+            onTap = {
+                launchGoogleSignIn(
+                    context,
+                    launcher
+                )
+            },
+        ) {
+            ButtonContent(
+                "Login with Google",
+                MaterialTheme.colorScheme.primary,
+            )
+        }
+    }
+}
+
+
+@Stable
+class PasswordTransformation : OutputTransformation {
+    override fun TextFieldBuffer.transformOutput() {
+
+        // "•".repeat(length)
+        if (length > 0)
+            replace(0, length, "•".repeat(length))
+
+    }
+}
+
+@Composable
+fun SignUpScreen(
+    authUiModel: AuthUiModel,
+    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>
+) {
+    var email = rememberTextFieldState()
+    var password = rememberTextFieldState()
+    var confirmPassword = rememberTextFieldState()
+    var passwordVisible by rememberSaveable { mutableStateOf(false) }
+
+    val uiState by authUiModel.authUiState.collectAsState()
+    val isLoading = uiState.isLoading
+    val context = LocalContext.current
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text("Email Address", modifier = Modifier
+            .padding(vertical = 6.dp)
+            .align(Alignment.Start))
+        OutlinedTextField(
+            state = email,
+            placeholder = { Text("Enter your email") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            contentPadding = PaddingValues(14.dp),
+            leadingIcon = {
+                Icon(
+                    Icons.Outlined.AlternateEmail,
+                    contentDescription = null,
+                )
+            }
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text("Password", modifier = Modifier
+            .padding(vertical = 6.dp)
+            .align(Alignment.Start))
+        OutlinedTextField(
+            state = password,
+            placeholder = { Text("Enter your password") },
+            outputTransformation = if (passwordVisible) null else PasswordTransformation(),
+            trailingIcon = {
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(
+                        if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                        contentDescription = null
+                    )
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            contentPadding = PaddingValues(14.dp),
+            leadingIcon = {
+                Icon(
+                    Icons.Outlined.Lock,
+                    contentDescription = null
+                )
+            }
+        )
+
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text("Confirm Password", modifier = Modifier
+            .padding(vertical = 6.dp)
+            .align(Alignment.Start))
+        OutlinedTextField(
+            state = confirmPassword,
+            placeholder = { Text("Confirm your password") },
+            outputTransformation = if (passwordVisible) null else PasswordTransformation(),
+            trailingIcon = {
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(
+                        if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                        contentDescription = null
+                    )
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            contentPadding = PaddingValues(14.dp),
+            leadingIcon = {
+                Icon(
+                    Icons.Outlined.Lock,
+                    contentDescription = null
+                )
+            }
+        )
+        MainLoadingButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+            pIsLoading = isLoading,
+            disableOnTap = false,
+            loadOnTap = false,
+            onTap = {
+
+            },
+        ) {
+            ButtonContent(
+                "Create an account",
+                Color.White,
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(vertical = 8.dp)
+        ) {
+            HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.surface, modifier = Modifier.weight(1f) )
+            Text(
+                "Or continue with", modifier = Modifier
+                    .padding(horizontal = 8.dp)
+            )
+            HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.surface, modifier = Modifier.weight(1f)  )
+        }
+        NonLoadingSecButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp),
+            disableOnTap = false,
+            onTap = {
+
+            },
+        ) {
+            ButtonContent(
+                "Create an account with Google",
+                MaterialTheme.colorScheme.primary,
+            )
+        }
+    }
+}
+
 
 private fun launchGoogleSignIn(
     context: Context,
@@ -259,5 +489,13 @@ private fun launchGoogleSignIn(
     val client = GoogleSignIn.getClient(context, gso)
     val signInIntent = client.signInIntent
     launcher.launch(signInIntent)
+}
+
+@Preview
+@Composable
+fun AuthScreenPreview(
+
+) {
+
 }
 

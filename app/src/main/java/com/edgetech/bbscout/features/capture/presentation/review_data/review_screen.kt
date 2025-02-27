@@ -223,7 +223,8 @@ fun ReviewRecordMain(
                             bitmap = currentData.fullImage.asImageBitmap(),
                             contentDescription = "Cropped Billboard",
                             modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.FillBounds
+                            contentScale = ContentScale.Fit
+
                         )
                     }
                 }

@@ -96,7 +96,7 @@ suspend fun checkIfErrorIsInvalidToken(api: BBScoutApi, dao: BBScoutDao, error: 
     if (error == 401) {
         try {
             val authObject = dao.getAuth()
-            val response = api.refreshToken(authObject.refreshToken ?: "")
+            val response = api.refreshToken("Bearer ${authObject.refreshToken}")
             if (response.isSuccessful) {
                 val auth = response.body()
                 if (auth != null) {

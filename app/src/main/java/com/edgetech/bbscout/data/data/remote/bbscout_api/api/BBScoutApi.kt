@@ -23,7 +23,7 @@ interface BBScoutApi {
     @POST("api/v1/auth/login")
     suspend fun login(@Body loginRequest: LoginRequest): Response<AuthResponse>
 
-    @POST("api/v1/v1/auth/refresh/account")
+    @GET("api/v1/v1/auth/refresh/account")
     suspend fun refreshToken(@Header("Authorization") token: String): Response<AuthResponse>
 
 
