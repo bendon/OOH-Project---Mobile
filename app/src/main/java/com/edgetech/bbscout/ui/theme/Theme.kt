@@ -2,6 +2,7 @@ package com.edgetech.bbscout.ui.theme
 
 import android.app.Activity
 import android.os.Build
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -61,10 +62,12 @@ fun BBScoutTheme(
         else -> LightColors
     }
     val view = LocalView.current
+    val context = LocalActivity.current
     if (!view.isInEditMode) {
         SideEffect {
-            val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
+            val window = context?.window
+            window?.statusBarColor = colorScheme.primary.toArgb()
+            if (window != null)
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
         }
     }

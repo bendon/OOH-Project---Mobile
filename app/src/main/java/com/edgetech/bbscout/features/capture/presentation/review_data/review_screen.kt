@@ -59,9 +59,12 @@ import com.edgetech.bbscout.data.data.remote.bbscout_api.model.api_exception.UnA
 import com.edgetech.bbscout.features.auth.domain.model.AuthEventSink
 import com.edgetech.bbscout.features.auth.domain.model.AuthUiEvent
 import com.edgetech.bbscout.features.auth.domain.model.EmptyCredentialsException
+import com.edgetech.bbscout.features.capture.domain.model.BillboardTypeErrorException
+import com.edgetech.bbscout.features.capture.domain.model.BrandDescriptionErrorException
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiEvent
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
+import com.edgetech.bbscout.features.capture.domain.model.LocationErrorException
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
 import com.edgetech.bbscout.features.navigation.AppDestinations
 import com.example.core.core.utils.components.LocationAwareActivity
@@ -147,7 +150,9 @@ fun ReviewRecordMain(
         ErrorShowDialog(
             showErrorMessage = true,
             customError = mapOf(
-
+                BillboardTypeErrorException to "Billboard type is required",
+                LocationErrorException to "Location is required",
+                BrandDescriptionErrorException to "Brand description is required"
             ),
             error = request.exception,
             event = request.eventSink,

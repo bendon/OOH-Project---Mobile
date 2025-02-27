@@ -19,6 +19,7 @@ data class BillboardExtractedInfo(
     val billboardOwner: String? = null,
     val billboardWidth: String? = null,
     val billboardLength: String? = null,
+    val unitOfMeasurement: String? = null,
 
 )
 

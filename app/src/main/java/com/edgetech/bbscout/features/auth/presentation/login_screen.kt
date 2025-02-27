@@ -47,6 +47,7 @@ import com.edgetech.bbscout.components.ui.ErrorShowDialog
 import com.edgetech.bbscout.components.ui.MainLoadingButton
 import com.edgetech.bbscout.components.ui.NonLoadingSecButton
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.api_exception.UnAuthenticatedException
+import com.edgetech.bbscout.data.utils.DataConstants
 import com.edgetech.bbscout.features.auth.domain.model.AuthEventSink
 import com.edgetech.bbscout.features.auth.domain.model.AuthUiEvent
 import com.edgetech.bbscout.features.auth.domain.model.AuthUiModel
@@ -251,7 +252,7 @@ private fun launchGoogleSignIn(
     launcher: ActivityResultLauncher<Intent>
 ) {
     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-        .requestIdToken("387495462865-tce3eneih9mlq7o4klk7vubka6dvfl1u.apps.googleusercontent.com") // Replace with your client ID
+        .requestIdToken(DataConstants.GOOGLE_CLIENT_ID) // Replace with your client ID
         .requestEmail()
         .build()
 

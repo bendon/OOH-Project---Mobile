@@ -70,6 +70,10 @@ fun HomeDashboard(
         )
     }
 
+    Column {
+        if (capturesUiState.isLoading) {
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -77,17 +81,20 @@ fun HomeDashboard(
                 .verticalScroll(rememberScrollState())
 
         ) {
+
             HeaderSectionI()
             HeaderSection(numberOfCaptures = capturesUiState.allCaptures.size)
             Spacer(modifier = Modifier.height(16.dp))
             ChallengeCard()
             Spacer(modifier = Modifier.height(16.dp))
             QuickActions(appState, onPageTap = onPageTap)
-//            Spacer(modifier = Modifier.height(16.dp))
-//            NearbyBillboards()
+            //            Spacer(modifier = Modifier.height(16.dp))
+            //            NearbyBillboards()
             Spacer(modifier = Modifier.height(16.dp))
+            if (recentEntries.isNotEmpty())
             RecentActivity(recentEntries, appState)
         }
+    }
     }
 
 

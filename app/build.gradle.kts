@@ -131,6 +131,9 @@ dependencies {
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
     implementation ("com.google.code.gson:gson:2.10.1")
 
+    //Glide
+    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
+
     //room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)

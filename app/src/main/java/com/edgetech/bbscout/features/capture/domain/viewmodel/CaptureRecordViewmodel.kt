@@ -21,10 +21,13 @@ import com.edgetech.bbscout.data.utils.SimpleResource
 import com.edgetech.bbscout.data.utils.onError
 import com.edgetech.bbscout.data.utils.onSuccess
 import com.edgetech.bbscout.features.capture.domain.model.BillboardExtractedInfo
+import com.edgetech.bbscout.features.capture.domain.model.BillboardTypeErrorException
+import com.edgetech.bbscout.features.capture.domain.model.BrandDescriptionErrorException
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiEvent
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiState
+import com.edgetech.bbscout.features.capture.domain.model.LocationErrorException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -108,6 +111,9 @@ class CaptureRecordViewmodel @Inject constructor(
 
     private fun getCapture(eventSink: CaptureRecordEventSink.OnGetCapture) {
         viewModelScope.launch(ioDispatcher) {
+            _captureUiState.update {
+                it.copy(isLoading = true)
+            }
             var mainFilePath: String? = null
             var billboardFilePath: String? = null
             repository.getCaptureRecord(eventSink.captureId).onSuccess { data ->
@@ -123,29 +129,33 @@ class CaptureRecordViewmodel @Inject constructor(
                     CaptureRecordUiEvent.Error(ex ?: BBScoutException("Unknown Error"), eventSink)
                 }
             }
-            listOf(
-                launch {
-                    if (!mainFilePath.isNullOrEmpty()) {
-                        fileSaver.getBitmapFromPath(mainFilePath!!).onSuccess { bit ->
-                            _captureUiState.update {
-                                it.copy(
-                                    selectedRecordMainImage = bit
-                                )
-                            }
-                        }
-                    }
-                }, launch {
-                    if (!billboardFilePath.isNullOrEmpty()) {
-                        fileSaver.getBitmapFromPath(billboardFilePath!!).onSuccess { bit ->
-                            _captureUiState.update {
-                                it.copy(
-                                    selectedRecordBillboardImage = bit
-                                )
-                            }
-                        }
-                    }
-
-                }).joinAll()
+ //           listOf(
+//                launch {
+//                    if (!mainFilePath.isNullOrEmpty()) {
+//                        fileSaver.getBitmapFromPath(mainFilePath!!).onSuccess { bit ->
+//                            _captureUiState.update {
+//                                it.copy(
+//                                    selectedRecordMainImage = bit
+//                                )
+//                            }
+//                        }
+//                    }
+//                },
+//                launch {
+//                    if (!billboardFilePath.isNullOrEmpty()) {
+//                        fileSaver.getBitmapFromPath(billboardFilePath!!).onSuccess { bit ->
+//                            _captureUiState.update {
+//                                it.copy(
+//                                    selectedRecordBillboardImage = bit
+//                                )
+//                            }
+//                        }
+//                    }
+//
+//                }).joinAll()
+            _captureUiState.update {
+                it.copy(isLoading = false)
+            }
         }
     }
 
@@ -191,22 +201,47 @@ class CaptureRecordViewmodel @Inject constructor(
 //                }
 //            }
 
+
+            var fullImageId: String? = null
+            val captureFile = _captureUiState.value.billboardData?.fileUri
+
+
+            if (_captureUiState.value.selectedLocation?.latitude == null || _captureUiState.value.selectedLocation?.longitude == null) {
+                _captureUiEvent.update {
+                    CaptureRecordUiEvent.Error(LocationErrorException, eventSink)
+                }
+                return@launch
+            }
+
+            if (_captureUiState.value.billboardData?.billboardType.isNullOrEmpty()) {
+                _captureUiEvent.update {
+                    CaptureRecordUiEvent.Error(BillboardTypeErrorException, eventSink)
+                }
+                return@launch
+            }
+
+            if (_captureUiState.value.billboardData?.brandCampaign.isNullOrEmpty()){
+                _captureUiEvent.update {
+                    CaptureRecordUiEvent.Error(BrandDescriptionErrorException, eventSink)
+                }
+                return@launch
+            }
             _captureUiState.update {
                 it.copy(isLoading = true)
             }
-            var fullImageId: String? = null
-            val captureFile = _captureUiState.value.billboardData?.fileUri
             if (!captureFile.isNullOrEmpty()) {
                 uploadImage(File(captureFile)).onSuccess {
                     fullImageId = it?.id
-                }.onError {ex ->
+                }.onError { ex ->
                     _captureUiEvent.update {
                         CaptureRecordUiEvent.Error(ex ?: BBScoutException(), eventSink)
+                    }
+                    _captureUiState.update {
+                        it.copy(isLoading = false)
                     }
                     return@launch
                 }
             }
-
 
             val newEntry = EntryRecord(
                 entryEntity = EntryEntity(
@@ -258,7 +293,7 @@ class CaptureRecordViewmodel @Inject constructor(
         }
     }
 
-    private suspend fun uploadImage(file: File): SimpleResource<FileResponse>{
+    private suspend fun uploadImage(file: File): SimpleResource<FileResponse> {
         val multipartBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
             .addFormDataPart("file", "file", file.asRequestBody())
@@ -268,6 +303,9 @@ class CaptureRecordViewmodel @Inject constructor(
 
     private fun onGetAllCaptures(eventSink: CaptureRecordEventSink.OnGetAllCaptures) {
         viewModelScope.launch(ioDispatcher) {
+            _captureUiState.update {
+                it.copy(isLoading = true)
+            }
             repository.getAllEntries().onSuccess { data ->
                 _captureUiState.update {
                     it.copy(
@@ -278,6 +316,9 @@ class CaptureRecordViewmodel @Inject constructor(
                 _captureUiEvent.update {
                     CaptureRecordUiEvent.Error(ex ?: BBScoutException("Unknown Error"), eventSink)
                 }
+            }
+            _captureUiState.update {
+                it.copy(isLoading = false)
             }
         }
     }

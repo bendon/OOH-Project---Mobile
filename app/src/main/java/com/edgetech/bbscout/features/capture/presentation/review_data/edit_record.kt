@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -52,11 +53,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.navOptions
 import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.components.location.GetLocationInfo
+import com.edgetech.bbscout.components.ui.LargeDropdownMenu
 import com.edgetech.bbscout.components.utils.ifEmptySetNull
 import com.edgetech.bbscout.components.utils.logD
 import com.edgetech.bbscout.data.data.local.enities.BillboardDataEntity
@@ -136,6 +139,13 @@ fun EditRecordMain(
         mutableStateOf("")
     }
 
+    val billboardTypes = listOf("Static Billboard","Digital Billboard", "Banner Ads", "Wallscapes", "Mobile Billboards","Lamp Posts","Interactive Billboards" )
+
+    val unitOfMeasurements = listOf("centimeters", "meters", "feet" , "inches")
+
+    var selectedUnitOfMeasurement by rememberSaveable {
+        mutableStateOf("")
+    }
 
     LaunchedEffect(
         recordId
@@ -234,9 +244,22 @@ fun EditRecordMain(
                         modifier = Modifier
                             .padding(vertical = 8.dp)
                             .fillMaxWidth(),
-                        value = billboardType,
-                        onValueChange = { billboardType = it },
-                        label = { Text("Billboard type") })
+                        value = billboardOwner,
+                        onValueChange = { billboardOwner = it },
+                        label = { Text("Billboard owner") })
+                    LargeDropdownMenu(
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .fillMaxWidth(),
+                        label = "Billboard type",
+                        items = billboardTypes,
+                        selectedIndex = billboardTypes.indexOf(billboardType),
+                        onItemSelected = { index, item ->
+                            billboardType = item
+
+                        },
+
+                    )
 
                     OutlinedTextField(
                         modifier = Modifier
@@ -254,16 +277,31 @@ fun EditRecordMain(
                                 .weight(1f)
                                 .padding(end = 2.dp),
                             value = billboardWidth,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             onValueChange = { billboardWidth = it },
                             label = { Text("Width (m)") })
                         OutlinedTextField(
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(start = 2.dp),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             value = billboardLength,
                             onValueChange = { billboardLength = it },
                             label = { Text("Height (m)") })
                     }
+
+                    LargeDropdownMenu(
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .fillMaxWidth(),
+                        label = "Unit of measurement",
+                        items = unitOfMeasurements,
+                        selectedIndex = unitOfMeasurements.indexOf(selectedUnitOfMeasurement),
+                        onItemSelected = { index, item ->
+                            selectedUnitOfMeasurement = item
+                        },
+
+                        )
                 }
                 //check qr c
 
@@ -297,14 +335,16 @@ fun EditRecordMain(
                                     billboardType = billboardType.ifEmptySetNull() ?: currentData.billboardType,
                                     billboardOwner = billboardOwner.ifEmptySetNull() ?: currentData.billboardOwner,
                                     billboardWidth = billboardWidth.ifEmptySetNull() ?: currentData.billboardWidth,
-                                    billboardLength = billboardLength.ifEmptySetNull() ?: currentData.billboardLength
+                                    billboardLength = billboardLength.ifEmptySetNull() ?: currentData.billboardLength,
+                                    unitOfMeasurement = selectedUnitOfMeasurement.ifEmptySetNull() ?: currentData.unitOfMeasurement
                                 ) ?: BillboardExtractedInfo(
                                     brandName = campaignBrand.ifEmptySetNull() ?: currentData?.brandName,
                                     brandCampaign = campaignDescription.ifEmptySetNull() ?: currentData?.brandCampaign,
                                     billboardType = billboardType.ifEmptySetNull() ?: currentData?.billboardType,
                                     billboardOwner = billboardOwner.ifEmptySetNull() ?: currentData?.billboardOwner,
                                     billboardWidth = billboardWidth.ifEmptySetNull() ?: currentData?.billboardWidth,
-                                    billboardLength = billboardLength.ifEmptySetNull() ?: currentData?.billboardLength
+                                    billboardLength = billboardLength.ifEmptySetNull() ?: currentData?.billboardLength,
+                                    unitOfMeasurement = selectedUnitOfMeasurement.ifEmptySetNull() ?: currentData?.unitOfMeasurement
                                 )
                             )
                         )

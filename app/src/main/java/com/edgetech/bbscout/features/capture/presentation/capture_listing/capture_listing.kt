@@ -1,13 +1,18 @@
 package com.edgetech.bbscout.features.capture.presentation.capture_listing
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -22,7 +27,7 @@ import com.edgetech.bbscout.features.navigation.AppDestinations
 fun CapturesListingScreen(
     appState: BBScoutAppState?,
     captureRecordViewmodel: CaptureRecordViewmodel = hiltViewModel(),
-){
+) {
     CapturesListingMain(
         appState = appState,
         captureRecordUiModel = captureRecordViewmodel.uiModel
@@ -30,12 +35,11 @@ fun CapturesListingScreen(
 }
 
 
-
 @Composable
 fun CapturesListingMain(
     appState: BBScoutAppState?,
     captureRecordUiModel: CaptureRecordUiModel,
-){
+) {
 
     val capturesUiState by captureRecordUiModel.captureUiState.collectAsState()
 
@@ -47,20 +51,40 @@ fun CapturesListingMain(
         )
     }
 
-    Scaffold  {
-        LazyColumn(modifier = Modifier.padding(it).padding(top = 32.dp).padding(horizontal = 16.dp)) {
-            items(allEntries.size) {
-                val item = allEntries[it]
-                BillboardListingItem(
-                    item,
-                    onTap = {
-                        appState?.navController?.navigate(AppDestinations.CaptureDetail(item.entryEntity.remoteId ?: ""))
-                    }
-                )
+    Scaffold {
+        Column {
+            if (capturesUiState.isLoading) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+
+            }
+            if (capturesUiState.isLoading || capturesUiState.allCaptures.isEmpty())
+            Text(
+                text = if (!capturesUiState.isLoading) "No records found" else "Loading...",
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 48.dp).align(Alignment.CenterHorizontally)
+            )
+            LazyColumn(
+                modifier = Modifier
+                    .padding(it)
+                    .padding(top = 32.dp)
+                    .padding(horizontal = 16.dp)
+            ) {
+
+                items(allEntries.size) {
+                    val item = allEntries[it]
+                    BillboardListingItem(
+                        item,
+                        onTap = {
+                            appState?.navController?.navigate(
+                                AppDestinations.CaptureDetail(
+                                    item.entryEntity.remoteId ?: ""
+                                )
+                            )
+                        }
+                    )
+                }
             }
         }
     }
-
 
 
 }

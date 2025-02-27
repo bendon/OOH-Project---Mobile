@@ -26,16 +26,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.components.ui.StatusDialog
 import com.edgetech.bbscout.components.ui.WarningIcon
+import com.edgetech.bbscout.data.utils.DataConstants
 import com.edgetech.bbscout.features.auth.domain.model.AuthEventSink
 import com.edgetech.bbscout.features.auth.domain.model.AuthUiEvent
 import com.edgetech.bbscout.features.auth.domain.model.AuthUiModel
 import com.edgetech.bbscout.features.auth.domain.viewmodel.AuthViewmodel
 import com.edgetech.bbscout.features.navigation.AppDestinations
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
 
 @Composable
@@ -61,6 +65,8 @@ fun SettingsMain(
 
     val user = authUiState.user
 
+    val context = LocalContext.current
+
     var showLogOutWarning by rememberSaveable {
         mutableStateOf(false)
     }
@@ -77,6 +83,13 @@ fun SettingsMain(
             },
             onConfirmation = {
                 showLogOutWarning = false
+                val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(DataConstants.GOOGLE_CLIENT_ID) // Replace with your client ID
+                    .requestEmail()
+                    .build()
+
+                val client = GoogleSignIn.getClient(context, gso)
+                client.signOut()
                 authEventSink(AuthEventSink.Logout)
             },
             title = "Log Out",

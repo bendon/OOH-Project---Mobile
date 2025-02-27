@@ -18,6 +18,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -41,6 +42,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.R
 import com.edgetech.bbscout.components.utils.ifEmptySetNull
@@ -69,7 +72,7 @@ fun CaptureDetailScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun CaptureDetailMain(
     captureId: String,
@@ -133,251 +136,263 @@ fun CaptureDetailMain(
                 )
         }
     ) {
-        Column(
-            modifier = Modifier
-                .padding(it)
-                .padding(horizontal = 16.dp)
-                .fillMaxSize()
-                .verticalScroll(
-                    rememberScrollState()
-                )
-        ) {
-
-            if (captureUiState.selectedRecordMainImage != null) {
-                Text(
-                    text = "Full image",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-                Surface(
-                    shape = MaterialTheme.shapes.small,
-                    modifier = Modifier
-                        .height(200.dp)
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                ) {
-                    Image(
-                        captureUiState.selectedRecordMainImage!!.asImageBitmap(),
-                        contentDescription = "Cropped Billboard",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.FillBounds
+        Column {
+            if (captureUiState.isLoading){
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
+            Column(
+                modifier = Modifier
+                    .padding(it)
+                    .padding(horizontal = 16.dp)
+                    .fillMaxSize()
+                    .verticalScroll(
+                        rememberScrollState()
                     )
-                }
-            }
+            ) {
 
-            if (captureUiState.selectedRecordBillboardImage != null) {
-                Text(
-                    text = "Billboard image",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-                Surface(
-                    shape = MaterialTheme.shapes.small,
-                    modifier = Modifier
-                        .height(200.dp)
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                ) {
-                    Image(
-                        captureUiState.selectedRecordBillboardImage!!.asImageBitmap(),
-                        contentDescription = "Cropped Billboard",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.FillBounds
+                if (captureUiState.selectedRecord?.entryEntity?.remoteFileUrl != null) {
+                    Text(
+                        text = "Full image",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(top = 16.dp)
                     )
-                }
-            }
-
-            Text(
-                text = "Campaign information",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(top = 16.dp)
-            )
-
-            Row(
-                modifier = Modifier
-                    .padding(vertical = 8.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Campaign brand",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier.padding(end = 16.dp)
-                )
-                Text(
-                    text = selectedCapture?.entryEntity?.brand.ifEmptySetNull() ?: "Unknown",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            Text(
-                text = "Campaign",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Normal,
-                modifier = Modifier.padding(top = 0.dp)
-            )
-            Text(
-                text = selectedCapture?.entryEntity?.augmentedText.ifEmptySetNull()
-                    ?: selectedCapture?.entryEntity?.rawText.ifEmptySetNull() ?: "Unknown",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(end = 16.dp)
-            )
-            Text(
-                text = "Billboard information",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(top = 16.dp)
-            )
-            Row(
-                modifier = Modifier
-                    .padding(top = 8.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Billboard owner",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier.padding(end = 16.dp)
-                )
-                Text(
-                    text = selectedCapture?.billboardData?.owner.ifEmptySetNull() ?: "N/A",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .padding(top = 6.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Billboard type",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier.padding(end = 16.dp)
-                )
-                Text(
-                    text = selectedCapture?.billboardData?.type.ifEmptySetNull() ?: "N/A",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .padding(top = 6.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Billboard height",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier.padding(end = 16.dp)
-                )
-                Text(
-                    text = selectedCapture?.billboardData?.type.ifEmptySetNull() ?: "N/A",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .padding(top = 6.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Billboard width",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier.padding(end = 16.dp)
-                )
-                Text(
-                    text = selectedCapture?.billboardData?.type.ifEmptySetNull() ?: "N/A",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-            if (!selectedCapture?.otherData.isNullOrEmpty()) {
-                Text(
-                    text = "Others",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-                selectedCapture?.otherData?.forEach { data ->
-                    Row(
+                    Surface(
+                        shape = MaterialTheme.shapes.small,
                         modifier = Modifier
-                            .padding(top = 6.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                            .height(200.dp)
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
                     ) {
-                        Text(
-                            text = data.type ?: data.key ?: "",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Normal,
-                            modifier = Modifier.padding(end = 16.dp)
+                        GlideImage(
+                            model = "https://scout.edgetech.co.ke/api/v1/${captureUiState.selectedRecord?.entryEntity?.remoteFileUrl}",
+                            contentDescription = "",
+                            modifier = Modifier.fillMaxSize(),
                         )
-                        Text(
-                            text = data.value ?: "N/A",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
+//                        Image(
+//                            captureUiState.selectedRecordMainImage!!.asImageBitmap(),
+//                            contentDescription = "Cropped Billboard",
+//                            modifier = Modifier.fillMaxSize(),
+//                            contentScale = ContentScale.FillBounds
+//                        )
+                    }
+                }
+
+                if (captureUiState.selectedRecordBillboardImage != null) {
+                    Text(
+                        text = "Billboard image",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
+                    Surface(
+                        shape = MaterialTheme.shapes.small,
+                        modifier = Modifier
+                            .height(200.dp)
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                    ) {
+                        Image(
+                            captureUiState.selectedRecordBillboardImage!!.asImageBitmap(),
+                            contentDescription = "Cropped Billboard",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.FillBounds
                         )
                     }
                 }
 
-            }
+                Text(
+                    text = "Campaign information",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
 
-            Text(
-                text = "Billboard location",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(top = 16.dp)
-            )
-            Surface(
-                shape = MaterialTheme.shapes.small,
-                color = MaterialTheme.colorScheme.surface,
-                border = BorderStroke(width = 1.dp, color = Color.LightGray),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .padding(vertical = 8.dp)
-            ) {
-                GoogleMap(
-                    modifier = Modifier.fillMaxSize(),
-                    cameraPositionState = cameraPositionState
+                Row(
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    if (selectedLocation != null) {
-                        Marker(
-                            state = MarkerState(position = selectedLocation!!),
-                            title = "Your location",
-                            snippet = "Location"
-                        )
+                    Text(
+                        text = "Campaign brand",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal,
+                        modifier = Modifier.padding(end = 16.dp)
+                    )
+                    Text(
+                        text = selectedCapture?.entryEntity?.brand.ifEmptySetNull() ?: "Unknown",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Text(
+                    text = "Campaign",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier.padding(top = 0.dp)
+                )
+                Text(
+                    text = selectedCapture?.entryEntity?.augmentedText.ifEmptySetNull()
+                        ?: selectedCapture?.entryEntity?.rawText.ifEmptySetNull() ?: "Unknown",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(end = 16.dp)
+                )
+                Text(
+                    text = "Billboard information",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+                Row(
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Billboard owner",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal,
+                        modifier = Modifier.padding(end = 16.dp)
+                    )
+                    Text(
+                        text = selectedCapture?.billboardData?.owner.ifEmptySetNull() ?: "N/A",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .padding(top = 6.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Billboard type",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal,
+                        modifier = Modifier.padding(end = 16.dp)
+                    )
+                    Text(
+                        text = selectedCapture?.billboardData?.type.ifEmptySetNull() ?: "N/A",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .padding(top = 6.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Billboard height",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal,
+                        modifier = Modifier.padding(end = 16.dp)
+                    )
+                    Text(
+                        text = selectedCapture?.billboardData?.type.ifEmptySetNull() ?: "N/A",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .padding(top = 6.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Billboard width",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal,
+                        modifier = Modifier.padding(end = 16.dp)
+                    )
+                    Text(
+                        text = selectedCapture?.billboardData?.type.ifEmptySetNull() ?: "N/A",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+                if (!selectedCapture?.otherData.isNullOrEmpty()) {
+                    Text(
+                        text = "Others",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
+                    selectedCapture?.otherData?.forEach { data ->
+                        Row(
+                            modifier = Modifier
+                                .padding(top = 6.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = data.type ?: data.key ?: "",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Normal,
+                                modifier = Modifier.padding(end = 16.dp)
+                            )
+                            Text(
+                                text = data.value ?: "N/A",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                    }
+
+                }
+
+                Text(
+                    text = "Billboard location",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+                Surface(
+                    shape = MaterialTheme.shapes.small,
+                    color = MaterialTheme.colorScheme.surface,
+                    border = BorderStroke(width = 1.dp, color = Color.LightGray),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .padding(vertical = 8.dp)
+                ) {
+                    GoogleMap(
+                        modifier = Modifier.fillMaxSize(),
+                        cameraPositionState = cameraPositionState
+                    ) {
+                        if (selectedLocation != null) {
+                            Marker(
+                                state = MarkerState(position = selectedLocation!!),
+                                title = "Your location",
+                                snippet = "Location"
+                            )
+                        }
                     }
                 }
-            }
-            Text(
-                selectedCapture?.location?.locationName ?: selectedCapture?.location?.subAdminArea
-                ?: "",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(vertical = 4.dp)
-            )
+                Text(
+                    selectedCapture?.location?.locationName
+                        ?: selectedCapture?.location?.subAdminArea
+                        ?: "",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
 
-            Text(
-                selectedCapture?.location?.mainAdminArea ?: selectedCapture?.location?.locationCity
-                ?: "",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(vertical = 4.dp)
-            )
+                Text(
+                    selectedCapture?.location?.mainAdminArea
+                        ?: selectedCapture?.location?.locationCity
+                        ?: "",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+            }
         }
     }
 }

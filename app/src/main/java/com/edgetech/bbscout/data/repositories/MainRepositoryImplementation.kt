@@ -69,28 +69,7 @@ class MainRepositoryImplementation @Inject constructor(
                 }
                 if (campaignResponse.data != null){
                     val newRecord = EntryRecord.fromCampaignResponse(campaignResponse.data!!)
-                    try {
-                        val entryId = bbScoutDao.insertEntityRecord(newRecord.entryEntity)
-                        coroutineScope {
-                            listOf(launch {
-                                if (newRecord.location != null) {
-                                    bbScoutDao.insertUserLocation(newRecord.location.copy(entryId = entryId))
-                                }
-                            }, launch {
-                                if (newRecord.otherData.isNotEmpty()) {
-                                    bbScoutDao.insertOtherData(newRecord.otherData.map { it.copy(entryId = entryId) })
-                                }
-                            },
-                                launch {
-                                    if (newRecord.billboardData != null) {
-                                        bbScoutDao.insertBillboardDataEntity(newRecord.billboardData.copy(entryId = entryId))
-                                    }
-                                }).joinAll()
-                        }
-
-                    } catch (e: Exception) {
-                       // return SimpleResource.Error(e.message ?: "Unknown Error")
-                    }
+                    insertRecord(newRecord)
                     return SimpleResource.Success(newRecord)
                 }
                 else {
@@ -108,6 +87,34 @@ class MainRepositoryImplementation @Inject constructor(
 
     }
 
+
+    private suspend fun insertRecord(newRecord: EntryRecord): SimpleResource<EntryRecord>{
+
+        try {
+            val entryId = bbScoutDao.insertEntityRecord(newRecord.entryEntity)
+            coroutineScope {
+                listOf(launch {
+                    if (newRecord.location != null) {
+                        bbScoutDao.insertUserLocation(newRecord.location.copy(entryId = entryId))
+                    }
+                }, launch {
+                    if (newRecord.otherData.isNotEmpty()) {
+                        bbScoutDao.insertOtherData(newRecord.otherData.map { it.copy(entryId = entryId) })
+                    }
+                },
+                    launch {
+                        if (newRecord.billboardData != null) {
+                            bbScoutDao.insertBillboardDataEntity(newRecord.billboardData.copy(entryId = entryId))
+                        }
+                    }).joinAll()
+            }
+
+        } catch (e: Exception) {
+            // return SimpleResource.Error(e.message ?: "Unknown Error")
+        }
+        return SimpleResource.Success(newRecord)
+    }
+
     override suspend fun getAllEntries(): SimpleResource<List<EntryRecord>> {
 
 
@@ -117,7 +124,7 @@ class MainRepositoryImplementation @Inject constructor(
         if (billboardsUpload.data != null){
             val billboards =  billboardsUpload.data!!.data?.map { EntryRecord.fromBillboardResponse(it) } ?: emptyList()
             billboards.forEach {
-                addEntryRecord(it)
+                insertRecord(it)
             }
             return SimpleResource.Success(billboards)
         } else {
@@ -137,7 +144,7 @@ class MainRepositoryImplementation @Inject constructor(
         }
         if (billboardsUpload.data != null) {
             val billboard = EntryRecord.fromBillboardResponse(billboardsUpload.data!!)
-            addEntryRecord(billboard)
+            insertRecord(billboard)
             return SimpleResource.Success(billboard)
         } else
             try {
