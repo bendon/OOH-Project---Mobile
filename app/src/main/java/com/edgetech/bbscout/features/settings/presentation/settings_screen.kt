@@ -1,9 +1,11 @@
 package com.edgetech.bbscout.features.settings.presentation
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,6 +13,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material.icons.outlined.PersonOutline
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -27,9 +31,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.diracks.app.app.app_state.BBScoutAppState
+import com.edgetech.bbscout.R
 import com.edgetech.bbscout.components.ui.StatusDialog
 import com.edgetech.bbscout.components.ui.WarningIcon
 import com.edgetech.bbscout.data.utils.DataConstants
@@ -131,13 +138,65 @@ fun SettingsMain(
                 )
             }
             Text("${user?.firstName} ${user?.lastName}", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(bottom = 16.dp))
-            SettingsItem(
-                Icons.Outlined.Logout,
-                "Logout",
-                modifier = Modifier.padding(vertical = 16.dp)
-            ){
-                showLogOutWarning = true
+
+            Text(text = "Policies", fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 16.dp).align(Alignment.Start))
+            Card(
+                shape = MaterialTheme.shapes.small,
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                border = BorderStroke(2.dp, MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            ) {
+                SettingsItemComp(
+                    "Privacy Policy",
+                    R.drawable.privacy_dashboard_svgrepo_com,
+                    onClick = {
+
+                    }
+
+                )
+                SettingsItemComp(
+                    "Terms and conditions",
+                    R.drawable.terms_svgrepo_com,
+                    onClick = {
+
+                    },
+                    hasDivider = false
+
+                )
             }
+
+            Text(text = "Account", fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 16.dp).align(Alignment.Start))
+            Card(
+                shape = MaterialTheme.shapes.small,
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                border = BorderStroke(2.dp, MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            ) {
+                SettingsItemComp(
+                    "Change Password",
+                    R.drawable.password_minimalistic_input_svgrepo_com,
+                    onClick = {
+
+                    }
+
+                )
+                SettingsItemComp(
+                    "Logout",
+                    R.drawable.logout_svgrepo_com,
+                    onClick = {
+                        showLogOutWarning = true
+                    },
+                    hasDivider = false
+
+                )
+            }
+
 
 
 

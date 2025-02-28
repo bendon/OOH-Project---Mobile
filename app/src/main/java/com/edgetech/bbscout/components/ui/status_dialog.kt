@@ -3,6 +3,7 @@ package com.edgetech.bbscout.components.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +18,8 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -54,6 +57,7 @@ fun StatusDialog(
                     .wrapContentWidth()
                     .wrapContentHeight(),
                 shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
             ) {
                 Column(
                     modifier = Modifier.padding(8.dp),
@@ -84,12 +88,19 @@ fun StatusDialog(
                         modifier = Modifier.padding(16.dp),
                     )
 
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth().padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
                     if (posText != null) {
 
                         Box(
                             modifier = Modifier
-                                .padding(top = 8.dp, start = 16.dp, end = 16.dp)
-                                .fillMaxWidth()
+                                .padding(end = 4.dp)
+                                .weight(1f)
                         ) {
                             MainLoadingButton(
                                 onTap = {
@@ -112,8 +123,8 @@ fun StatusDialog(
 
                         NonLoadingSecButton(
                             modifier = Modifier
-                                .padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
-                                .fillMaxWidth(),
+                                .padding(start = 4.dp)
+                                .weight(1f),
                             onTap = {
                                 onDismissRequest()
                             }) {
@@ -124,9 +135,10 @@ fun StatusDialog(
                             )
 
                         }
-                    } else {
-                        Spacer(modifier = Modifier.height(16.dp))
                     }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+
 
 
                 }
