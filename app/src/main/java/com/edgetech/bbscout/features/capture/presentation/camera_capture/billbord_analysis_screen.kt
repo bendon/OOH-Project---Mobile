@@ -19,9 +19,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -108,6 +112,9 @@ fun CaptureBillboardMain(
 
     // Create ML Kit analyzers
 
+    var cameraSelector by remember {
+        mutableStateOf<CameraSelector>(CameraSelector.DEFAULT_BACK_CAMERA)
+    }
 
     val uiEvent by captureRecordUiModel.captureUiEvent.collectAsState()
 
@@ -117,10 +124,6 @@ fun CaptureBillboardMain(
             CaptureRecordEventSink.ResetState
         )
     }
-
-
-
-
 
     // Setup camera
     LaunchedEffect(previewView) {
@@ -138,7 +141,7 @@ fun CaptureBillboardMain(
             }
         }
 
-        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
 
         try {
             cameraProvider.unbindAll()
@@ -177,53 +180,90 @@ fun CaptureBillboardMain(
                         .weight(1f)
                         .fillMaxWidth()
                 )
-                FloatingActionButton(
-                    onClick = {
-                        takePhoto(
-                            context = context,
-                            imageCapture = imageCapture,
-                            executor = cameraExecutor,
-                            onImageCaptured = { uri ->
-                                captureRecordUiModel.captureEventSink(
-                                    CaptureRecordEventSink.OnCaptureEvent(BillboardExtractedInfo(
-                                        fileUri = uri.path
-                                    ))
-                                )
-                            },
-                            onError = { error ->
 
-                            }
-                        )
 
-                    },
-                    modifier = Modifier.padding(top = 16.dp)
-                ) {
-                    Icon(
-                        Icons.Default.CameraAlt,
-                        contentDescription = "Capture"
-                    )
-                }
-                Text(
-                    if (croppedBitmap != null) "Ready" else "Analysing...",
-                    modifier = Modifier.padding(16.dp)
-                )
 
             }
-            if (croppedBitmap != null)
-                Surface(
-                    shape = MaterialTheme.shapes.small,
-                    modifier = Modifier
-                        .height(250.dp).width(150.dp)
-                        .align(Alignment.BottomStart)
-                        .padding(bottom = 140.dp, start = 16.dp),
-                ) {
-                    Image(
-                        bitmap = croppedBitmap!!.asImageBitmap(),
-                        contentDescription = "Cropped Billboard",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.FillBounds
+            FloatingActionButton(
+                onClick = {
+                    appState?.navController?.navigateUp()
+
+                },
+                modifier = Modifier.padding(bottom = 16.dp, start = 24.dp).align(Alignment.BottomStart),
+                shape = CircleShape,
+                containerColor = MaterialTheme.colorScheme.background,
+                contentColor = MaterialTheme.colorScheme.onBackground,
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp)
+            ) {
+                Icon(
+                    Icons.Default.Close,
+                    contentDescription = "Capture"
+                )
+            }
+            FloatingActionButton(
+                onClick = {
+                    takePhoto(
+                        context = context,
+                        imageCapture = imageCapture,
+                        executor = cameraExecutor,
+                        onImageCaptured = { uri ->
+                            captureRecordUiModel.captureEventSink(
+                                CaptureRecordEventSink.OnCaptureEvent(BillboardExtractedInfo(
+                                    fileUri = uri.path
+                                ))
+                            )
+                        },
+                        onError = { error ->
+
+                        }
                     )
-                }
+
+                },
+                modifier = Modifier.padding(bottom = 16.dp).align(Alignment.BottomCenter),
+                shape = CircleShape,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ) {
+                Icon(
+                    Icons.Default.CameraAlt,
+                    contentDescription = "Capture"
+                )
+            }
+            FloatingActionButton(
+                onClick = {
+                   if (cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA){
+                       cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+                   } else {
+                       cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+                   }
+
+                },
+                modifier = Modifier.padding(bottom = 16.dp, end = 24.dp).align(Alignment.BottomEnd),
+                shape = CircleShape,
+                containerColor = MaterialTheme.colorScheme.background,
+                contentColor = MaterialTheme.colorScheme.onBackground,
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp)
+            ) {
+                Icon(
+                    Icons.Default.Sync,
+                    contentDescription = "Capture"
+                )
+            }
+//            if (croppedBitmap != null)
+//                Surface(
+//                    shape = MaterialTheme.shapes.small,
+//                    modifier = Modifier
+//                        .height(250.dp).width(150.dp)
+//                        .align(Alignment.BottomStart)
+//                        .padding(bottom = 140.dp, start = 16.dp),
+//                ) {
+//                    Image(
+//                        bitmap = croppedBitmap!!.asImageBitmap(),
+//                        contentDescription = "Cropped Billboard",
+//                        modifier = Modifier.fillMaxSize(),
+//                        contentScale = ContentScale.FillBounds
+//                    )
+//                }
         }
     }
 }
