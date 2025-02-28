@@ -22,6 +22,8 @@ val mainBlue = Color(37, 99, 234)
 val lightBlue = Color(0xFFeff6ff)
 val litherBlue = Color(0xFF2563ea).copy(alpha = 0.1f)
 
+val darkerBlue = Color(0xFF003092)
+
 val mainOrange = Color(0xFFFF6B6B)
 val lightOrange = Color(0xFFFFBFB9)
 val litherOrange = Color(0xFFFF6B6B).copy(alpha = 0.1f)

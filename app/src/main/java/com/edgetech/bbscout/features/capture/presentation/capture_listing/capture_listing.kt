@@ -51,7 +51,11 @@ fun CapturesListingMain(
         )
     }
 
-    Scaffold {
+    Scaffold(
+        topBar = {
+
+        }
+    ) {
         Column {
             if (capturesUiState.isLoading) {
                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth())

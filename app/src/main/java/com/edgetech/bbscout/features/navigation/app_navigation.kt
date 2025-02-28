@@ -113,6 +113,9 @@ fun DirackAppNavigation(
         composable<AppDestinations.Loading> {
             LoadingScreen(authViewModel, navController)
         }
+        composable<AppDestinations.CaptureCheckRequirement> {
+            CaptureCheckPermission(appState)
+        }
 
     }
 
@@ -139,11 +142,11 @@ fun BBScoutDashboardNavigation(
             HomeDashboard(appState, onPageTap = onPageTap)
         }
 
-        composable(
-            route = DashboardScreenOption.CAPTURE.name
-        ) {
-            CaptureCheckPermission(appState)
-        }
+//        composable(
+//            route = DashboardScreenOption.CAPTURE.name
+//        ) {
+//
+//        }
 
         composable(
             route = DashboardScreenOption.HISTORY.name
@@ -163,7 +166,7 @@ fun BBScoutDashboardNavigation(
 
 enum class DashboardScreenOption(val route: String, val iconUnselected: ImageVector, val iconSelected: ImageVector, val label: String) {
     HOME("home", Icons.Outlined.Home, Icons.Filled.Home, "Home"),
-    CAPTURE("capture", Icons.Outlined.PhotoCamera, Icons.Filled.PhotoCamera,"Capture"),
+   // CAPTURE("capture", Icons.Outlined.PhotoCamera, Icons.Filled.PhotoCamera,"Capture"),
     HISTORY("history", Icons.Outlined.History, Icons.Filled.History, "History"),
     SETTINGS("settings", Icons.Outlined.Settings, Icons.Filled.Settings, "Settings")
 }
@@ -197,5 +200,8 @@ sealed interface AppDestinations {
 
     @Serializable
     data object Loading : AppDestinations
+
+    @Serializable
+    data object CaptureCheckRequirement: AppDestinations
 
 }

@@ -2,6 +2,7 @@ package com.edgetech.bbscout.features.capture.presentation.camera_capture
 
 import android.graphics.Bitmap
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
@@ -83,6 +84,11 @@ fun CaptureBillboardMain(
     captureRecordUiModel: CaptureRecordUiModel
 
 ) {
+
+    BackHandler {
+        appState?.navController?.popBackStack(AppDestinations.Dashboard, false)
+    }
+
     val context = LocalContext.current
     val previewView = remember { PreviewView(context) }
 

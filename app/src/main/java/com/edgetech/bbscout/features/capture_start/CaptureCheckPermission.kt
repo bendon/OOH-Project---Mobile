@@ -15,11 +15,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.CheckCircleOutline
 import androidx.compose.material.icons.outlined.GpsFixed
@@ -27,7 +29,10 @@ import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Smartphone
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -36,6 +41,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -65,6 +71,7 @@ import com.edgetech.bbscout.ui.theme.mainBlue
 import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CaptureCheckPermission(
     appState: BBScoutAppState?
@@ -131,9 +138,31 @@ fun CaptureCheckPermission(
         actionType = CheckPermissionType.GPS
     } else if (hasLocationPermission && hasCameraPermission && hasGPSEnabled){
         actionType = CheckPermissionType.ALL_GRANTED
+        appState?.navController?.navigate(AppDestinations.CameraCapture)
     }
 
     Scaffold(
+
+        topBar = {
+            CenterAlignedTopAppBar(
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors()
+                    .copy(containerColor = MaterialTheme.colorScheme.background),
+                windowInsets = WindowInsets(0, 0, 0, 0),
+                title = { Text(text = "Checking requirement") },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        appState?.navController?.navigateUp()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Navigate up",
+                            tint = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                },
+
+                )
+        },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
@@ -325,59 +354,5 @@ enum class CheckPermissionType(val data: AppScreenData) {
     )
 }
 
-fun checkLocationPermission(context: Context): Boolean {
-    return ContextCompat.checkSelfPermission(
-        context,
-        Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
-}
 
-fun checkCameraPermission(context: Context): Boolean {
-    return ContextCompat.checkSelfPermission(
-        context,
-        Manifest.permission.CAMERA
-    ) == PackageManager.PERMISSION_GRANTED
-}
-
-fun hasRequestedPermissionBefore(context: Context, permission: String): Boolean {
-    return when (context) {
-        is ComponentActivity -> {
-            ActivityCompat.shouldShowRequestPermissionRationale(context, permission)
-                .not() && isPermissionDenied(context, permission)
-        }
-        else -> false
-    }
-}
-
-private fun isPermissionDenied(context: Context, permission: String): Boolean {
-    return ActivityCompat.checkSelfPermission(
-        context,
-        permission
-    ) == PackageManager.PERMISSION_DENIED
-}
-
-fun isGPSEnabled(context: Context): Boolean {
-    val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-    return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-}
-
-fun goSettings(context: Context){
-    try {
-        // Try vendor-specific intent first (works on most modern devices)
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            data = Uri.fromParts("package", getApplicationPackagedName(), null)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            // This extra attempts to open the permissions page directly
-            putExtra(":settings:fragment_args_key", "permission_settings")
-        }
-        startActivity(context, intent, null)
-    } catch (e: Exception) {
-        // Fallback to regular app settings if vendor-specific intent fails
-        val fallbackIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            data = Uri.fromParts("package", getApplicationPackagedName(), null)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        startActivity(context, fallbackIntent, null)
-    }
-}
 
