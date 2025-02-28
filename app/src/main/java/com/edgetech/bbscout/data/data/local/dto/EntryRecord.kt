@@ -38,7 +38,7 @@ data class EntryRecord(
                     height = entryRecord.billboardData?.height ?: 0.0,
                     width = entryRecord.billboardData?.width ?: 0.0,
                     type = entryRecord.billboardData?.type ?: "traditional",
-                    unit = "centimeters",
+                    unit = entryRecord.billboardData?.unitOfMeasurement ?: "centimeters",
                     price = 0.0,
                     imageId = entryRecord.entryEntity.remoteFileId,
                     location = entryRecord.location?.locationName,
@@ -57,7 +57,7 @@ data class EntryRecord(
         fun fromBillboardResponse(billboardResponse: BillboardResponse) = EntryRecord(
             entryEntity = EntryEntity(
                 brand = billboardResponse.campaign?.clientFirstName,
-                remoteFileUrl = billboardResponse.image?.fileUrl,
+                remoteFileUrl = billboardResponse.image?.fileName,
                 rawText = billboardResponse.campaign?.campaignDescription,
                 augmentedText = billboardResponse.campaign?.campaignDescription,
                 remoteId = billboardResponse.billboardId,
@@ -80,7 +80,7 @@ data class EntryRecord(
         fun fromCampaignResponse(campaignResponse: CampaignResponse) = EntryRecord(
             entryEntity = EntryEntity(
                 brand = campaignResponse.clientFirstName,
-                remoteFileUrl = campaignResponse.image?.fileUrl,
+                remoteFileUrl = campaignResponse.image?.fileName,
                 rawText = campaignResponse.campaignDescription,
                 augmentedText = campaignResponse.campaignDescription,
                 remoteId = campaignResponse.billboard?.billboardId,

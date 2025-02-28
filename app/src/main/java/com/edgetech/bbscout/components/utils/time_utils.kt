@@ -42,14 +42,15 @@ fun LocalTime.toLong() = this.getLong(ChronoField.MICRO_OF_DAY)
 fun now(zoneId: String = "UTC") = LocalDateTime.now(ZoneId.of(zoneId))
 
 fun Long.getFullDateAndTimeFromLong(zoneId: String = "UTC"): String {
-    if (this.toLocalDate() == now().toLocalDate())
-        return "Today, ${this.getTimeFromDateLong(zoneId)}"
-    if (this.toLocalDate() == now().toLocalDate().minusDays(1))
-        return "Yesterday, ${this.getTimeFromDateLong(zoneId)}"
-    val sdf = SimpleDateFormat("HH:mm dd/MM/yyyy", Locale.ENGLISH)
-    sdf.applyPattern("HH:mm EEE, d MMM yyyy")
+    val time = this * 1000
+    if (time.toLocalDate() == now().toLocalDate())
+        return "Today, ${time.getTimeFromDateLong(zoneId)}"
+    if (time.toLocalDate() == now().toLocalDate().minusDays(1))
+        return "Yesterday, ${time.getTimeFromDateLong(zoneId)}"
+    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
+    sdf.applyPattern("d MMM yyyy")
     sdf.timeZone = TimeZone.getTimeZone(TimeZone.getDefault().toZoneId().id)
-    return sdf.format(Date(this))
+    return sdf.format(Date(time))
 }
 
 fun Long.getTimeFromDateLong(zoneId: String = "UTC"): String {

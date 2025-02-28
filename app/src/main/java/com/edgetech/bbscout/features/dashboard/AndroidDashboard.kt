@@ -1,6 +1,8 @@
 package com.edgetech.bbscout.features.dashboard
 
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,6 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.diracks.app.app.app_state.BBScoutAppState
+import com.edgetech.bbscout.components.utils.defaultZoneId
+import com.edgetech.bbscout.components.utils.getFullDateAndTimeFromLong
 import com.edgetech.bbscout.data.data.local.dto.EntryRecord
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
@@ -98,7 +102,7 @@ fun HomeDashboard(
             ) {
                 HeaderSection(numberOfCaptures = capturesUiState.allCaptures.size)
                 Spacer(modifier = Modifier.height(16.dp))
-                ChallengeCard()
+                ChallengeCard(appState)
                 Spacer(modifier = Modifier.height(16.dp))
                 QuickActions(appState, onPageTap = onPageTap)
                 //            Spacer(modifier = Modifier.height(16.dp))
@@ -156,7 +160,11 @@ fun HeaderSection(
 }
 
 @Composable
-fun ChallengeCard() {
+fun ChallengeCard(
+    appState: BBScoutAppState?
+) {
+    val context = LocalContext.current
+
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
@@ -183,7 +191,7 @@ fun ChallengeCard() {
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Map your first 5 billboards.",
+                    text = "Map your next billboards.",
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -193,12 +201,27 @@ fun ChallengeCard() {
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    modifier = Modifier.padding(vertical = 8.dp).clickable {
+                        navigateToCapture(appState, context)
+                    }
                 )
             }
             //Icon(Icons.Outlined.WarningAmber, contentDescription = null)
         }
     }
+}
+
+fun navigateToCapture(
+    appState: BBScoutAppState?,
+    context: Context
+){
+    if (checkCameraPermission(context) && checkLocationPermission(context) && isGPSEnabled(
+            context
+        )
+    )
+        appState?.navController?.navigate(AppDestinations.CameraCapture)
+    else
+        appState?.navController?.navigate(AppDestinations.CaptureCheckRequirement)
 }
 
 @Composable
@@ -221,13 +244,7 @@ fun QuickActions(appState: BBScoutAppState?, onPageTap: (DashboardScreenOption) 
                 modifier = Modifier.weight(1f),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
                 onClick = {
-                    if (checkCameraPermission(context) && checkLocationPermission(context) && isGPSEnabled(
-                            context
-                        )
-                    )
-                        appState?.navController?.navigate(AppDestinations.CameraCapture)
-                    else
-                        appState?.navController?.navigate(AppDestinations.CaptureCheckRequirement)
+                    navigateToCapture(appState, context)
                 }
             ) {
                 Column(
@@ -367,9 +384,15 @@ fun RecentActivity(recentCaptures: List<EntryRecord>, appState: BBScoutAppState?
             recentCaptures.forEachIndexed { index, item ->
                 BillboardItem(
                     item.entryEntity.brand ?: "N/A",
-                    item.location?.locationName ?: "N/A",
+                    "${item.location?.locationName ?: ""} ${if (!item.location?.locationName.isNullOrEmpty()) "•" else ""} ${
+                        item.entryEntity.createdAt?.getFullDateAndTimeFromLong(
+                            defaultZoneId.id
+                        ) ?: ""
+                    }",
                     hasDivider = index != recentCaptures.lastIndex,
-
+                    modifier = Modifier.clickable {
+                        appState?.navController?.navigate(AppDestinations.CaptureDetail(item.entryEntity.remoteId ?: ""))
+                    }
                     )
 
             }

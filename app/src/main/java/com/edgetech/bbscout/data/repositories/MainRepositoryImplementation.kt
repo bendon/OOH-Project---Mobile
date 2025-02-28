@@ -142,8 +142,10 @@ class MainRepositoryImplementation @Inject constructor(
         val billboardsUpload = repoHelper.apiDbRequestOrFail {
             bbScoutApi.getBillboard(entry)
         }
+
         if (billboardsUpload.data != null) {
-            val billboard = EntryRecord.fromBillboardResponse(billboardsUpload.data!!)
+            val remBillboard = billboardsUpload.data!!
+            val billboard = EntryRecord.fromBillboardResponse(remBillboard)
             insertRecord(billboard)
             return SimpleResource.Success(billboard)
         } else

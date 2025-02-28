@@ -344,9 +344,9 @@ fun ReviewRecordMain(
                     modifier = Modifier.weight(1f),
                    pIsLoading = captureRecordUiState.isLoading
                 ) {
-                    Icon(Icons.Default.CheckCircleOutline, contentDescription = "Capture")
+                    Icon(Icons.Default.CheckCircleOutline, contentDescription = "Capture", tint = MaterialTheme.colorScheme.onPrimary)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Submit")
+                    Text("Submit", color = MaterialTheme.colorScheme.onPrimary)
                 }
 
 

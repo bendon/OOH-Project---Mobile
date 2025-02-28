@@ -56,4 +56,9 @@ interface BBScoutApi {
 
     @POST("api/v1/en/sl/upload/files")
     suspend fun uploadFile(@Body body: MultipartBody): Response<FileResponse>
+
+    @GET("api/v1/auth/file/{name}")
+    suspend fun getFile(
+        @Path("name") name: String
+    ): Response<FileResponse>
 }

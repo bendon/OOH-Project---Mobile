@@ -107,8 +107,8 @@ fun MainLoadingButton(
             pIsLoading = pIsLoading,
             disableOnTap = disableOnTap,
             colors = ButtonDefaults.buttonColors(
-                containerColor = mainBlue,
-                disabledContainerColor = lightBlue
+                containerColor = MaterialTheme.colorScheme.primary,
+                disabledContainerColor = MaterialTheme.colorScheme.primaryContainer
             ),
             shape = RoundedCornerShape(20),
             onTap = onTap,
@@ -180,7 +180,7 @@ fun LoadingButton(
         if (isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.padding(vertical = 4.dp).size(28.dp),
-                color = MaterialTheme.colorScheme.background
+                color = MaterialTheme.colorScheme.primary
             )
         } else {
             content()

@@ -103,7 +103,7 @@ fun CaptureDetailMain(
 
     LaunchedEffect(selectedLocation) {
         cameraPositionState.position =
-            CameraPosition.fromLatLngZoom(selectedLocation ?: LatLng(-0.0236, 37.9062), 5f)
+            CameraPosition.fromLatLngZoom(selectedLocation ?: LatLng(-0.0236, 37.9062), 10f)
     }
 
 
@@ -165,7 +165,7 @@ fun CaptureDetailMain(
                             .padding(vertical = 8.dp),
                     ) {
                         GlideImage(
-                            model = "https://scout.edgetech.co.ke/api/v1/${captureUiState.selectedRecord?.entryEntity?.remoteFileUrl}",
+                            model = "https://scout.edgetech.co.ke/api/v1/auth/file/${captureUiState.selectedRecord?.entryEntity?.remoteFileUrl}",
                             contentDescription = "",
                             modifier = Modifier.fillMaxSize(),
                         )
@@ -201,7 +201,9 @@ fun CaptureDetailMain(
                     }
                 }
 
-
+                CaptureBillboardInfo(
+                    selectedCapture = selectedCapture
+                )
 
                 Text(
                     text = "Billboard location",
@@ -348,7 +350,7 @@ fun CaptureBillboardInfo(selectedCapture: EntryRecord?){
             modifier = Modifier.padding(end = 16.dp)
         )
         Text(
-            text = selectedCapture?.billboardData?.type.ifEmptySetNull() ?: "N/A",
+            text = selectedCapture?.billboardData?.height?.toString() ?: "N/A",
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold
         )
@@ -367,7 +369,7 @@ fun CaptureBillboardInfo(selectedCapture: EntryRecord?){
             modifier = Modifier.padding(end = 16.dp)
         )
         Text(
-            text = selectedCapture?.billboardData?.type.ifEmptySetNull() ?: "N/A",
+            text = selectedCapture?.billboardData?.width.toString() ?: "N/A",
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
         )
@@ -403,10 +405,7 @@ fun CaptureBillboardInfo(selectedCapture: EntryRecord?){
     }
 }
 
-@Composable
-fun BillboardLocation(selectedCapture: EntryRecord?){
 
-}
 
 @Preview
 @Composable

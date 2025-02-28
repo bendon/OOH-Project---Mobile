@@ -309,7 +309,7 @@ class CaptureRecordViewmodel @Inject constructor(
             repository.getAllEntries().onSuccess { data ->
                 _captureUiState.update {
                     it.copy(
-                        allCaptures = data?.take(5) ?: emptyList()
+                        allCaptures = data?.sortedByDescending { it.entryEntity.createdAt } ?: emptyList()
                     )
                 }
             }.onError { ex ->
