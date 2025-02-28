@@ -60,7 +60,9 @@ data class EntryRecord(
                 remoteFileUrl = billboardResponse.image?.fileUrl,
                 rawText = billboardResponse.campaign?.campaignDescription,
                 augmentedText = billboardResponse.campaign?.campaignDescription,
-                remoteId = billboardResponse.billboardId
+                remoteId = billboardResponse.billboardId,
+                updatedAt = billboardResponse.updatedAt,
+                createdAt = billboardResponse.createdAt
             ),
             otherData = emptyList(),
             location = UserLocationEntity(
@@ -81,7 +83,9 @@ data class EntryRecord(
                 remoteFileUrl = campaignResponse.image?.fileUrl,
                 rawText = campaignResponse.campaignDescription,
                 augmentedText = campaignResponse.campaignDescription,
-                remoteId = campaignResponse.billboard?.billboardId
+                remoteId = campaignResponse.billboard?.billboardId,
+                updatedAt = campaignResponse.billboard?.updatedAt,
+                createdAt = campaignResponse.billboard?.createdAt
             ),
             otherData = emptyList(),
             location = UserLocationEntity(

@@ -182,7 +182,7 @@ fun SettingsMain(
                     "Change Password",
                     R.drawable.password_minimalistic_input_svgrepo_com,
                     onClick = {
-
+                        appState?.navController?.navigate(AppDestinations.ChangePassword)
                     }
 
                 )

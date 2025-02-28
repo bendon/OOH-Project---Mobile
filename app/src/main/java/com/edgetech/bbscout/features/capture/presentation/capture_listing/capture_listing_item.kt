@@ -1,5 +1,6 @@
 package com.edgetech.bbscout.features.capture.presentation.capture_listing
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.edgetech.bbscout.components.utils.defaultZoneId
+import com.edgetech.bbscout.components.utils.getFullDateAndTimeFromLong
 import com.edgetech.bbscout.components.utils.ifEmptySetNull
 import com.edgetech.bbscout.data.data.local.dto.EntryRecord
 
@@ -34,7 +37,8 @@ fun BillboardListingItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+        border = BorderStroke(width = 2.dp, color = MaterialTheme.colorScheme.surface),
         onClick = onTap
     ) {
         Row(
@@ -66,7 +70,11 @@ fun BillboardListingItem(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "${item.location?.locationName ?: item.location?.subAdminArea ?: ""} • ${item.location?.mainAdminArea ?: item.location?.locationCity ?: ""}",
+                    text = "${item.location?.locationName ?: ""} ${if (!item.location?.locationName.isNullOrEmpty()) "•" else ""} ${
+                        item.entryEntity.createdAt?.getFullDateAndTimeFromLong(
+                            defaultZoneId.id
+                        ) ?: ""
+                    }",
                     fontSize = 14.sp,
                     color = Color.Gray
                 )

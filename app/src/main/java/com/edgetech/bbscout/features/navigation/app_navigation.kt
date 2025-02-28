@@ -24,6 +24,7 @@ import androidx.navigation.toRoute
 import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.components.utils.getPreference
 import com.edgetech.bbscout.features.auth.domain.viewmodel.AuthViewmodel
+import com.edgetech.bbscout.features.auth.presentation.ChangePasswordScreen
 import com.edgetech.bbscout.features.auth.presentation.LoadingScreen
 import com.edgetech.bbscout.features.auth.presentation.LoginScreen
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
@@ -117,6 +118,10 @@ fun DirackAppNavigation(
             CaptureCheckPermission(appState)
         }
 
+        composable<AppDestinations.ChangePassword> {
+            ChangePasswordScreen(appState, authViewModel)
+        }
+
     }
 
 }
@@ -158,6 +163,8 @@ fun BBScoutDashboardNavigation(
         ) {
             SettingsScreen(authViewModel = authViewModel, appState)
         }
+
+
 
     }
 
@@ -203,5 +210,8 @@ sealed interface AppDestinations {
 
     @Serializable
     data object CaptureCheckRequirement: AppDestinations
+
+    @Serializable
+    data object ChangePassword : AppDestinations
 
 }

@@ -17,6 +17,9 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.outlined.Error
+import androidx.compose.material.icons.outlined.Help
+import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -95,11 +98,28 @@ fun StatusDialog(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
+                        if (negText != null) {
+
+                            NonLoadingSecButton(
+                                modifier = Modifier
+                                    .padding(end = 4.dp)
+                                    .weight(1f),
+                                onTap = {
+                                    onDismissRequest()
+                                }) {
+                                ButtonContent(
+                                    negText,
+                                    MaterialTheme.colorScheme.onBackground,
+                                    // brush = LocalAppResources.current.primaryBackgroundBrush
+                                )
+
+                            }
+                        }
                     if (posText != null) {
 
                         Box(
                             modifier = Modifier
-                                .padding(end = 4.dp)
+                                .padding(start = 4.dp)
                                 .weight(1f)
                         ) {
                             MainLoadingButton(
@@ -119,23 +139,7 @@ fun StatusDialog(
 
                     }
 
-                    if (negText != null) {
 
-                        NonLoadingSecButton(
-                            modifier = Modifier
-                                .padding(start = 4.dp)
-                                .weight(1f),
-                            onTap = {
-                                onDismissRequest()
-                            }) {
-                            ButtonContent(
-                                negText,
-                                MaterialTheme.colorScheme.onBackground,
-                               // brush = LocalAppResources.current.primaryBackgroundBrush
-                            )
-
-                        }
-                    }
                     }
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -184,7 +188,7 @@ fun SuccessIcon() {
 fun ErrorIcon() {
 
     Icon(
-        Icons.Default.Error,
+        Icons.Outlined.Error,
         //tint = monzaDark,
         contentDescription = "Error",
         modifier = Modifier.size(78.dp)
@@ -195,7 +199,7 @@ fun ErrorIcon() {
 fun WarningIcon() {
 
     Icon(
-        Icons.Default.Warning,
+        Icons.Outlined.Warning,
         tint = Color(0xffffcc00),
         contentDescription = "Warning",
         modifier = Modifier.size(78.dp)
@@ -206,7 +210,7 @@ fun WarningIcon() {
 fun HelpIcon() {
 
     Icon(
-        Icons.Default.Help,
+        Icons.Outlined.Help,
        // tint = LocalAppResources.current.successColor,
         contentDescription = "Help",
         modifier = Modifier.size(78.dp)

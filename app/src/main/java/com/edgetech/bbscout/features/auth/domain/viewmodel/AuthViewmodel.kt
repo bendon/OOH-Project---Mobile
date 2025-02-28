@@ -83,7 +83,11 @@ class AuthViewmodel @Inject constructor(
             }
             return
         }
+
         viewModelScope.launch(ioDispatcher) {
+            _uiState.update {
+                it.copy(isLoading = true)
+            }
             repository.changePassword(
                 ChangePasswordRequest(
                     oldPassword = eventSink.oldPassword,
@@ -97,6 +101,9 @@ class AuthViewmodel @Inject constructor(
                 _uiEvent.update {
                     AuthUiEvent.Error(ex ?: BBScoutException("Unknown Error"), eventSink)
                 }
+            }
+            _uiState.update {
+                it.copy(isLoading = false)
             }
         }
     }

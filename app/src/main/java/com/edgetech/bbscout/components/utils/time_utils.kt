@@ -2,12 +2,16 @@ package com.edgetech.bbscout.components.utils
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.temporal.ChronoField
+import java.util.Date
+import java.util.Locale
 import java.util.TimeZone
 
 
@@ -36,3 +40,21 @@ fun LocalTime.toUtc(): LocalTime = LocalDateTime.of(LocalDate.now(), this).toUtc
 
 fun LocalTime.toLong() = this.getLong(ChronoField.MICRO_OF_DAY)
 fun now(zoneId: String = "UTC") = LocalDateTime.now(ZoneId.of(zoneId))
+
+fun Long.getFullDateAndTimeFromLong(zoneId: String = "UTC"): String {
+    if (this.toLocalDate() == now().toLocalDate())
+        return "Today, ${this.getTimeFromDateLong(zoneId)}"
+    if (this.toLocalDate() == now().toLocalDate().minusDays(1))
+        return "Yesterday, ${this.getTimeFromDateLong(zoneId)}"
+    val sdf = SimpleDateFormat("HH:mm dd/MM/yyyy", Locale.ENGLISH)
+    sdf.applyPattern("HH:mm EEE, d MMM yyyy")
+    sdf.timeZone = TimeZone.getTimeZone(TimeZone.getDefault().toZoneId().id)
+    return sdf.format(Date(this))
+}
+
+fun Long.getTimeFromDateLong(zoneId: String = "UTC"): String {
+    val date = Date(this)
+    val formatter: DateFormat = SimpleDateFormat("HH:mm")
+    formatter.timeZone = TimeZone.getTimeZone(TimeZone.getDefault().toZoneId().id)
+    return formatter.format(date)
+}
