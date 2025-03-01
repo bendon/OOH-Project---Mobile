@@ -129,7 +129,7 @@ class CaptureRecordViewmodel @Inject constructor(
                     CaptureRecordUiEvent.Error(ex ?: BBScoutException("Unknown Error"), eventSink)
                 }
             }
- //           listOf(
+            //           listOf(
 //                launch {
 //                    if (!mainFilePath.isNullOrEmpty()) {
 //                        fileSaver.getBitmapFromPath(mainFilePath!!).onSuccess { bit ->
@@ -220,7 +220,7 @@ class CaptureRecordViewmodel @Inject constructor(
                 return@launch
             }
 
-            if (_captureUiState.value.billboardData?.brandCampaign.isNullOrEmpty()){
+            if (_captureUiState.value.billboardData?.brandCampaign.isNullOrEmpty()) {
                 _captureUiEvent.update {
                     CaptureRecordUiEvent.Error(BrandDescriptionErrorException, eventSink)
                 }
@@ -294,12 +294,17 @@ class CaptureRecordViewmodel @Inject constructor(
     }
 
     private suspend fun uploadImage(file: File): SimpleResource<FileResponse> {
-        val multipartBody = MultipartBody.Builder()
+        val multipartBody = buildMutipartBody(file)
+        return repository.uploadFile(multipartBody)
+    }
+
+    private fun buildMutipartBody(file: File): MultipartBody {
+        return MultipartBody.Builder()
             .setType(MultipartBody.FORM)
             .addFormDataPart("file", "file", file.asRequestBody())
             .build()
-        return repository.uploadFile(multipartBody)
     }
+
 
     private fun onGetAllCaptures(eventSink: CaptureRecordEventSink.OnGetAllCaptures) {
         viewModelScope.launch(ioDispatcher) {
@@ -309,7 +314,8 @@ class CaptureRecordViewmodel @Inject constructor(
             repository.getAllEntries().onSuccess { data ->
                 _captureUiState.update {
                     it.copy(
-                        allCaptures = data?.sortedByDescending { it.entryEntity.createdAt } ?: emptyList()
+                        allCaptures = data?.sortedByDescending { it.entryEntity.createdAt }
+                            ?: emptyList()
                     )
                 }
             }.onError { ex ->
@@ -325,7 +331,11 @@ class CaptureRecordViewmodel @Inject constructor(
 
     private fun onCapture(eventSink: CaptureRecordEventSink.OnCaptureEvent) {
         viewModelScope.launch(ioDispatcher) {
-
+            _captureUiState.update {
+                it.copy(
+                    analysingLoading = true
+                )
+            }
             val fileBitMap = fileSaver.getBitmapFromPath(eventSink.billboardData.fileUri!!)
 
             if (fileBitMap.data != null) {
@@ -339,21 +349,44 @@ class CaptureRecordViewmodel @Inject constructor(
                 _captureUiEvent.update {
                     CaptureRecordUiEvent.CaptureAdded
                 }
-                llmInference.getCampaignInfo(eventSink.billboardData.fullImage, "")
-                    .onSuccess { campaign ->
 
+                val fileMultipart = buildMutipartBody(File(eventSink.billboardData.fileUri))
+                repository.analyzeFile(fileMultipart)
+                    .onSuccess { res ->
                         _captureUiState.update {
                             it.copy(
                                 billboardData = it.billboardData?.copy(
-                                    brandName = campaign?.brand,
-                                    brandSlogan = campaign?.slogan,
-                                    brandCampaign = campaign?.campaignTheme
+                                    brandName = res?.campaign_brand,
+                                    brandSlogan = res?.campaign_description,
+                                    brandCampaign = res?.campaign_description,
+                                    billboardWidth = res?.billboard_measurements?.width?.toString()
+                                        ?: "",
+                                    billboardLength = res?.billboard_measurements?.height?.toString()
+                                        ?: "",
                                 )
                             )
                         }
                     }
-            }
 
+//                llmInference.getCampaignInfo(eventSink.billboardData.fullImage, "")
+//                    .onSuccess { campaign ->
+//
+//                        _captureUiState.update {
+//                            it.copy(
+//                                billboardData = it.billboardData?.copy(
+//                                    brandName = campaign?.brand,
+//                                    brandSlogan = campaign?.slogan,
+//                                    brandCampaign = campaign?.campaignTheme
+//                                )
+//                            )
+//                        }
+//                    }
+            }
+            _captureUiState.update {
+                it.copy(
+                    analysingLoading = false
+                )
+            }
         }
     }
 

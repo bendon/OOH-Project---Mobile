@@ -22,6 +22,7 @@ data class CaptureRecordUiModel(
 
 data class CaptureRecordUiState(
     val isLoading: Boolean = false,
+    val analysingLoading: Boolean = false,
     val allCaptures: List<EntryRecord> = emptyList(),
     val recentCaptures: List<EntryRecord> = emptyList(),
     val billboardData: BillboardExtractedInfo? = null,

@@ -4,6 +4,7 @@ import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,6 +29,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +50,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -56,6 +59,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.diracks.app.app.app_state.BBScoutAppState
@@ -233,13 +237,22 @@ fun ReviewRecordMain(
                             .padding(vertical = 8.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     ) {
-                        Image(
-                            bitmap = currentData.fullImage.asImageBitmap(),
-                            contentDescription = "Cropped Billboard",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Fit
+                        Box(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Image(
+                                bitmap = currentData.fullImage.asImageBitmap(),
+                                contentDescription = "Cropped Billboard",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Fit
 
-                        )
+                            )
+                            if (captureRecordUiState.analysingLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.align(Center)
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -442,7 +455,8 @@ fun BillboardCaptureComp(
     Card(
         shape = MaterialTheme.shapes.small,
         modifier = Modifier
-            .fillMaxWidth().padding(bottom = 8.dp)
+            .fillMaxWidth()
+            .padding(bottom = 8.dp)
             .padding(top = 16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
@@ -589,7 +603,9 @@ fun BillboardLocationComp(
                     Icon(
                         Icons.Outlined.LocationOn,
                         contentDescription = null,
-                        modifier = Modifier.fillMaxSize().padding(6.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(6.dp),
                         tint =  MaterialTheme.colorScheme.primary
                     )
                 }
