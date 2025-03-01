@@ -8,6 +8,7 @@ import com.edgetech.bbscout.data.data.remote.bbscout_api.api.RepositoryHelper
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.AccountResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.AccountResponseList
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.AuthResponse
+import com.edgetech.bbscout.data.data.remote.bbscout_api.model.BBScoutUserStatResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.ChangePasswordRequest
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.FileResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.LoginRequest
@@ -204,6 +205,12 @@ class MainRepositoryImplementation @Inject constructor(
     override suspend fun analyzeFile(file: MultipartBody): SimpleResource<BBScoutAiAnalyserResponse> {
         return repoHelper.apiDbRequestOrFail {
             bbScoutApi.anylizeFile(file)
+        }
+    }
+
+    override suspend fun getMonthlyStats(): SimpleResource<BBScoutUserStatResponse> {
+        return repoHelper.apiDbRequestOrFail {
+            bbScoutApi.getMonthlyStats()
         }
     }
 
