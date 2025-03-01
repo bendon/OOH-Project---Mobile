@@ -23,6 +23,7 @@ import com.edgetech.bbscout.features.auth.domain.model.AuthUiEvent
 import com.edgetech.bbscout.features.auth.domain.model.AuthUiModel
 import com.edgetech.bbscout.features.auth.domain.model.AuthUiState
 import com.edgetech.bbscout.features.auth.domain.model.EmptyCredentialsException
+import com.edgetech.bbscout.features.auth.domain.model.EmptyNameException
 import com.edgetech.bbscout.features.auth.domain.model.PasswordDoNotMatchException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -72,8 +73,36 @@ class AuthViewmodel @Inject constructor(
             is AuthEventSink.GetAccountInfo -> {
                 getAccountInfo(eventSink)
             }
+
+            is AuthEventSink.RegisterWithEmailAndPassword -> {
+                registerWithEmailAndPassword(eventSink)
+            }
+            is AuthEventSink.RegisterWithGoogle -> {
+                registerWithGoogle(eventSink)
+            }
         }
 
+    }
+
+    private fun registerWithGoogle(eventSink: AuthEventSink.RegisterWithGoogle) {
+        TODO("Not yet implemented")
+    }
+
+    private fun registerWithEmailAndPassword(eventSink: AuthEventSink.RegisterWithEmailAndPassword) {
+        if (eventSink.firstName.isNullOrEmpty()){
+            _uiEvent.update {
+                AuthUiEvent.Error(EmptyNameException, eventSink)
+            }
+            return
+        }
+
+        if (eventSink.password.isNullOrEmpty() || eventSink.password != eventSink.passwordConfirmation) {
+            _uiEvent.update {
+                AuthUiEvent.Error(PasswordDoNotMatchException, eventSink)
+            }
+            return
+        }
+        TODO("Not yet implemented")
     }
 
     private fun changePassword(eventSink: AuthEventSink.ChangePassword) {

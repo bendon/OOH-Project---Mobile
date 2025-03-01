@@ -21,6 +21,8 @@ data class AuthUiState(
 sealed class AuthUiEvent {
     data class LoginSuccessful(val token: String?) : AuthUiEvent()
 
+    data class RegistrationSuccessful(val token: String?) : AuthUiEvent()
+
     data class Error(val exception: BBScoutException, val eventSink : AppEventSink) : AuthUiEvent()
 
     data object Empty : AuthUiEvent()
@@ -41,6 +43,18 @@ sealed class AuthEventSink : AppEventSink {
 
 
     data class LoginWithGoogle(
+        val token: String
+    ) : AuthEventSink()
+
+    data class RegisterWithEmailAndPassword(
+        val firstName: String,
+        val lastName: String,
+        val email: String,
+        val password: String,
+        val passwordConfirmation: String,
+    ) : AuthEventSink()
+
+    data class RegisterWithGoogle(
         val token: String
     ) : AuthEventSink()
 
