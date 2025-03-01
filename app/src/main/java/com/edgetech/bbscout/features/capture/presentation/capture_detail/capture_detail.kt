@@ -350,7 +350,7 @@ fun CaptureBillboardInfo(selectedCapture: EntryRecord?){
             modifier = Modifier.padding(end = 16.dp)
         )
         Text(
-            text = selectedCapture?.billboardData?.height?.toString() ?: "N/A",
+            text = "${selectedCapture?.billboardData?.height.toString() ?: "--"} ${selectedCapture?.billboardData?.unitOfMeasurement ?: ""}",
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold
         )
@@ -369,7 +369,7 @@ fun CaptureBillboardInfo(selectedCapture: EntryRecord?){
             modifier = Modifier.padding(end = 16.dp)
         )
         Text(
-            text = selectedCapture?.billboardData?.width.toString() ?: "N/A",
+            text = "${selectedCapture?.billboardData?.width.toString() ?: "--"} ${selectedCapture?.billboardData?.unitOfMeasurement ?: ""}",
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
         )

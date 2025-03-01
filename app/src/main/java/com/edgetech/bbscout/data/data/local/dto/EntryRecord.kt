@@ -73,7 +73,8 @@ data class EntryRecord(
             billboardData = BillboardDataEntity(
                 height = billboardResponse.height,
                 width = billboardResponse.width,
-                type = billboardResponse.type
+                type = billboardResponse.type,
+                unitOfMeasurement = billboardResponse.unit
             )
         )
 
@@ -96,7 +97,8 @@ data class EntryRecord(
             billboardData = BillboardDataEntity(
                 height = campaignResponse.billboard?.height,
                 width = campaignResponse.billboard?.width,
-                type = campaignResponse.billboard?.type
+                type = campaignResponse.billboard?.type,
+                unitOfMeasurement = campaignResponse.billboard?.unit
             )
         )
 

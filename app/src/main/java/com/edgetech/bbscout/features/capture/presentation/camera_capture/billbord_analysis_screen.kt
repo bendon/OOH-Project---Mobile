@@ -126,7 +126,7 @@ fun CaptureBillboardMain(
     }
 
     // Setup camera
-    LaunchedEffect(previewView) {
+    LaunchedEffect(previewView, cameraSelector) {
         val cameraProvider = suspendCoroutine<ProcessCameraProvider> { continuation ->
             ProcessCameraProvider.getInstance(context).also { future ->
                 future.addListener({

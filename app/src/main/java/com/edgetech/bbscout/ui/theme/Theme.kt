@@ -29,7 +29,7 @@ private val LightColors = lightColorScheme(
     background = Color.White,
     onBackground = Color.Black,
     surface = Color.LightGray.copy(alpha = 0.2f),
-    onSurface = Color.DarkGray,
+    onSurface = Color.Gray,
     tertiary = darkerBlue
 )
 

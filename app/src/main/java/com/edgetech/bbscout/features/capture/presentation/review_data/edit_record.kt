@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -17,6 +18,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.foundation.text.input.setTextAndSelectAll
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -31,9 +35,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -113,35 +119,31 @@ fun EditRecordMain(
     val captureRecordUiEvent by captureRecordUiModel.captureUiEvent.collectAsState()
 
 
-
-    var campaignBrand by rememberSaveable {
-        mutableStateOf("")
-    }
-
-    var campaignDescription by rememberSaveable {
-        mutableStateOf("")
-    }
+    var campaignBrand = rememberTextFieldState()
+    var campaignDescription = rememberTextFieldState()
 
 
     var billboardType by rememberSaveable {
         mutableStateOf("")
     }
 
-    var billboardOwner by rememberSaveable {
-        mutableStateOf("")
-    }
+    var billboardOwner = rememberTextFieldState()
 
-    var billboardWidth by rememberSaveable {
-        mutableStateOf("")
-    }
+    var billboardWidth = rememberTextFieldState()
 
-    var billboardLength by rememberSaveable {
-        mutableStateOf("")
-    }
+    var billboardLength = rememberTextFieldState()
 
-    val billboardTypes = listOf("Static Billboard","Digital Billboard", "Banner Ads", "Wallscapes", "Mobile Billboards","Lamp Posts","Interactive Billboards" )
+    val billboardTypes = listOf(
+        "Static Billboard",
+        "Digital Billboard",
+        "Banner Ads",
+        "Wallscapes",
+        "Mobile Billboards",
+        "Lamp Posts",
+        "Interactive Billboards"
+    )
 
-    val unitOfMeasurements = listOf("centimeters", "meters", "feet" , "inches")
+    val unitOfMeasurements = listOf("centimeters", "meters", "feet", "inches")
 
     var selectedUnitOfMeasurement by rememberSaveable {
         mutableStateOf("")
@@ -151,12 +153,20 @@ fun EditRecordMain(
         recordId
     ) {
         if (recordId == null) {
-            campaignBrand = currentData?.brandName.ifEmptySetNull() ?: ""
-            campaignDescription = currentData?.brandCampaign.ifEmptySetNull() ?: ""
+            campaignBrand.setTextAndPlaceCursorAtEnd(currentData?.brandName?.ifEmptySetNull() ?: "")
+            campaignDescription.setTextAndPlaceCursorAtEnd(
+                currentData?.brandCampaign.ifEmptySetNull() ?: ""
+            )
             billboardType = currentData?.billboardType.ifEmptySetNull() ?: ""
-            billboardOwner = currentData?.billboardOwner.ifEmptySetNull() ?: ""
-            billboardWidth = currentData?.billboardWidth.ifEmptySetNull() ?: ""
-            billboardLength = currentData?.billboardLength.ifEmptySetNull() ?: ""
+            billboardOwner.setTextAndPlaceCursorAtEnd(
+                currentData?.billboardOwner.ifEmptySetNull() ?: ""
+            )
+            billboardWidth.setTextAndPlaceCursorAtEnd(
+                currentData?.billboardWidth.ifEmptySetNull() ?: ""
+            )
+            billboardLength.setTextAndPlaceCursorAtEnd(
+                currentData?.billboardLength.ifEmptySetNull() ?: ""
+            )
         }
     }
 
@@ -216,22 +226,47 @@ fun EditRecordMain(
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(top = 16.dp)
                     )
-                    OutlinedTextField(
+                    Text(
+                        "Brand name",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Medium,
                         modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .fillMaxWidth(),
-                        value = campaignBrand,
-                        onValueChange = { campaignBrand = it },
-                        label = { Text("Campaign brand") }
+                            .padding(bottom = 2.dp, top = 8.dp)
+                            .align(Alignment.Start)
                     )
-
                     OutlinedTextField(
                         modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .fillMaxWidth(),
-                        value = campaignDescription,
-                        onValueChange = { campaignDescription = it },
-                        label = { Text("Campaign description") })
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground
+                        ),
+                        contentPadding = PaddingValues(14.dp),
+                        state = campaignBrand,
+                        placeholder = { Text("Campaign brand") }
+                    )
+                    Text(
+                        "Campaign description",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier
+                            .padding(bottom = 2.dp, top = 8.dp)
+                            .align(Alignment.Start)
+                    )
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(120.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground
+                        ),
+                        contentPadding = PaddingValues(14.dp),
+                        state = campaignDescription,
+                        placeholder = { Text("Campaign description") })
                 }
                 if (recordType == RecordType.BILLBOARD_INFO) {
                     Text(
@@ -240,59 +275,96 @@ fun EditRecordMain(
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(top = 16.dp)
                     )
+                    Text(
+                        "Billboard owner",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier
+                            .padding(bottom = 2.dp, top = 8.dp)
+                            .align(Alignment.Start)
+                    )
                     OutlinedTextField(
                         modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .fillMaxWidth(),
-                        value = billboardOwner,
-                        onValueChange = { billboardOwner = it },
-                        label = { Text("Billboard owner") })
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground
+                        ),
+                        contentPadding = PaddingValues(14.dp),
+                        state = billboardOwner,
+                        placeholder = { Text("Billboard owner") })
                     LargeDropdownMenu(
                         modifier = Modifier
-                            .padding(vertical = 8.dp)
                             .fillMaxWidth(),
                         label = "Billboard type",
                         items = billboardTypes,
                         selectedIndex = billboardTypes.indexOf(billboardType),
                         onItemSelected = { index, item ->
                             billboardType = item
-
                         },
 
-                    )
+                        )
 
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .fillMaxWidth(),
-                        value = billboardOwner,
-                        onValueChange = { billboardOwner = it },
-                        label = { Text("Billboard owner") })
 
                     Row(
                         modifier = Modifier.padding(vertical = 8.dp)
                     ) {
-                        OutlinedTextField(
+                        Column(
                             modifier = Modifier
                                 .weight(1f)
-                                .padding(end = 2.dp),
-                            value = billboardWidth,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            onValueChange = { billboardWidth = it },
-                            label = { Text("Width (m)") })
-                        OutlinedTextField(
+                                .padding(end = 2.dp)
+                        ) {
+                            Text(
+                                "Width",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier
+                                    .padding(bottom = 2.dp, top = 8.dp)
+                                    .align(Alignment.Start)
+                            )
+                            OutlinedTextField(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(50.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground
+                                ),
+                                contentPadding = PaddingValues(14.dp),
+                                state = billboardWidth,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                placeholder = { Text("Width") })
+                        }
+                        Column(
                             modifier = Modifier
                                 .weight(1f)
-                                .padding(start = 2.dp),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            value = billboardLength,
-                            onValueChange = { billboardLength = it },
-                            label = { Text("Height (m)") })
+                                .padding(start = 2.dp)
+                        ) {
+                            Text(
+                                "Height",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier
+                                    .padding(bottom = 2.dp, top = 8.dp)
+                                    .align(Alignment.Start)
+                            )
+                            OutlinedTextField(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(50.dp),
+                                contentPadding = PaddingValues(14.dp),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                state = billboardLength,
+                                placeholder = { Text("Height") })
+                        }
                     }
 
                     LargeDropdownMenu(
                         modifier = Modifier
-                            .padding(vertical = 8.dp)
                             .fillMaxWidth(),
                         label = "Unit of measurement",
                         items = unitOfMeasurements,
@@ -304,9 +376,6 @@ fun EditRecordMain(
                         )
                 }
                 //check qr c
-
-
-
 
 
             }
@@ -330,21 +399,35 @@ fun EditRecordMain(
                         captureRecordUiModel.captureEventSink(
                             CaptureRecordEventSink.OnCaptureEvent(
                                 billboardData = currentData?.copy(
-                                    brandName = campaignBrand.ifEmptySetNull() ?: currentData.brandName,
-                                    brandCampaign = campaignDescription.ifEmptySetNull() ?: currentData.brandCampaign,
-                                    billboardType = billboardType.ifEmptySetNull() ?: currentData.billboardType,
-                                    billboardOwner = billboardOwner.ifEmptySetNull() ?: currentData.billboardOwner,
-                                    billboardWidth = billboardWidth.ifEmptySetNull() ?: currentData.billboardWidth,
-                                    billboardLength = billboardLength.ifEmptySetNull() ?: currentData.billboardLength,
-                                    unitOfMeasurement = selectedUnitOfMeasurement.ifEmptySetNull() ?: currentData.unitOfMeasurement
+                                    brandName = campaignBrand.text.toString().ifEmptySetNull()
+                                        ?: currentData.brandName,
+                                    brandCampaign = campaignDescription.text.toString()
+                                        .ifEmptySetNull() ?: currentData.brandCampaign,
+                                    billboardType = billboardType.ifEmptySetNull()
+                                        ?: currentData.billboardType,
+                                    billboardOwner = billboardOwner.text.toString().ifEmptySetNull()
+                                        ?: currentData.billboardOwner,
+                                    billboardWidth = billboardWidth.text.toString().ifEmptySetNull()
+                                        ?: currentData.billboardWidth,
+                                    billboardLength = billboardLength.text.toString()
+                                        .ifEmptySetNull() ?: currentData.billboardLength,
+                                    unitOfMeasurement = selectedUnitOfMeasurement.ifEmptySetNull()
+                                        ?: currentData.unitOfMeasurement
                                 ) ?: BillboardExtractedInfo(
-                                    brandName = campaignBrand.ifEmptySetNull() ?: currentData?.brandName,
-                                    brandCampaign = campaignDescription.ifEmptySetNull() ?: currentData?.brandCampaign,
-                                    billboardType = billboardType.ifEmptySetNull() ?: currentData?.billboardType,
-                                    billboardOwner = billboardOwner.ifEmptySetNull() ?: currentData?.billboardOwner,
-                                    billboardWidth = billboardWidth.ifEmptySetNull() ?: currentData?.billboardWidth,
-                                    billboardLength = billboardLength.ifEmptySetNull() ?: currentData?.billboardLength,
-                                    unitOfMeasurement = selectedUnitOfMeasurement.ifEmptySetNull() ?: currentData?.unitOfMeasurement
+                                    brandName = campaignBrand.text.toString().ifEmptySetNull()
+                                        ?: currentData?.brandName,
+                                    brandCampaign = campaignDescription.text.toString()
+                                        .ifEmptySetNull() ?: currentData?.brandCampaign,
+                                    billboardType = billboardType.ifEmptySetNull()
+                                        ?: currentData?.billboardType,
+                                    billboardOwner = billboardOwner.text.toString().ifEmptySetNull()
+                                        ?: currentData?.billboardOwner,
+                                    billboardWidth = billboardWidth.text.toString().ifEmptySetNull()
+                                        ?: currentData?.billboardWidth,
+                                    billboardLength = billboardLength.text.toString()
+                                        .ifEmptySetNull() ?: currentData?.billboardLength,
+                                    unitOfMeasurement = selectedUnitOfMeasurement.ifEmptySetNull()
+                                        ?: currentData?.unitOfMeasurement
                                 )
                             )
                         )

@@ -442,7 +442,7 @@ fun BillboardCaptureComp(
     Card(
         shape = MaterialTheme.shapes.small,
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth().padding(bottom = 8.dp)
             .padding(top = 16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
