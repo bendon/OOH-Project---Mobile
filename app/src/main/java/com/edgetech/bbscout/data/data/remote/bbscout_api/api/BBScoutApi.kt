@@ -10,6 +10,7 @@ import com.edgetech.bbscout.data.data.remote.bbscout_api.model.ChangePasswordReq
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.FileResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.LoginRequest
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.UserResponse
+import com.edgetech.bbscout.data.data.remote.gen_ai.data_model.bbscout.BBScoutAiAnalyserResponse
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -61,4 +62,10 @@ interface BBScoutApi {
     suspend fun getFile(
         @Path("name") name: String
     ): Response<FileResponse>
+
+    @GET("api/v1/auth/gemini/data/extraction")
+    suspend fun anylizeFile(
+        @Body body: MultipartBody
+    ): Response<BBScoutAiAnalyserResponse>
+
 }

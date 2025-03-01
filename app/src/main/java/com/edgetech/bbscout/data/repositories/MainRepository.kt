@@ -9,6 +9,7 @@ import com.edgetech.bbscout.data.data.remote.bbscout_api.model.ChangePasswordReq
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.FileResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.LoginRequest
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.UserResponse
+import com.edgetech.bbscout.data.data.remote.gen_ai.data_model.bbscout.BBScoutAiAnalyserResponse
 import com.edgetech.bbscout.data.utils.SimpleResource
 import okhttp3.MultipartBody
 
@@ -40,5 +41,6 @@ interface MainRepository {
 
     suspend fun uploadFile(file: MultipartBody): SimpleResource<FileResponse>
 
+    suspend fun analyzeFile(file: MultipartBody): SimpleResource<BBScoutAiAnalyserResponse>
 
 }
