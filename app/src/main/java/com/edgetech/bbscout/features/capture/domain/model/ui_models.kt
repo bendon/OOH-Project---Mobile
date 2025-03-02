@@ -6,6 +6,8 @@ import com.edgetech.bbscout.components.domain_util.AppEventSink
 import com.edgetech.bbscout.data.data.local.dto.EntryRecord
 import com.edgetech.bbscout.data.data.local.enities.BillboardDataEntity
 import com.edgetech.bbscout.data.data.local.enities.UserLocationEntity
+import com.edgetech.bbscout.data.data.remote.bbscout_api.model.BBScoutUserStat
+import com.edgetech.bbscout.data.data.remote.bbscout_api.model.BBScoutUserStatResponse
 import com.edgetech.bbscout.data.utils.BBScoutException
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +29,7 @@ data class CaptureRecordUiState(
     val recentCaptures: List<EntryRecord> = emptyList(),
     val billboardData: BillboardExtractedInfo? = null,
     val selectedRecord: EntryRecord? = null,
+    val userStat: BBScoutUserStat? = null,
     val selectedRecordMainImage: Bitmap? = null,
     val selectedRecordBillboardImage: Bitmap? = null,
     val selectedLocation: UserLocationEntity? = null,

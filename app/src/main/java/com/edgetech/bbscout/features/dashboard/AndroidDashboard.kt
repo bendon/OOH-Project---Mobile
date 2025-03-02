@@ -76,9 +76,9 @@ fun HomeDashboard(
     val recentEntries = capturesUiState.allCaptures.take(5)
 
     LaunchedEffect(true) {
-        captureRecordUiModel.captureEventSink(
-            CaptureRecordEventSink.OnGetAllCaptures
-        )
+//        captureRecordUiModel.captureEventSink(
+//            CaptureRecordEventSink.OnGetAllCaptures
+//        )
         captureRecordUiModel.captureEventSink(
             CaptureRecordEventSink.GetRecentCaptures
         )
@@ -100,7 +100,7 @@ fun HomeDashboard(
             Column(
                 modifier = Modifier.padding(horizontal = 16.dp)
             ) {
-                HeaderSection(numberOfCaptures = capturesUiState.allCaptures.size)
+                HeaderSection(numberOfCaptures = capturesUiState.allCaptures.size, monthlystat = capturesUiState.userStat?.billboardCount)
                 Spacer(modifier = Modifier.height(16.dp))
                 ChallengeCard(appState)
                 Spacer(modifier = Modifier.height(16.dp))
@@ -141,21 +141,49 @@ fun HeaderSectionI() {
 fun HeaderSection(
     modifier: Modifier = Modifier.padding(top = 16.dp),
     numberOfCaptures: Int,
+    monthlystat: Int?
 ) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
     ) {
-        Text(
-            text = "${numberOfCaptures}",
-            style = MaterialTheme.typography.headlineLargeEmphasized,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Text(text = "Captures", fontSize = 14.sp)
+        Column(
+            modifier = Modifier.weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "${numberOfCaptures}",
+                style = MaterialTheme.typography.headlineLargeEmphasized,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(text = "Captures", fontSize = 14.sp)
 
-        //Text(text = "96% Accuracy", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4CAF50))
-        // Text(text = "Level 12", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            //Text(text = "96% Accuracy", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4CAF50))
+            // Text(text = "Level 12", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        }
+        Spacer(
+            modifier = Modifier.weight(1f)
+        )
+
+        Column(
+            modifier = Modifier.weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "${monthlystat ?: 0}",
+                style = MaterialTheme.typography.headlineLargeEmphasized,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.secondary
+            )
+            Text(text = "Captures this month", fontSize = 14.sp,
+                textAlign = TextAlign.Center,)
+
+            //Text(text = "96% Accuracy", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4CAF50))
+            // Text(text = "Level 12", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        }
     }
 }
 
@@ -201,9 +229,11 @@ fun ChallengeCard(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(vertical = 8.dp).clickable {
-                        navigateToCapture(appState, context)
-                    }
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
+                        .clickable {
+                            navigateToCapture(appState, context)
+                        }
                 )
             }
             //Icon(Icons.Outlined.WarningAmber, contentDescription = null)

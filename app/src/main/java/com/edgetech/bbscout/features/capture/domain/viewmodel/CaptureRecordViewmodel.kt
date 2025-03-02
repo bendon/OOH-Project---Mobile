@@ -39,6 +39,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 
@@ -162,17 +163,38 @@ class CaptureRecordViewmodel @Inject constructor(
 
     private fun getRecentCaptures(eventSink: CaptureRecordEventSink.GetRecentCaptures) {
         viewModelScope.launch(ioDispatcher) {
-            repository.getAllEntries().onSuccess { data ->
-                _captureUiState.update {
-                    it.copy(
-                        allCaptures = data ?: emptyList()
-                    )
-                }
-            }.onError { ex ->
-                _captureUiEvent.update {
-                    CaptureRecordUiEvent.Error(ex ?: BBScoutException("Unknown Error"), eventSink)
-                }
+            _captureUiState.update {
+                it.copy(isLoading = true)
             }
+            listOf(
+                launch {
+                    repository.getAllEntries().onSuccess { data ->
+                        _captureUiState.update {
+                            it.copy(
+                                allCaptures = data ?: emptyList()
+                            )
+                        }
+                    }.onError { ex ->
+                        _captureUiEvent.update {
+                            CaptureRecordUiEvent.Error(ex ?: BBScoutException("Unknown Error"), eventSink)
+                        }
+                    }
+                },
+                launch {
+                    repository.getMonthlyStats().onSuccess {
+                        val res = it?.first { it.uploadMonth == LocalDateTime.now().monthValue &&  it.uploadYear == LocalDateTime.now().year}
+                        _captureUiState.update {
+                            it.copy(
+                                userStat = res
+                            )
+                        }
+                    }
+                }
+            ).joinAll()
+            _captureUiState.update {
+                it.copy(isLoading = false)
+            }
+
         }
     }
 
