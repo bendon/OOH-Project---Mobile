@@ -27,6 +27,7 @@ import com.edgetech.bbscout.features.auth.domain.viewmodel.AuthViewmodel
 import com.edgetech.bbscout.features.auth.presentation.ChangePasswordScreen
 import com.edgetech.bbscout.features.auth.presentation.LoadingScreen
 import com.edgetech.bbscout.features.auth.presentation.LoginScreen
+import com.edgetech.bbscout.features.auth.presentation.RequestPasswordScreen
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
 import com.edgetech.bbscout.features.capture.presentation.camera_capture.CaptureBillboardScreen
 import com.edgetech.bbscout.features.capture.presentation.capture_detail.CaptureDetailScreen
@@ -122,6 +123,10 @@ fun DirackAppNavigation(
             ChangePasswordScreen(appState, authViewModel)
         }
 
+        composable<AppDestinations.ForgotPassword> {
+            RequestPasswordScreen(authViewModel, appState)
+        }
+
     }
 
 }
@@ -213,5 +218,8 @@ sealed interface AppDestinations {
 
     @Serializable
     data object ChangePassword : AppDestinations
+
+    @Serializable
+    data object ForgotPassword : AppDestinations
 
 }

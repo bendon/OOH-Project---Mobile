@@ -11,6 +11,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -32,6 +33,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.AlternateEmail
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -73,12 +75,16 @@ import com.edgetech.bbscout.components.ui.ButtonContent
 import com.edgetech.bbscout.components.ui.ErrorShowDialog
 import com.edgetech.bbscout.components.ui.MainLoadingButton
 import com.edgetech.bbscout.components.ui.NonLoadingSecButton
+import com.edgetech.bbscout.data.data.remote.bbscout_api.model.api_exception.BadRequestException
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.api_exception.UnAuthenticatedException
 import com.edgetech.bbscout.data.utils.DataConstants
 import com.edgetech.bbscout.features.auth.domain.model.AuthEventSink
 import com.edgetech.bbscout.features.auth.domain.model.AuthUiEvent
 import com.edgetech.bbscout.features.auth.domain.model.AuthUiModel
 import com.edgetech.bbscout.features.auth.domain.model.EmptyCredentialsException
+import com.edgetech.bbscout.features.auth.domain.model.EmptyNameException
+import com.edgetech.bbscout.features.auth.domain.model.PasswordDoNotMatchException
+import com.edgetech.bbscout.features.auth.domain.model.RegistrationBadRequest
 import com.edgetech.bbscout.features.auth.domain.viewmodel.AuthViewmodel
 import com.edgetech.bbscout.features.navigation.AppDestinations
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -128,9 +134,15 @@ fun LoginScreenMain(
             val idToken = account?.idToken
             if (idToken != null) {
                 token = idToken
-                authUiModel.authEventSink(
-                    AuthEventSink.LoginWithGoogle(idToken)
-                )
+                if (selectedTab == 0) {
+                    authUiModel.authEventSink(
+                        AuthEventSink.LoginWithGoogle(idToken)
+                    )
+                } else {
+                    authUiModel.authEventSink(
+                        AuthEventSink.RegisterWithGoogle(idToken)
+                    )
+                }
             } else {
 
             }
@@ -144,13 +156,23 @@ fun LoginScreenMain(
         authUiModel.authEventSink(
             AuthEventSink.ResetState
         )
-    } else if (uiEvent is AuthUiEvent.Error) {
+    }
+    else if (uiEvent is AuthUiEvent.RegistrationSuccessful){
+        navController.navigate(AppDestinations.Dashboard)
+        authUiModel.authEventSink(
+            AuthEventSink.ResetState
+        )
+    }
+        else if (uiEvent is AuthUiEvent.Error) {
         val request = (uiEvent as AuthUiEvent.Error)
         ErrorShowDialog(
             showErrorMessage = true,
             customError = mapOf(
                 UnAuthenticatedException() to "Wrong credentials",
-                EmptyCredentialsException to "Please provide an email and password"
+                EmptyCredentialsException to "Please provide an email and password",
+                PasswordDoNotMatchException to "Passwords can not be empty and have to match",
+                EmptyNameException to "Please provide a first and last name",
+                RegistrationBadRequest to "Bad request, it is possible that you are trying to use an email or phone number that is already in use by another account."
             ),
             error = request.exception,
             event = request.eventSink,
@@ -208,7 +230,7 @@ fun LoginScreenMain(
 
             if (selectedTab == 0) {
                 LoginScreenContent(
-                    authUiModel, launcher
+                    authUiModel, launcher, navController
                 )
             } else {
                 SignUpScreen(authUiModel, launcher)
@@ -223,7 +245,8 @@ fun LoginScreenMain(
 @Composable
 fun LoginScreenContent(
     authUiModel: AuthUiModel,
-    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>
+    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
+    navController: NavController
 ) {
     var email = rememberTextFieldState()
     var password = rememberTextFieldState()
@@ -278,6 +301,9 @@ fun LoginScreenContent(
                 )
             }
         )
+        Text("Forgot password?", modifier = Modifier.clickable {
+            navController.navigate(AppDestinations.ForgotPassword)
+        }.padding(vertical = 8.dp).align(Alignment.End), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
         MainLoadingButton(
             modifier = Modifier
                 .fillMaxWidth()
@@ -348,6 +374,9 @@ fun SignUpScreen(
     authUiModel: AuthUiModel,
     launcher: ManagedActivityResultLauncher<Intent, ActivityResult>
 ) {
+
+    var firstName = rememberTextFieldState()
+    var lastName = rememberTextFieldState()
     var email = rememberTextFieldState()
     var password = rememberTextFieldState()
     var confirmPassword = rememberTextFieldState()
@@ -358,6 +387,43 @@ fun SignUpScreen(
     val context = LocalContext.current
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+        Text("First name", modifier = Modifier
+            .padding(vertical = 6.dp)
+            .align(Alignment.Start))
+        OutlinedTextField(
+            state = firstName,
+            placeholder = { Text("Enter your first name") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            contentPadding = PaddingValues(14.dp),
+            leadingIcon = {
+                Icon(
+                    Icons.Outlined.Person,
+                    contentDescription = null,
+                )
+            }
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text("Last name", modifier = Modifier
+            .padding(vertical = 6.dp)
+            .align(Alignment.Start))
+        OutlinedTextField(
+            state = lastName,
+            placeholder = { Text("Enter your last name") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            contentPadding = PaddingValues(14.dp),
+            leadingIcon = {
+                Icon(
+                    Icons.Outlined.Person,
+                    contentDescription = null,
+                )
+            }
+        )
+        Spacer(modifier = Modifier.height(8.dp))
         Text("Email Address", modifier = Modifier
             .padding(vertical = 6.dp)
             .align(Alignment.Start))
@@ -439,7 +505,15 @@ fun SignUpScreen(
             disableOnTap = false,
             loadOnTap = false,
             onTap = {
-
+                authUiModel.authEventSink(
+                    AuthEventSink.RegisterWithEmailAndPassword(
+                        firstName = firstName.toString(),
+                        lastName = lastName.toString(),
+                        email = email.toString(),
+                        password = password.toString(),
+                        passwordConfirmation = confirmPassword.toString()
+                    )
+                )
             },
         ) {
             ButtonContent(
@@ -465,7 +539,10 @@ fun SignUpScreen(
                 .padding(bottom = 24.dp),
             disableOnTap = false,
             onTap = {
-
+                launchGoogleSignIn(
+                    context,
+                    launcher
+                )
             },
         ) {
             ButtonContent(

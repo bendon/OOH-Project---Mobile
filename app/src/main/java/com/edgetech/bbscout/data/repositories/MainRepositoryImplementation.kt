@@ -12,7 +12,9 @@ import com.edgetech.bbscout.data.data.remote.bbscout_api.model.BBScoutUserStat
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.ChangePasswordRequest
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.FileResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.LoginRequest
+import com.edgetech.bbscout.data.data.remote.bbscout_api.model.RegisterRequest
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.UserResponse
+import com.edgetech.bbscout.data.data.remote.bbscout_api.model.api_exception.ApiStatusResponse
 import com.edgetech.bbscout.data.data.remote.gen_ai.data_model.bbscout.BBScoutAiAnalyserResponse
 import com.edgetech.bbscout.data.utils.BBScoutException
 import com.edgetech.bbscout.data.utils.SimpleResource
@@ -159,10 +161,22 @@ class MainRepositoryImplementation @Inject constructor(
             }
     }
 
+    override suspend fun register(request: RegisterRequest): SimpleResource<AuthResponse> {
+        return  repoHelper.apiDbRequestOrFail {
+            bbScoutApi.register(request)
+        }
+    }
+
 
     override suspend fun login(request: LoginRequest): SimpleResource<AuthResponse> {
         return repoHelper.apiDbRequestOrFail {
             bbScoutApi.login(request)
+        }
+    }
+
+    override suspend fun forgotPassword(request: LoginRequest): SimpleResource<ApiStatusResponse> {
+        return repoHelper.apiDbRequestOrFail {
+            bbScoutApi.forgotPassword(request)
         }
     }
 

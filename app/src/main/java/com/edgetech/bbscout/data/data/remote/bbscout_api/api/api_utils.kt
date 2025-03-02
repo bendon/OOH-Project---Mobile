@@ -68,6 +68,7 @@ class RepositoryHelper @Inject constructor(
 }
 
  fun <T : ApiResponse> onHttpApiError(response: Response<T>): SimpleResource.Error<T> {
+    val error = response.body()
     if (response.code() == 400) {
         return SimpleResource.Error(
             response.message(),
@@ -126,3 +127,5 @@ suspend fun checkIfErrorIsInvalidToken(api: BBScoutApi, dao: BBScoutDao, error: 
         return false
     }
 }
+
+

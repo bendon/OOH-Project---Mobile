@@ -25,6 +25,8 @@ sealed class AuthUiEvent {
 
     data class Error(val exception: BBScoutException, val eventSink : AppEventSink) : AuthUiEvent()
 
+    data object RequestPasswordResetSuccessful : AuthUiEvent()
+
     data object Empty : AuthUiEvent()
 
     data object LogoutSuccessful : AuthUiEvent()
@@ -66,6 +68,10 @@ sealed class AuthEventSink : AppEventSink {
         val oldPassword: String,
         val newPassword: String,
         val newPasswordConfirmation: String,
+    ) : AuthEventSink()
+
+    data class RequestPasswordReset(
+        val email: String,
     ) : AuthEventSink()
 
     data object ResetState : AuthEventSink()

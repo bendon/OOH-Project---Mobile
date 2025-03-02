@@ -8,3 +8,7 @@ data object PasswordDoNotMatchException : BBScoutException("Passwords do not mat
 data object EmptyCredentialsException : BBScoutException("Email or password cannot be empty")
 
 data object EmptyNameException : BBScoutException("Name cannot be empty")
+
+data object RegistrationBadRequest : BBScoutException("Registration failed")
+
+data object RequestPasswordResetBadRequest : BBScoutException("Password reset request failed")

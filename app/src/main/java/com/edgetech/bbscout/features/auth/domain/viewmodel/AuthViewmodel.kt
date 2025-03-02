@@ -13,6 +13,8 @@ import com.edgetech.bbscout.data.data.remote.bbscout_api.model.AccountResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.AuthResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.ChangePasswordRequest
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.LoginRequest
+import com.edgetech.bbscout.data.data.remote.bbscout_api.model.RegisterRequest
+import com.edgetech.bbscout.data.data.remote.bbscout_api.model.api_exception.BadRequestException
 import com.edgetech.bbscout.data.data.remote.gen_ai.llm.FulltextAndImageInference
 import com.edgetech.bbscout.data.repositories.MainRepository
 import com.edgetech.bbscout.data.utils.BBScoutException
@@ -25,6 +27,8 @@ import com.edgetech.bbscout.features.auth.domain.model.AuthUiState
 import com.edgetech.bbscout.features.auth.domain.model.EmptyCredentialsException
 import com.edgetech.bbscout.features.auth.domain.model.EmptyNameException
 import com.edgetech.bbscout.features.auth.domain.model.PasswordDoNotMatchException
+import com.edgetech.bbscout.features.auth.domain.model.RegistrationBadRequest
+import com.edgetech.bbscout.features.auth.domain.model.RequestPasswordResetBadRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -77,32 +81,117 @@ class AuthViewmodel @Inject constructor(
             is AuthEventSink.RegisterWithEmailAndPassword -> {
                 registerWithEmailAndPassword(eventSink)
             }
+
             is AuthEventSink.RegisterWithGoogle -> {
                 registerWithGoogle(eventSink)
+            }
+
+            is AuthEventSink.RequestPasswordReset -> {
+                forgotPassword(eventSink)
             }
         }
 
     }
 
+    private fun forgotPassword(eventSink: AuthEventSink.RequestPasswordReset) {
+       if (eventSink.email.isEmpty()){
+           _uiEvent.update {
+               AuthUiEvent.Error(EmptyCredentialsException, eventSink)
+           }
+           return
+       }
+
+        viewModelScope.launch(ioDispatcher) {
+            repository.forgotPassword(LoginRequest(eventSink.email)).onSuccess {
+                _uiEvent.update {
+                    AuthUiEvent.RequestPasswordResetSuccessful
+                }
+            }.onError { err ->
+                if (err is BadRequestException) {
+                    _uiEvent.update {
+                        AuthUiEvent.Error(RequestPasswordResetBadRequest, eventSink)
+                    }
+                } else {
+                    _uiEvent.update {
+                        AuthUiEvent.Error(err ?: BBScoutException(), eventSink)
+                    }
+                }
+
+            }
+        }
+    }
+
     private fun registerWithGoogle(eventSink: AuthEventSink.RegisterWithGoogle) {
-        TODO("Not yet implemented")
+        viewModelScope.launch(ioDispatcher) {
+            var authResponse: AuthResponse? = null
+            repository.loginWithGoogle(LoginRequest(eventSink.token))
+                .onSuccess { res ->
+                    authResponse = res
+                    _uiEvent.update {
+                        AuthUiEvent.RegistrationSuccessful(res?.accessToken)
+                    }
+                }.onError { er ->
+                    if (er is BadRequestException) {
+                        _uiEvent.update {
+                            AuthUiEvent.Error(RegistrationBadRequest, eventSink)
+                        }
+                    } else {
+                        _uiEvent.update {
+                            AuthUiEvent.Error(er ?: BBScoutException(), eventSink)
+                        }
+                    }
+
+                }
+            if (authResponse != null) {
+                addAuthEntity(authResponse)
+            }
+        }
     }
 
     private fun registerWithEmailAndPassword(eventSink: AuthEventSink.RegisterWithEmailAndPassword) {
-        if (eventSink.firstName.isNullOrEmpty()){
+        if (eventSink.firstName.isEmpty() || eventSink.lastName.isEmpty()) {
             _uiEvent.update {
                 AuthUiEvent.Error(EmptyNameException, eventSink)
             }
             return
         }
 
-        if (eventSink.password.isNullOrEmpty() || eventSink.password != eventSink.passwordConfirmation) {
+        if (eventSink.password.isEmpty() || eventSink.password != eventSink.passwordConfirmation) {
             _uiEvent.update {
                 AuthUiEvent.Error(PasswordDoNotMatchException, eventSink)
             }
             return
         }
-        TODO("Not yet implemented")
+        viewModelScope.launch(ioDispatcher) {
+            val regRequest = RegisterRequest(
+                firstName = eventSink.firstName,
+                lastName = eventSink.lastName,
+                email = eventSink.email,
+                password = eventSink.password
+            )
+            var authResponse: AuthResponse? = null
+            repository.register(regRequest).onSuccess { res ->
+                authResponse = res
+                _uiEvent.update {
+                    AuthUiEvent.RegistrationSuccessful(res?.accessToken)
+                }
+            }.onError { er ->
+                if (er is BadRequestException) {
+                    _uiEvent.update {
+                        AuthUiEvent.Error(RegistrationBadRequest, eventSink)
+                    }
+                } else {
+                    _uiEvent.update {
+                        AuthUiEvent.Error(er ?: BBScoutException(), eventSink)
+                    }
+                }
+
+            }
+            if (authResponse != null) {
+                addAuthEntity(authResponse)
+            }
+
+        }
     }
 
     private fun changePassword(eventSink: AuthEventSink.ChangePassword) {
@@ -205,13 +294,7 @@ class AuthViewmodel @Inject constructor(
     private suspend fun login(pAuthResponse: AuthResponse?, eventSink: AuthEventSink) {
         var accountId = ""
         var authResponse = pAuthResponse
-        val authEntity = AuthEntity(
-            refreshToken = authResponse?.refreshToken,
-            accessToken = authResponse?.accessToken,
-            authObject = authResponse?.toJson(),
-            timeAdded = LocalDateTime.now().toLong()
-        )
-        repository.addAuth(authEntity)
+        addAuthEntity(authResponse)
         repository.getAccounts().onSuccess {
             accountId = it?.firstOrNull()?.id ?: ""
         }.onError { ex ->
@@ -235,16 +318,20 @@ class AuthViewmodel @Inject constructor(
             }
 
             if (authResponse != null) {
-                val authEntity2 = AuthEntity(
-                    refreshToken = authResponse!!.refreshToken,
-                    accessToken = authResponse?.accessToken,
-                    authObject = authResponse?.toJson(),
-                    timeAdded = LocalDateTime.now().toLong()
-                )
-                repository.addAuth(authEntity2)
+                addAuthEntity(authResponse)
             }
 
         }
+    }
+
+    suspend fun addAuthEntity(authResponse: AuthResponse?) {
+        val authEntity2 = AuthEntity(
+            refreshToken = authResponse!!.refreshToken,
+            accessToken = authResponse?.accessToken,
+            authObject = authResponse?.toJson(),
+            timeAdded = LocalDateTime.now().toLong()
+        )
+        repository.addAuth(authEntity2)
     }
 
     private fun logout(eventSink: AuthEventSink.Logout) {
@@ -263,7 +350,7 @@ class AuthViewmodel @Inject constructor(
     }
 
     private fun getAccountInfo(eventSink: AuthEventSink.GetAccountInfo) {
-        viewModelScope.launch(ioDispatcher){
+        viewModelScope.launch(ioDispatcher) {
             repository.getProfile().onSuccess { user ->
                 _uiEvent.update {
                     AuthUiEvent.LoginSuccessful("")

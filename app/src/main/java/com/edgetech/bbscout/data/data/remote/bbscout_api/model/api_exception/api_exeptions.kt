@@ -1,5 +1,6 @@
 package com.edgetech.bbscout.data.data.remote.bbscout_api.model.api_exception
 
+import com.edgetech.bbscout.data.data.remote.bbscout_api.model.ApiResponse
 import com.edgetech.bbscout.data.utils.BBScoutException
 
 
@@ -15,3 +16,8 @@ data class BadRequestException(override val message: String? = null): BBScoutExc
 
 data class NotFoundException(override val message: String? = null): BBScoutException()
 
+
+data class ApiStatusResponse(
+    val status: Int? = null,
+    val message: String? = null
+): ApiResponse

@@ -10,7 +10,9 @@ import com.edgetech.bbscout.data.data.remote.bbscout_api.model.BBScoutUserStatRe
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.ChangePasswordRequest
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.FileResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.LoginRequest
+import com.edgetech.bbscout.data.data.remote.bbscout_api.model.RegisterRequest
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.UserResponse
+import com.edgetech.bbscout.data.data.remote.bbscout_api.model.api_exception.ApiStatusResponse
 import com.edgetech.bbscout.data.data.remote.gen_ai.data_model.bbscout.BBScoutAiAnalyserResponse
 import com.edgetech.bbscout.data.utils.SimpleResource
 import okhttp3.MultipartBody
@@ -29,9 +31,13 @@ interface MainRepository {
 
     suspend fun getCaptureRecord(entry: String): SimpleResource<EntryRecord?>
 
+    suspend fun register(request: RegisterRequest): SimpleResource<AuthResponse>
+
     suspend fun login(request: LoginRequest): SimpleResource<AuthResponse>
 
     suspend fun loginWithGoogle(request: LoginRequest): SimpleResource<AuthResponse>
+
+    suspend fun forgotPassword(request: LoginRequest): SimpleResource<ApiStatusResponse>
 
     suspend fun getProfile(): SimpleResource<UserResponse>
 

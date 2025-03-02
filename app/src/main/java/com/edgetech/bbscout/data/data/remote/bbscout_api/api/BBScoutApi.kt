@@ -10,7 +10,9 @@ import com.edgetech.bbscout.data.data.remote.bbscout_api.model.CampaignResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.ChangePasswordRequest
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.FileResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.LoginRequest
+import com.edgetech.bbscout.data.data.remote.bbscout_api.model.RegisterRequest
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.UserResponse
+import com.edgetech.bbscout.data.data.remote.bbscout_api.model.api_exception.ApiStatusResponse
 import com.edgetech.bbscout.data.data.remote.gen_ai.data_model.bbscout.BBScoutAiAnalyserResponse
 import okhttp3.MultipartBody
 import retrofit2.Response
@@ -22,10 +24,14 @@ import retrofit2.http.Path
 
 interface BBScoutApi {
 
+
+    @POST("api/v1/auth/register")
+    suspend fun register(@Body registerRequest: RegisterRequest): Response<AuthResponse>
+
     @POST("api/v1/auth/login")
     suspend fun login(@Body loginRequest: LoginRequest): Response<AuthResponse>
 
-    @GET("api/v1/v1/auth/refresh/account")
+    @GET("api/v1/auth/refresh/account")
     suspend fun refreshToken(@Header("Authorization") token: String): Response<AuthResponse>
 
 
@@ -71,5 +77,8 @@ interface BBScoutApi {
 
     @GET("api/v1/en/sl/report/billboard/user/monthly")
     suspend fun getMonthlyStats() : Response<BBScoutUserStat>
+
+    @POST("api/v1/auth/forgot-password")
+    suspend fun forgotPassword(@Body request: LoginRequest): Response<ApiStatusResponse>
 
 }
