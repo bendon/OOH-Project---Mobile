@@ -5,6 +5,7 @@ import com.edgetech.bbscout.data.data.local.enities.AuthEntity
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.AccountResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.AccountResponseList
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.AuthResponse
+import com.edgetech.bbscout.data.data.remote.bbscout_api.model.BBScoutUserStat
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.BBScoutUserStatResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.ChangePasswordRequest
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.FileResponse
@@ -44,5 +45,5 @@ interface MainRepository {
 
     suspend fun analyzeFile(file: MultipartBody): SimpleResource<BBScoutAiAnalyserResponse>
 
-    suspend fun getMonthlyStats(): SimpleResource<BBScoutUserStatResponse>
+    suspend fun getMonthlyStats(): SimpleResource<BBScoutUserStat>
 }

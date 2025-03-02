@@ -1,6 +1,7 @@
 package com.edgetech.bbscout.data.data.remote.bbscout_api.api
 
 
+import com.edgetech.bbscout.components.utils.log
 import com.edgetech.bbscout.components.utils.toLong
 import com.edgetech.bbscout.data.data.local.BBScoutDao
 import com.edgetech.bbscout.data.data.local.utils.BBScoutDatabase
@@ -42,18 +43,22 @@ class RepositoryHelper @Inject constructor(
                 return onHttpApiError(response)
             }
         } catch (e: HttpException) {
+            log("An Http error occurred $e")
             SimpleResource.Error(e.message(),)
         } catch (e: IOException) {
+            log("An IO error occurred $e")
             SimpleResource.Error(
                 e.message ?: "Couldn't reach server, check your internet connection",
                 IoErrorException()
             )
         } catch (e: NetworkErrorException) {
+            log("An Network error occurred $e")
             SimpleResource.Error(
                 e.message ?: "Couldn't reach server, check your internet connection",
                 NetworkErrorException()
             )
         } catch (e: Exception) {
+            log("An Unknown error occurred $e")
             //log("An Unknown error occurred $e with request ${e.stackTrace}")
             SimpleResource.Error(e.message ?: "An Unknown error occurred", BBScoutException())
         }

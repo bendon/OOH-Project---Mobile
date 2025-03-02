@@ -5,7 +5,6 @@ import com.edgetech.bbscout.data.data.remote.bbscout_api.model.AccountResponseLi
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.ApiResponsePage
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.AuthResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.BBScoutUserStat
-import com.edgetech.bbscout.data.data.remote.bbscout_api.model.BBScoutUserStatResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.BillboardResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.CampaignResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.ChangePasswordRequest
@@ -65,12 +64,12 @@ interface BBScoutApi {
         @Path("name") name: String
     ): Response<FileResponse>
 
-    @GET("api/v1/auth/gemini/data/extraction")
-    suspend fun anylizeFile(
+    @POST("api/v1/auth/gemini/data/extraction")
+    suspend fun analyzeFile(
         @Body body: MultipartBody
     ): Response<BBScoutAiAnalyserResponse>
 
     @GET("api/v1/en/sl/report/billboard/user/monthly")
-    suspend fun getMonthlyStats() : Response<BBScoutUserStatResponse>
+    suspend fun getMonthlyStats() : Response<BBScoutUserStat>
 
 }

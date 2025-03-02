@@ -182,7 +182,7 @@ class CaptureRecordViewmodel @Inject constructor(
                 },
                 launch {
                     repository.getMonthlyStats().onSuccess {
-                        val res = it?.first { it.uploadMonth == LocalDateTime.now().monthValue &&  it.uploadYear == LocalDateTime.now().year}
+                        val res = it //?.first { it.uploadMonth == LocalDateTime.now().monthValue &&  it.uploadYear == LocalDateTime.now().year}
                         _captureUiState.update {
                             it.copy(
                                 userStat = res
@@ -359,6 +359,29 @@ class CaptureRecordViewmodel @Inject constructor(
                 )
             }
             val fileBitMap = fileSaver.getBitmapFromPath(eventSink.billboardData.fileUri!!)
+            val fileMultipart = buildMutipartBody(File(eventSink.billboardData.fileUri))
+
+
+            println("analyze...")
+            repository.analyzeFile(fileMultipart)
+                .onSuccess { res ->
+                    println("analyze...Success")
+                    _captureUiState.update {
+                        it.copy(
+                            billboardData = it.billboardData?.copy(
+                                brandName = res?.campaign_brand,
+                                brandSlogan = res?.campaign_description,
+                                brandCampaign = res?.campaign_description,
+                                billboardWidth = res?.billboard_measurements?.width?.toString()
+                                    ?: "",
+                                billboardLength = res?.billboard_measurements?.height?.toString()
+                                    ?: "",
+                            )
+                        )
+                    }
+                }.onError {
+
+                }
 
             if (fileBitMap.data != null) {
                 _captureUiState.update {
@@ -372,37 +395,7 @@ class CaptureRecordViewmodel @Inject constructor(
                     CaptureRecordUiEvent.CaptureAdded
                 }
 
-                val fileMultipart = buildMutipartBody(File(eventSink.billboardData.fileUri))
-                repository.analyzeFile(fileMultipart)
-                    .onSuccess { res ->
-                        _captureUiState.update {
-                            it.copy(
-                                billboardData = it.billboardData?.copy(
-                                    brandName = res?.campaign_brand,
-                                    brandSlogan = res?.campaign_description,
-                                    brandCampaign = res?.campaign_description,
-                                    billboardWidth = res?.billboard_measurements?.width?.toString()
-                                        ?: "",
-                                    billboardLength = res?.billboard_measurements?.height?.toString()
-                                        ?: "",
-                                )
-                            )
-                        }
-                    }
 
-//                llmInference.getCampaignInfo(eventSink.billboardData.fullImage, "")
-//                    .onSuccess { campaign ->
-//
-//                        _captureUiState.update {
-//                            it.copy(
-//                                billboardData = it.billboardData?.copy(
-//                                    brandName = campaign?.brand,
-//                                    brandSlogan = campaign?.slogan,
-//                                    brandCampaign = campaign?.campaignTheme
-//                                )
-//                            )
-//                        }
-//                    }
             }
             _captureUiState.update {
                 it.copy(
