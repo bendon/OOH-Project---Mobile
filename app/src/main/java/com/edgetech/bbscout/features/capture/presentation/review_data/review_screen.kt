@@ -52,6 +52,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -80,6 +81,7 @@ import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
 import com.edgetech.bbscout.features.capture.domain.model.LocationErrorException
 import com.edgetech.bbscout.features.capture.domain.model.NoBillboardFoundException
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
+import com.edgetech.bbscout.features.capture.presentation.GetLocationComp
 import com.edgetech.bbscout.features.navigation.AppDestinations
 import com.example.core.core.utils.components.LocationAwareActivity
 import com.example.core.core.utils.components.toLatLng
@@ -124,12 +126,7 @@ fun ReviewRecordMain(
         mutableStateOf<LatLng?>(null)
     }
 
-    var isGettingCurrentLocation by rememberSaveable {
-        mutableStateOf(false)
-    }
-
-
-
+    GetLocationComp(captureRecordUiModel, false)
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(selectedLocation ?: LatLng(-0.0236, 37.9062), 5f)
@@ -157,30 +154,46 @@ fun ReviewRecordMain(
             CaptureRecordEventSink.ResetState
         )
 
-    } else if (currentBillBoadUiEvent is CaptureRecordUiEvent.Error) {
+    }
+    else if (currentBillBoadUiEvent is CaptureRecordUiEvent.Error) {
         val request = (currentBillBoadUiEvent as CaptureRecordUiEvent.Error)
-        ErrorShowDialog(
-            showErrorMessage = true,
-            customError = mapOf(
-                BillboardTypeErrorException to "Billboard type is required",
-                LocationErrorException to "Location is required",
-                BrandDescriptionErrorException to "Brand description is required",
-                NoBillboardFoundException to "No billboard detected"
-            ),
-            error = request.exception,
-            event = request.eventSink,
-            onDismiss = {
-                captureRecordUiModel.captureEventSink(
-                    CaptureRecordEventSink.ResetState
+        if (request.exception is BrandDescriptionErrorException){
+            appState?.navController?.navigate(
+                AppDestinations.EditCapture(
+                    null,
+                    RecordType.CAMPAIGN
                 )
-                if (request.exception is NoBillboardFoundException) {
-                    appState?.navController?.navigateUp()
-                }
-            },
-            onPositive = { eventSink, ex ->
-                captureRecordUiModel.captureEventSink(
-                    CaptureRecordEventSink.ResetState
+            )
+        } else if (request.exception is BillboardTypeErrorException){
+            appState?.navController?.navigate(
+                AppDestinations.EditCapture(
+                    null,
+                    RecordType.BILLBOARD_INFO
                 )
+            )
+        } else {
+            ErrorShowDialog(
+                showErrorMessage = true,
+                customError = mapOf(
+                    BillboardTypeErrorException to "Billboard type is required",
+                    LocationErrorException to "Location is required",
+                    BrandDescriptionErrorException to "Brand description is required",
+                    NoBillboardFoundException to "No billboard detected"
+                ),
+                error = request.exception,
+                event = request.eventSink,
+                onDismiss = {
+                    captureRecordUiModel.captureEventSink(
+                        CaptureRecordEventSink.ResetState
+                    )
+                    if (request.exception is NoBillboardFoundException) {
+                        appState?.navController?.navigateUp()
+                    }
+                },
+                onPositive = { eventSink, ex ->
+                    captureRecordUiModel.captureEventSink(
+                        CaptureRecordEventSink.ResetState
+                    )
 //                if (ex !is EmptyCredentialsException && eventSink != null){
 //                    authUiModel.authEventSink(eventSink as AuthEventSink)
 //                } else {
@@ -188,9 +201,10 @@ fun ReviewRecordMain(
 //                        AuthEventSink.ResetState
 //                    )
 //                }
-            }
+                }
 
-        )
+            )
+        }
     }
 
     if (analysingBillboard) {
@@ -529,7 +543,9 @@ fun BillboardCaptureComp(
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier.padding(end = 16.dp)
                 )
-                Column {
+                Column(
+                    horizontalAlignment = Alignment.End
+                ) {
                     currentData?.products?.forEach {
                         Text(
                             text = it,
@@ -717,7 +733,7 @@ fun BillboardCaptureComp(
                     appState?.navController?.navigate(
                         AppDestinations.EditCapture(
                             null,
-                            RecordType.BILLBOARD_INFO
+                            RecordType.CONTACT
                         )
                     )
                 })
@@ -734,7 +750,9 @@ fun BillboardCaptureComp(
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier.padding(end = 16.dp)
                 )
-                Column {
+                Column(
+                    horizontalAlignment = Alignment.End
+                ) {
                     currentData?.phone?.forEach {
                         Text(
                             text = it.toString(),
@@ -767,7 +785,9 @@ fun BillboardCaptureComp(
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier.padding(end = 16.dp)
                 )
-                Column {
+                Column(
+                    horizontalAlignment = Alignment.End
+                ) {
                     currentData?.email?.forEach {
                         Text(
                             text = it,
@@ -799,7 +819,9 @@ fun BillboardCaptureComp(
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier.padding(end = 16.dp)
                 )
-                Column {
+                Column(
+                    horizontalAlignment = Alignment.End
+                ) {
                     currentData?.siteUrl?.forEach {
                         Text(
                             text = it,
@@ -831,7 +853,9 @@ fun BillboardCaptureComp(
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier.padding(end = 16.dp)
                 )
-                Column {
+                Column(
+                    horizontalAlignment = Alignment.End
+                ) {
                     currentData?.campainSocials?.forEach {
                         Text(
                             text = it,

@@ -56,6 +56,7 @@ import com.edgetech.bbscout.features.capture.domain.model.DetectedObjectWithLabe
 import com.edgetech.bbscout.features.capture.domain.model.EntityInfo
 import com.edgetech.bbscout.features.capture.domain.model.ImageLabel
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
+import com.edgetech.bbscout.features.capture.presentation.GetLocationComp
 import com.edgetech.bbscout.features.capture.presentation.setupZoomListener
 import com.edgetech.bbscout.features.capture.presentation.takePhoto
 import com.edgetech.bbscout.features.navigation.AppDestinations
@@ -89,22 +90,9 @@ fun CaptureBillboardMain(
 
 ) {
 
-    val context = LocalActivity.current as LocationAwareActivity
-    LaunchedEffect(true) {
-        context.getLocation()
-    }
-    val currentLocation by context.appLocation.observeAsState()
-    if (currentLocation != null ) {
+    val context = LocalContext.current
 
-        LaunchedEffect(currentLocation) {
-           val loc = currentLocation?.toLatLng()
-            if (loc != null)
-            captureRecordUiModel.captureEventSink(
-                CaptureRecordEventSink.OnSetLocation(loc)
-            )
-
-        }
-    }
+    GetLocationComp(captureRecordUiModel, true)
 
     BackHandler {
         appState?.navController?.popBackStack(AppDestinations.Dashboard, false)

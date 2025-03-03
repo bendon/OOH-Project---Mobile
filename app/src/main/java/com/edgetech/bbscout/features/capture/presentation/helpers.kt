@@ -6,16 +6,26 @@ import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.util.Log
 import android.view.ScaleGestureDetector
+import androidx.activity.compose.LocalActivity
 import androidx.camera.core.Camera
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.view.PreviewView
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import com.edgetech.bbscout.components.utils.toLong
+import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
+import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
 //import com.edgetech.bbscout.features.capture.BillboardDetectionResult
 //import com.edgetech.bbscout.features.capture.detectBillboardWithText
 import com.edgetech.bbscout.features.capture.domain.model.DetectedObjectWithLabels
 import com.edgetech.bbscout.features.capture.domain.model.EntityInfo
+import com.example.core.core.utils.components.LocationAwareActivity
+import com.example.core.core.utils.components.toLatLng
 import com.google.android.gms.tasks.Tasks
 //import com.google.mlkit.common.model.DownloadConditions
 //import com.google.mlkit.nl.entityextraction.DateTimeEntity
@@ -350,3 +360,32 @@ fun takePhoto(
 //        imageProxy.close()
 //    }
 //}
+
+@Composable
+fun GetLocationComp(
+    captureRecordUiModel: CaptureRecordUiModel,
+    alwaysGetEvenIfGottenBefore: Boolean = false
+){
+    val context = LocalActivity.current as LocationAwareActivity
+    val userLoc by captureRecordUiModel.captureUiState.collectAsState()
+
+    val hasLoc = userLoc.selectedLocation?.latitude != null && userLoc.selectedLocation?.longitude != null
+
+    val shouldGetLocation = alwaysGetEvenIfGottenBefore || !hasLoc
+    if (shouldGetLocation)
+    LaunchedEffect(shouldGetLocation) {
+        context.getLocation()
+    }
+    val currentLocation by context.appLocation.observeAsState()
+    if (currentLocation != null ) {
+
+        LaunchedEffect(currentLocation) {
+            val loc = currentLocation?.toLatLng()
+            if (loc != null && shouldGetLocation)
+                captureRecordUiModel.captureEventSink(
+                    CaptureRecordEventSink.OnSetLocation(loc)
+                )
+
+        }
+    }
+}
