@@ -248,7 +248,7 @@ fun takePhoto(
             File.createTempFile(
                 "JPEG_${LocalDateTime.now().toLong()}_", /* prefix */
                 ".jpg", /* suffix */
-                context.filesDir /* directory */
+                context.cacheDir /* directory */
             )
         )
         .build()

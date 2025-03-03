@@ -101,7 +101,7 @@ fun SettingsMain(
             },
             title = "Log Out",
             message = "Are you sure you want to log out?",
-            posText = "Log Out",
+            posText = "Logout",
             negText = "Cancel",
             icon = {
                 WarningIcon()

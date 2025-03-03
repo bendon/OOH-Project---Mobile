@@ -23,11 +23,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.insert
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -57,6 +60,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
@@ -156,14 +160,12 @@ fun LoginScreenMain(
         authUiModel.authEventSink(
             AuthEventSink.ResetState
         )
-    }
-    else if (uiEvent is AuthUiEvent.RegistrationSuccessful){
+    } else if (uiEvent is AuthUiEvent.RegistrationSuccessful) {
         navController.navigate(AppDestinations.Dashboard)
         authUiModel.authEventSink(
             AuthEventSink.ResetState
         )
-    }
-        else if (uiEvent is AuthUiEvent.Error) {
+    } else if (uiEvent is AuthUiEvent.Error) {
         val request = (uiEvent as AuthUiEvent.Error)
         ErrorShowDialog(
             showErrorMessage = true,
@@ -210,14 +212,21 @@ fun LoginScreenMain(
                     .fillMaxWidth()
                     .padding(vertical = 32.dp, horizontal = 24.dp)
             )
-            Text(text = "Welcome to BBScout", fontSize = 24.sp)
+            Text(
+                text = "Welcome to BBScout",
+                fontSize = 24.sp,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
             Text(
                 text = "The smart way to track billboard advertising",
                 fontSize = 14.sp,
                 color = Color.Gray
             )
             Spacer(modifier = Modifier.height(16.dp))
-            TabRow(selectedTabIndex = selectedTab, containerColor = MaterialTheme.colorScheme.background) {
+            TabRow(
+                selectedTabIndex = selectedTab,
+                containerColor = MaterialTheme.colorScheme.background
+            ) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
                         selected = selectedTab == index,
@@ -257,9 +266,11 @@ fun LoginScreenContent(
     val isLoading = uiState.isLoading
     val context = LocalContext.current
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("Email Address", modifier = Modifier
-            .padding(vertical = 6.dp)
-            .align(Alignment.Start))
+        Text(
+            "Email Address", modifier = Modifier
+                .padding(vertical = 6.dp)
+                .align(Alignment.Start)
+        )
         OutlinedTextField(
             state = email,
             placeholder = { Text("Enter your email") },
@@ -275,9 +286,11 @@ fun LoginScreenContent(
             }
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Text("Password", modifier = Modifier
-            .padding(vertical = 6.dp)
-            .align(Alignment.Start))
+        Text(
+            "Password", modifier = Modifier
+                .padding(vertical = 6.dp)
+                .align(Alignment.Start)
+        )
         OutlinedTextField(
             state = password,
             placeholder = { Text("Enter your password") },
@@ -301,9 +314,17 @@ fun LoginScreenContent(
                 )
             }
         )
-        Text("Forgot password?", modifier = Modifier.clickable {
-            navController.navigate(AppDestinations.ForgotPassword)
-        }.padding(vertical = 8.dp).align(Alignment.End), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+        Text(
+            "Forgot password?",
+            modifier = Modifier
+                .clickable {
+                    navController.navigate(AppDestinations.ForgotPassword)
+                }
+                .padding(vertical = 8.dp)
+                .align(Alignment.End),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
         MainLoadingButton(
             modifier = Modifier
                 .fillMaxWidth()
@@ -330,12 +351,20 @@ fun LoginScreenContent(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(vertical = 8.dp)
         ) {
-            HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.surface, modifier = Modifier.weight(1f) )
+            HorizontalDivider(
+                thickness = 2.dp,
+                color = MaterialTheme.colorScheme.surface,
+                modifier = Modifier.weight(1f)
+            )
             Text(
                 "Or continue with", modifier = Modifier
                     .padding(horizontal = 8.dp)
             )
-            HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.surface, modifier = Modifier.weight(1f)  )
+            HorizontalDivider(
+                thickness = 2.dp,
+                color = MaterialTheme.colorScheme.surface,
+                modifier = Modifier.weight(1f)
+            )
         }
         NonLoadingSecButton(
             modifier = Modifier
@@ -349,9 +378,16 @@ fun LoginScreenContent(
                 )
             },
         ) {
-            ButtonContent(
-                "Login with Google",
-                MaterialTheme.colorScheme.primary,
+            Image(
+                painter = painterResource(R.drawable.google_icon_logo_svgrepo_com),
+                contentDescription = null,
+                //colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                modifier = Modifier
+                    .size(32.dp).padding(vertical = 8.dp)
+            )
+            Text(
+                "Login with Google", color =
+                MaterialTheme.colorScheme.primary
             )
         }
     }
@@ -386,11 +422,17 @@ fun SignUpScreen(
     val isLoading = uiState.isLoading
     val context = LocalContext.current
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.verticalScroll(
+            rememberScrollState()
+        )
+    ) {
 
-        Text("First name", modifier = Modifier
-            .padding(vertical = 6.dp)
-            .align(Alignment.Start))
+        Text(
+            "First name", modifier = Modifier
+                .padding(vertical = 6.dp)
+                .align(Alignment.Start)
+        )
         OutlinedTextField(
             state = firstName,
             placeholder = { Text("Enter your first name") },
@@ -406,9 +448,11 @@ fun SignUpScreen(
             }
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Text("Last name", modifier = Modifier
-            .padding(vertical = 6.dp)
-            .align(Alignment.Start))
+        Text(
+            "Last name", modifier = Modifier
+                .padding(vertical = 6.dp)
+                .align(Alignment.Start)
+        )
         OutlinedTextField(
             state = lastName,
             placeholder = { Text("Enter your last name") },
@@ -424,9 +468,11 @@ fun SignUpScreen(
             }
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Text("Email Address", modifier = Modifier
-            .padding(vertical = 6.dp)
-            .align(Alignment.Start))
+        Text(
+            "Email Address", modifier = Modifier
+                .padding(vertical = 6.dp)
+                .align(Alignment.Start)
+        )
         OutlinedTextField(
             state = email,
             placeholder = { Text("Enter your email") },
@@ -442,9 +488,11 @@ fun SignUpScreen(
             }
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Text("Password", modifier = Modifier
-            .padding(vertical = 6.dp)
-            .align(Alignment.Start))
+        Text(
+            "Password", modifier = Modifier
+                .padding(vertical = 6.dp)
+                .align(Alignment.Start)
+        )
         OutlinedTextField(
             state = password,
             placeholder = { Text("Enter your password") },
@@ -471,9 +519,11 @@ fun SignUpScreen(
 
 
         Spacer(modifier = Modifier.height(8.dp))
-        Text("Confirm Password", modifier = Modifier
-            .padding(vertical = 6.dp)
-            .align(Alignment.Start))
+        Text(
+            "Confirm Password", modifier = Modifier
+                .padding(vertical = 6.dp)
+                .align(Alignment.Start)
+        )
         OutlinedTextField(
             state = confirmPassword,
             placeholder = { Text("Confirm your password") },
@@ -507,11 +557,11 @@ fun SignUpScreen(
             onTap = {
                 authUiModel.authEventSink(
                     AuthEventSink.RegisterWithEmailAndPassword(
-                        firstName = firstName.toString(),
-                        lastName = lastName.toString(),
-                        email = email.toString(),
-                        password = password.toString(),
-                        passwordConfirmation = confirmPassword.toString()
+                        firstName = firstName.text.toString(),
+                        lastName = lastName.text.toString(),
+                        email = email.text.toString(),
+                        password = password.text.toString(),
+                        passwordConfirmation = confirmPassword.text.toString()
                     )
                 )
             },
@@ -526,12 +576,20 @@ fun SignUpScreen(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(vertical = 8.dp)
         ) {
-            HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.surface, modifier = Modifier.weight(1f) )
+            HorizontalDivider(
+                thickness = 2.dp,
+                color = MaterialTheme.colorScheme.surface,
+                modifier = Modifier.weight(1f)
+            )
             Text(
                 "Or continue with", modifier = Modifier
                     .padding(horizontal = 8.dp)
             )
-            HorizontalDivider(thickness = 2.dp, color = MaterialTheme.colorScheme.surface, modifier = Modifier.weight(1f)  )
+            HorizontalDivider(
+                thickness = 2.dp,
+                color = MaterialTheme.colorScheme.surface,
+                modifier = Modifier.weight(1f)
+            )
         }
         NonLoadingSecButton(
             modifier = Modifier
@@ -545,10 +603,19 @@ fun SignUpScreen(
                 )
             },
         ) {
-            ButtonContent(
-                "Create an account with Google",
-                MaterialTheme.colorScheme.primary,
+            Image(
+                painter = painterResource(R.drawable.google_icon_logo_svgrepo_com),
+                contentDescription = null,
+                //colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                modifier = Modifier
+                    .size(32.dp).padding(vertical = 8.dp)
             )
+            Text(
+                "Create an account with Google", color =
+                MaterialTheme.colorScheme.primary
+            )
+
+
         }
     }
 }

@@ -58,8 +58,6 @@ class CaptureRecordViewmodel @Inject constructor(
     )
     private val _captureUiEvent = MutableStateFlow<CaptureRecordUiEvent>(CaptureRecordUiEvent.Empty)
 
-    // private var _billboardData: BillboardExtractedInfo? = null
-
 
     val uiModel = CaptureRecordUiModel(
         captureUiState = _captureUiState,
@@ -68,11 +66,6 @@ class CaptureRecordViewmodel @Inject constructor(
         when (eventSink) {
             is CaptureRecordEventSink.OnCaptureEvent -> {
 
-                _captureUiState.update {
-                    it.copy(
-                        billboardData = eventSink.billboardData
-                    )
-                }
                 onCapture(eventSink)
             }
 
@@ -106,6 +99,14 @@ class CaptureRecordViewmodel @Inject constructor(
                         )
                     }
                 }
+            }
+
+            is CaptureRecordEventSink.OnEditCaptureEvent -> {
+                onEditCapture(eventSink)
+            }
+
+            is CaptureRecordEventSink.OnAnalyseImage -> {
+                //onAnalyseImage(eventSink)
             }
         }
     }
@@ -176,13 +177,17 @@ class CaptureRecordViewmodel @Inject constructor(
                         }
                     }.onError { ex ->
                         _captureUiEvent.update {
-                            CaptureRecordUiEvent.Error(ex ?: BBScoutException("Unknown Error"), eventSink)
+                            CaptureRecordUiEvent.Error(
+                                ex ?: BBScoutException("Unknown Error"),
+                                eventSink
+                            )
                         }
                     }
                 },
                 launch {
                     repository.getMonthlyStats().onSuccess {
-                        val res = it //?.first { it.uploadMonth == LocalDateTime.now().monthValue &&  it.uploadYear == LocalDateTime.now().year}
+                        val res =
+                            it //?.first { it.uploadMonth == LocalDateTime.now().monthValue &&  it.uploadYear == LocalDateTime.now().year}
                         _captureUiState.update {
                             it.copy(
                                 userStat = res
@@ -323,7 +328,7 @@ class CaptureRecordViewmodel @Inject constructor(
     private fun buildMutipartBody(file: File): MultipartBody {
         return MultipartBody.Builder()
             .setType(MultipartBody.FORM)
-            .addFormDataPart("file", "file", file.asRequestBody())
+            .addFormDataPart("file", file.path.substringAfterLast("/"), file.asRequestBody())
             .build()
     }
 
@@ -351,43 +356,35 @@ class CaptureRecordViewmodel @Inject constructor(
         }
     }
 
+    private fun onEditCapture(eventSink: CaptureRecordEventSink.OnEditCaptureEvent) {
+        _captureUiState.update {
+            it.copy(
+                billboardData = eventSink.billboardData
+            )
+        }
+//        _captureUiEvent.update {
+//            CaptureRecordUiEvent.CaptureAdded
+//        }
+    }
+
+
     private fun onCapture(eventSink: CaptureRecordEventSink.OnCaptureEvent) {
-        viewModelScope.launch(ioDispatcher) {
-            _captureUiState.update {
-                it.copy(
-                    analysingLoading = true
+        _captureUiState.update {
+            it.copy(
+                billboardData = BillboardExtractedInfo(
+                    fileUri = eventSink.fileUri
                 )
-            }
-            val fileBitMap = fileSaver.getBitmapFromPath(eventSink.billboardData.fileUri!!)
-            val fileMultipart = buildMutipartBody(File(eventSink.billboardData.fileUri))
+            )
+        }
+        viewModelScope.launch(ioDispatcher) {
 
-
-            println("analyze...")
-            repository.analyzeFile(fileMultipart)
-                .onSuccess { res ->
-                    println("analyze...Success")
-                    _captureUiState.update {
-                        it.copy(
-                            billboardData = it.billboardData?.copy(
-                                brandName = res?.campaign_brand,
-                                brandSlogan = res?.campaign_description,
-                                brandCampaign = res?.campaign_description,
-                                billboardWidth = res?.billboard_measurements?.width?.toString()
-                                    ?: "",
-                                billboardLength = res?.billboard_measurements?.height?.toString()
-                                    ?: "",
-                            )
-                        )
-                    }
-                }.onError {
-
-                }
+            val fileBitMap = fileSaver.getBitmapFromPath(eventSink.fileUri)
 
             if (fileBitMap.data != null) {
                 _captureUiState.update {
                     it.copy(
-                        billboardData = eventSink.billboardData.copy(
-                            fullImage = fileBitMap.data
+                        billboardData = it.billboardData?.copy(
+                            fullImage = fileBitMap.data!!
                         )
                     )
                 }
@@ -395,14 +392,52 @@ class CaptureRecordViewmodel @Inject constructor(
                     CaptureRecordUiEvent.CaptureAdded
                 }
 
+                onAnalyseImage(CaptureRecordEventSink.OnAnalyseImage)
+            }
+
+
+        }
+
+    }
+
+    private suspend fun onAnalyseImage(eventSink: CaptureRecordEventSink.OnAnalyseImage) {
+       // viewModelScope.launch(ioDispatcher) {
+            if (_captureUiState.value.billboardData!!.fileUri != null) {
+                val fileMultipart =
+                    buildMutipartBody(File(_captureUiState.value.billboardData!!.fileUri))
+                _captureUiState.update {
+                    it.copy(
+                        analysingLoading = true
+                    )
+                }
+                repository.analyzeFile(fileMultipart)
+                    .onSuccess { res ->
+                        _captureUiState.update {
+                            it.copy(
+                                analysingLoading = false,
+                                billboardData = it.billboardData?.copy(
+                                    brandName = res?.campaign_brand,
+                                    brandSlogan = res?.campaign_description,
+                                    brandCampaign = res?.campaign_description,
+                                    billboardWidth = res?.billboard_measurements?.width?.toString()
+                                        ?: "",
+                                    billboardLength = res?.billboard_measurements?.height?.toString()
+                                        ?: "",
+                                )
+                            )
+                        }
+                    }.onError {
+                        println("Error...${it}")
+                        _captureUiState.update {
+                            it.copy(
+                                analysingLoading = false
+                            )
+                        }
+                    }
+
 
             }
-            _captureUiState.update {
-                it.copy(
-                    analysingLoading = false
-                )
-            }
-        }
+        //}
     }
 
 }

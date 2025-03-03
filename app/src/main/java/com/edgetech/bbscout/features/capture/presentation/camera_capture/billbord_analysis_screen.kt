@@ -42,15 +42,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.components.utils.log
-
-import com.edgetech.bbscout.features.capture.domain.model.BillboardExtractedInfo
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiEvent
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
@@ -208,9 +204,9 @@ fun CaptureBillboardMain(
                         executor = cameraExecutor,
                         onImageCaptured = { uri ->
                             captureRecordUiModel.captureEventSink(
-                                CaptureRecordEventSink.OnCaptureEvent(BillboardExtractedInfo(
-                                    fileUri = uri.path
-                                ))
+                                CaptureRecordEventSink.OnCaptureEvent(
+                                    fileUri = uri.path ?: ""
+                                )
                             )
                         },
                         onError = { error ->

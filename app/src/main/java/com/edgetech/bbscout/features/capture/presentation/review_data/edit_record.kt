@@ -397,7 +397,7 @@ fun EditRecordMain(
                 Button(
                     onClick = {
                         captureRecordUiModel.captureEventSink(
-                            CaptureRecordEventSink.OnCaptureEvent(
+                            CaptureRecordEventSink.OnEditCaptureEvent(
                                 billboardData = currentData?.copy(
                                     brandName = campaignBrand.text.toString().ifEmptySetNull()
                                         ?: currentData.brandName,
@@ -436,9 +436,9 @@ fun EditRecordMain(
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    Icon(Icons.Default.CheckCircleOutline, contentDescription = "Capture")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Submit")
+//                    Icon(Icons.Default.CheckCircleOutline, contentDescription = "Capture")
+//                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Save")
                 }
 
 

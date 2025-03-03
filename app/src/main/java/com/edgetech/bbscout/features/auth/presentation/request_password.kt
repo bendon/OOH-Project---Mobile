@@ -72,10 +72,13 @@ fun RequestPasswordMain(
     val uiEvent by authUiModel.authUiEvent.collectAsState()
 
 
-    if (uiEvent is AuthUiEvent.RegistrationSuccessful){
+    if (uiEvent is AuthUiEvent.RequestPasswordResetSuccessful){
         StatusDialog(
             true,
             onDismissRequest = {
+                authUiModel.authEventSink(
+                    AuthEventSink.ResetState
+                )
                 appState?.navController?.navigateUp()
             },
             title = "Password reset",
@@ -168,7 +171,7 @@ fun RequestPasswordMain(
                 onTap = {
                     authUiModel.authEventSink(
                             AuthEventSink.RequestPasswordReset(
-                                email.toString()
+                                email.text.toString()
                             )
                     )
                 },

@@ -101,6 +101,9 @@ class AuthViewmodel @Inject constructor(
            return
        }
 
+        _uiState.update {
+            it.copy(isLoading = true)
+        }
         viewModelScope.launch(ioDispatcher) {
             repository.forgotPassword(LoginRequest(eventSink.email)).onSuccess {
                 _uiEvent.update {
@@ -117,6 +120,9 @@ class AuthViewmodel @Inject constructor(
                     }
                 }
 
+            }
+            _uiState.update {
+                it.copy(isLoading = false)
             }
         }
     }
@@ -169,6 +175,9 @@ class AuthViewmodel @Inject constructor(
                 email = eventSink.email,
                 password = eventSink.password
             )
+            _uiState.update {
+                it.copy(isLoading = true)
+            }
             var authResponse: AuthResponse? = null
             repository.register(regRequest).onSuccess { res ->
                 authResponse = res
@@ -186,6 +195,9 @@ class AuthViewmodel @Inject constructor(
                     }
                 }
 
+            }
+            _uiState.update {
+                it.copy(isLoading = false)
             }
             if (authResponse != null) {
                 addAuthEntity(authResponse)

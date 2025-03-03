@@ -68,12 +68,6 @@ import com.edgetech.bbscout.components.ui.ErrorShowDialog
 import com.edgetech.bbscout.components.ui.MainLoadingButton
 import com.edgetech.bbscout.components.utils.ifEmptySetNull
 import com.edgetech.bbscout.data.data.local.enities.UserLocationEntity
-import com.edgetech.bbscout.data.data.remote.bbscout_api.model.api_exception.UnAuthenticatedException
-import com.edgetech.bbscout.features.auth.domain.model.AuthEventSink
-import com.edgetech.bbscout.features.auth.domain.model.AuthUiEvent
-import com.edgetech.bbscout.features.auth.domain.model.EmptyCredentialsException
-import com.edgetech.bbscout.features.auth.presentation.LoginScreenContent
-import com.edgetech.bbscout.features.auth.presentation.SignUpScreen
 import com.edgetech.bbscout.features.capture.domain.model.BillboardExtractedInfo
 import com.edgetech.bbscout.features.capture.domain.model.BillboardTypeErrorException
 import com.edgetech.bbscout.features.capture.domain.model.BrandDescriptionErrorException
@@ -135,6 +129,12 @@ fun ReviewRecordMain(
         position = CameraPosition.fromLatLngZoom(selectedLocation ?: LatLng(-0.0236, 37.9062), 5f)
     }
 
+    LaunchedEffect(recordId) {
+//        captureRecordUiModel.captureEventSink(
+//            CaptureRecordEventSink.OnAnalyseImage
+//        )
+    }
+
     var selectedTab by rememberSaveable { mutableStateOf(0) }
     val tabs = listOf("Billboard", "Location")
 
@@ -163,7 +163,8 @@ fun ReviewRecordMain(
             CaptureRecordEventSink.ResetState
         )
 
-    } else if(currentBillBoadUiEvent is CaptureRecordUiEvent.Error){
+    }
+    else if(currentBillBoadUiEvent is CaptureRecordUiEvent.Error){
         val request = (currentBillBoadUiEvent as CaptureRecordUiEvent.Error)
         ErrorShowDialog(
             showErrorMessage = true,

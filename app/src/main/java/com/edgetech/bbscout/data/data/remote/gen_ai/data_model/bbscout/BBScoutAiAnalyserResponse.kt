@@ -7,7 +7,7 @@ data class BBScoutAiAnalyserResponse(
     val billboard_measurements: BillboardMeasurements? = null,
     val campaign_brand: String? = null,
     val campaign_description: String? = null,
-    val campaign_socials: List<Any>? = null,
+    //val campaign_socials: List<Any>? = null,
     val contact_information: ContactInformation? = null,
     val location: String? = null,
     val other_details: List<OtherDetail>? = null,

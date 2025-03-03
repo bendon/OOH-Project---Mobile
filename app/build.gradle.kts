@@ -109,7 +109,7 @@ dependencies {
     implementation(libs.androidx.camera.view)
 
     // ML Kit and Location Services
-   // implementation(libs.google.mlkit.`object`.detection)
+    implementation(libs.google.mlkit.`object`.detection)
    // implementation(libs.mlkit.image.labeling)
    // implementation(libs.mlkit.barcode.scanning)
    // implementation(libs.google.mlkit.text.recognition)

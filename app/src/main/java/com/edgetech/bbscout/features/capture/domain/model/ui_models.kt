@@ -49,7 +49,13 @@ sealed class CaptureRecordUiEvent {
 
 sealed class CaptureRecordEventSink : AppEventSink {
 
+    data object OnAnalyseImage : CaptureRecordEventSink()
+
     data class OnCaptureEvent(
+        val fileUri: String,
+    ): CaptureRecordEventSink()
+
+    data class OnEditCaptureEvent(
         val billboardData: BillboardExtractedInfo
     ) : CaptureRecordEventSink()
 
