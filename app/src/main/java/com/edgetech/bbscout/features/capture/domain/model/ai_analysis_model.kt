@@ -1,6 +1,8 @@
 package com.edgetech.bbscout.features.capture.domain.model
 
 import android.graphics.Bitmap
+import com.edgetech.bbscout.data.data.local.utils.LongList
+import com.edgetech.bbscout.data.data.local.utils.StringList
 
 
 data class BillboardExtractedInfo(
@@ -19,16 +21,22 @@ data class BillboardExtractedInfo(
     val billboardOwner: String? = null,
     val billboardWidth: String? = null,
     val billboardLength: String? = null,
-    val unitOfMeasurement: String? = null,
-
-)
-
+    val objectType: String? = null,
+    val unitOfMeasurement: String? = "centimeters",
+    val phone: List<Long>? = null,
+    val email: List<String>? = null,
+    val campainSocials: List<String>? = null,
+    val siteUrl: List<String>? = null,
+    val products: List<String>? = null,
+    val targetGender: String? = null,
+    val targetAge: String? = null,
+    )
 
 
 data class DetectedObjectWithLabels(
     val trackingId: Int?,
     val labels: List<ObjectLabel>
-){
+) {
     companion object {
 //        fun fromDetectedObject(data: DetectedObject): DetectedObjectWithLabels {
 //            return DetectedObjectWithLabels(

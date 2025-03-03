@@ -8,3 +8,5 @@ data object BillboardTypeErrorException : BBScoutException()
 data object LocationErrorException : BBScoutException()
 
 data object BrandDescriptionErrorException : BBScoutException()
+
+data object NoBillboardFoundException : BBScoutException()

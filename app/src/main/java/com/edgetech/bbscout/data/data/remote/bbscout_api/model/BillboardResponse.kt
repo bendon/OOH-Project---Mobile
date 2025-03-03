@@ -24,5 +24,6 @@ data class BillboardResponse(
     val type: String? = null,
     val unit: String? = null,
     val updatedAt: Long? = null,
-    val width: Double? = null
+    val width: Double? = null,
+    val objectType: String? = null
 ) : ApiResponse

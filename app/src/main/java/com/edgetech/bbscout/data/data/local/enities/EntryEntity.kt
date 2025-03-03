@@ -18,6 +18,16 @@ data class EntryEntity(
     val rawText: String? = null,
     val augmentedText: String? = null,
     val advertDescription: String? = null,
+    val objectType: String? = null,
+    val phone: String? = null,
+    val email: String? = null,
+    val siteUrl: String? = null,
+    val campainSocials: String? = null,
+    val products: String? = null,
+    val targetGender: String? = null,
+    val targetAge : String? = null,
     override var createdAt: Long? = null,
     override var updatedAt: Long? = null
 ): BaseEntity()
+
+

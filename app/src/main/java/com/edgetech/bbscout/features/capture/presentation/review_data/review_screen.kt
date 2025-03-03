@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -62,6 +64,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.R
 import com.edgetech.bbscout.components.ui.ErrorShowDialog
@@ -75,6 +78,7 @@ import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiEvent
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
 import com.edgetech.bbscout.features.capture.domain.model.LocationErrorException
+import com.edgetech.bbscout.features.capture.domain.model.NoBillboardFoundException
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
 import com.edgetech.bbscout.features.navigation.AppDestinations
 import com.example.core.core.utils.components.LocationAwareActivity
@@ -108,9 +112,11 @@ fun ReviewRecordMain(
     recordId: Long?
 ) {
 
-    val context = LocalActivity.current as LocationAwareActivity
+
     val captureRecordUiState by captureRecordUiModel.captureUiState.collectAsState()
     val currentData = captureRecordUiState.billboardData
+
+    val analysingBillboard = captureRecordUiState.analysingLoading
 
     val currentBillBoadUiEvent by captureRecordUiModel.captureUiEvent.collectAsState()
 
@@ -122,13 +128,15 @@ fun ReviewRecordMain(
         mutableStateOf(false)
     }
 
-    val currentLocation by context.appLocation.observeAsState()
+
 
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(selectedLocation ?: LatLng(-0.0236, 37.9062), 5f)
     }
 
+    selectedLocation = LatLng(captureRecordUiState.selectedLocation?.latitude ?: 0.0, captureRecordUiState.selectedLocation?.longitude ?: 0.0)
+    cameraPositionState.position = CameraPosition.fromLatLngZoom(selectedLocation ?: LatLng(-0.0236, 37.9062), 5f)
     LaunchedEffect(recordId) {
 //        captureRecordUiModel.captureEventSink(
 //            CaptureRecordEventSink.OnAnalyseImage
@@ -138,24 +146,10 @@ fun ReviewRecordMain(
     var selectedTab by rememberSaveable { mutableStateOf(0) }
     val tabs = listOf("Billboard", "Location")
 
-    LaunchedEffect(true) {
-        context.getLocation()
-    }
 
-    if (currentLocation != null || isGettingCurrentLocation) {
-        isGettingCurrentLocation = false
-        LaunchedEffect(currentLocation) {
-            selectedLocation = currentLocation?.toLatLng()
-            if (selectedLocation != null) {
-                cameraPositionState.position = CameraPosition.fromLatLngZoom(selectedLocation!!, 5f)
-                captureRecordUiModel.captureEventSink(
-                    CaptureRecordEventSink.OnSetLocation(selectedLocation!!)
-                )
-            }
-        }
-    }
 
-    if (currentBillBoadUiEvent is CaptureRecordUiEvent.CaptureRecordCreated){
+
+    if (currentBillBoadUiEvent is CaptureRecordUiEvent.CaptureRecordCreated) {
         LaunchedEffect(true) {
             appState?.navController?.popBackStack(AppDestinations.Dashboard, false)
         }
@@ -163,15 +157,15 @@ fun ReviewRecordMain(
             CaptureRecordEventSink.ResetState
         )
 
-    }
-    else if(currentBillBoadUiEvent is CaptureRecordUiEvent.Error){
+    } else if (currentBillBoadUiEvent is CaptureRecordUiEvent.Error) {
         val request = (currentBillBoadUiEvent as CaptureRecordUiEvent.Error)
         ErrorShowDialog(
             showErrorMessage = true,
             customError = mapOf(
                 BillboardTypeErrorException to "Billboard type is required",
                 LocationErrorException to "Location is required",
-                BrandDescriptionErrorException to "Brand description is required"
+                BrandDescriptionErrorException to "Brand description is required",
+                NoBillboardFoundException to "No billboard detected"
             ),
             error = request.exception,
             event = request.eventSink,
@@ -179,6 +173,9 @@ fun ReviewRecordMain(
                 captureRecordUiModel.captureEventSink(
                     CaptureRecordEventSink.ResetState
                 )
+                if (request.exception is NoBillboardFoundException) {
+                    appState?.navController?.navigateUp()
+                }
             },
             onPositive = { eventSink, ex ->
                 captureRecordUiModel.captureEventSink(
@@ -194,6 +191,26 @@ fun ReviewRecordMain(
             }
 
         )
+    }
+
+    if (analysingBillboard) {
+        Dialog(onDismissRequest = {
+
+        }) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentWidth()
+                    .wrapContentHeight(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
+            ) {
+
+                CircularProgressIndicator(modifier = Modifier.padding(24.dp))
+            }
+
+
+        }
     }
 
     Scaffold(
@@ -257,7 +274,10 @@ fun ReviewRecordMain(
                     }
                 }
 
-                TabRow(selectedTabIndex = selectedTab, containerColor = MaterialTheme.colorScheme.background) {
+                TabRow(
+                    selectedTabIndex = selectedTab,
+                    containerColor = MaterialTheme.colorScheme.background
+                ) {
                     tabs.forEachIndexed { index, title ->
                         Tab(
                             selected = selectedTab == index,
@@ -280,7 +300,6 @@ fun ReviewRecordMain(
                         cameraPositionState = cameraPositionState
                     )
                 }
-
 
 
 //                Card(
@@ -331,8 +350,6 @@ fun ReviewRecordMain(
 //                }
 
 
-
-
             }
             Row(
                 modifier = Modifier
@@ -356,9 +373,13 @@ fun ReviewRecordMain(
                         )
                     },
                     modifier = Modifier.weight(1f),
-                   pIsLoading = captureRecordUiState.isLoading
+                    pIsLoading = captureRecordUiState.isLoading
                 ) {
-                    Icon(Icons.Default.CheckCircleOutline, contentDescription = "Capture", tint = MaterialTheme.colorScheme.onPrimary)
+                    Icon(
+                        Icons.Default.CheckCircleOutline,
+                        contentDescription = "Capture",
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Submit", color = MaterialTheme.colorScheme.onPrimary)
                 }
@@ -376,7 +397,7 @@ fun ReviewRecordMain(
 fun BillboardCaptureComp(
     appState: BBScoutAppState?,
     currentData: BillboardExtractedInfo?
-){
+) {
     Card(
         shape = MaterialTheme.shapes.small,
         modifier = Modifier
@@ -415,7 +436,12 @@ fun BillboardCaptureComp(
                         .weight(1f)
                 )
                 Icon(Icons.Outlined.Edit, "", tint = Color.Gray, modifier = Modifier.clickable {
-                    appState?.navController?.navigate(AppDestinations.EditCapture(null, RecordType.CAMPAIGN))
+                    appState?.navController?.navigate(
+                        AppDestinations.EditCapture(
+                            null,
+                            RecordType.CAMPAIGN
+                        )
+                    )
                 })
             }
 
@@ -450,6 +476,78 @@ fun BillboardCaptureComp(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(end = 16.dp)
             )
+
+            Row(
+                modifier = Modifier
+                    .padding(top = 6.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Target age",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier.padding(end = 16.dp)
+                )
+                Text(
+                    text = currentData?.targetAge?.ifEmptySetNull()
+                        ?: "Unknown",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .padding(top = 6.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Target gender",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier.padding(end = 16.dp)
+                )
+                Text(
+                    text = currentData?.targetGender?.ifEmptySetNull()
+                        ?: "Unknown",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .padding(top = 6.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Products",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier.padding(end = 16.dp)
+                )
+                Column {
+                    currentData?.products?.forEach {
+                        Text(
+                            text = it,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
+                    }
+                    if (currentData?.products.isNullOrEmpty()){
+                        Text(
+                            text = "N/A",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                        )
+                    }
+                }
+            }
         }
 
     }
@@ -492,7 +590,12 @@ fun BillboardCaptureComp(
                         .weight(1f)
                 )
                 Icon(Icons.Outlined.Edit, "", tint = Color.Gray, modifier = Modifier.clickable {
-                    appState?.navController?.navigate(AppDestinations.EditCapture(null, RecordType.BILLBOARD_INFO))
+                    appState?.navController?.navigate(
+                        AppDestinations.EditCapture(
+                            null,
+                            RecordType.BILLBOARD_INFO
+                        )
+                    )
                 })
             }
 
@@ -572,6 +675,184 @@ fun BillboardCaptureComp(
             }
         }
     }
+    Card(
+        shape = MaterialTheme.shapes.small,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp)
+            .padding(top = 16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment = CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Surface(
+                    shape = CircleShape,
+                    modifier = Modifier.size(28.dp)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.communication_global_internet_svgrepo_com),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(6.dp),
+                        colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.primary)
+                    )
+                }
+                Text(
+                    text = "Campain communication channel",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .weight(1f)
+                )
+                Icon(Icons.Outlined.Edit, "", tint = Color.Gray, modifier = Modifier.clickable {
+                    appState?.navController?.navigate(
+                        AppDestinations.EditCapture(
+                            null,
+                            RecordType.BILLBOARD_INFO
+                        )
+                    )
+                })
+            }
+            Row(
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Phone number",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier.padding(end = 16.dp)
+                )
+                Column {
+                    currentData?.phone?.forEach {
+                        Text(
+                            text = it.toString(),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
+                    }
+                    if (currentData?.phone.isNullOrEmpty()){
+                        Text(
+                            text = "N/A",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                        )
+                    }
+
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .padding(top = 6.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Email",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier.padding(end = 16.dp)
+                )
+                Column {
+                    currentData?.email?.forEach {
+                        Text(
+                            text = it,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
+                    }
+                    if (currentData?.email.isNullOrEmpty()){
+                        Text(
+                            text = "N/A",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                        )
+                    }
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .padding(top = 6.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Website",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier.padding(end = 16.dp)
+                )
+                Column {
+                    currentData?.siteUrl?.forEach {
+                        Text(
+                            text = it,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
+                    }
+                    if (currentData?.siteUrl.isNullOrEmpty()){
+                        Text(
+                            text = "N/A",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                        )
+                    }
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .padding(top = 6.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Social media",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier.padding(end = 16.dp)
+                )
+                Column {
+                    currentData?.campainSocials?.forEach {
+                        Text(
+                            text = it,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
+                    }
+                    if (currentData?.campainSocials.isNullOrEmpty()){
+                        Text(
+                            text = "N/A",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                        )
+                    }
+                }
+            }
+
+        }
+    }
 }
 
 @Composable
@@ -579,7 +860,7 @@ fun BillboardLocationComp(
     selectedLocation: UserLocationEntity?,
     selectedLoc: LatLng,
     cameraPositionState: CameraPositionState
-){
+) {
     Card(
         shape = MaterialTheme.shapes.small,
         modifier = Modifier
@@ -607,7 +888,7 @@ fun BillboardLocationComp(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(6.dp),
-                        tint =  MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
                 Text(
@@ -645,7 +926,7 @@ fun BillboardLocationComp(
             .padding(top = 16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-    ){
+    ) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState

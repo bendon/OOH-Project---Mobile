@@ -3,6 +3,7 @@ package com.edgetech.bbscout.features.capture.presentation.camera_capture
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
@@ -36,6 +37,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -57,6 +59,8 @@ import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewm
 import com.edgetech.bbscout.features.capture.presentation.setupZoomListener
 import com.edgetech.bbscout.features.capture.presentation.takePhoto
 import com.edgetech.bbscout.features.navigation.AppDestinations
+import com.example.core.core.utils.components.LocationAwareActivity
+import com.example.core.core.utils.components.toLatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -85,11 +89,28 @@ fun CaptureBillboardMain(
 
 ) {
 
+    val context = LocalActivity.current as LocationAwareActivity
+    LaunchedEffect(true) {
+        context.getLocation()
+    }
+    val currentLocation by context.appLocation.observeAsState()
+    if (currentLocation != null ) {
+
+        LaunchedEffect(currentLocation) {
+           val loc = currentLocation?.toLatLng()
+            if (loc != null)
+            captureRecordUiModel.captureEventSink(
+                CaptureRecordEventSink.OnSetLocation(loc)
+            )
+
+        }
+    }
+
     BackHandler {
         appState?.navController?.popBackStack(AppDestinations.Dashboard, false)
     }
 
-    val context = LocalContext.current
+
     val previewView = remember { PreviewView(context) }
 
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current

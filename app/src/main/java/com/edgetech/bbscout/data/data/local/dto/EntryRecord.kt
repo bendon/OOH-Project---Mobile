@@ -2,10 +2,14 @@ package com.edgetech.bbscout.data.data.local.dto
 
 import androidx.room.Embedded
 import androidx.room.Relation
+import com.edgetech.bbscout.components.utils.fromJson
+import com.edgetech.bbscout.components.utils.toJson
 import com.edgetech.bbscout.data.data.local.enities.BillboardDataEntity
 import com.edgetech.bbscout.data.data.local.enities.EntryEntity
 import com.edgetech.bbscout.data.data.local.enities.OtherDataEntity
 import com.edgetech.bbscout.data.data.local.enities.UserLocationEntity
+import com.edgetech.bbscout.data.data.local.utils.LongList
+import com.edgetech.bbscout.data.data.local.utils.StringList
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.BillboardResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.CampaignResponse
 
@@ -45,13 +49,20 @@ data class EntryRecord(
                     latitude = entryRecord.location?.latitude,
                     longitude = entryRecord.location?.longitude,
                     description = "",
-                    accuracy = 1.0
-
+                    accuracy = 1.0,
+                    objectType = entryRecord.billboardData?.objectType
                 ),
             imageId = entryRecord.entryEntity.remoteFileId,
             location = entryRecord.location?.locationName,
             campaignDescription = entryRecord.entryEntity.augmentedText ?: "a billboard",
             clientFirstName = entryRecord.entryEntity.brand,
+            phone = entryRecord.entryEntity.phone?.fromJson(LongList::class.java),
+            email = entryRecord.entryEntity.email?.fromJson(StringList::class.java),
+            campainSocials = entryRecord.entryEntity.campainSocials?.fromJson(StringList::class.java),
+            siteUrl = entryRecord.entryEntity.siteUrl?.fromJson(StringList::class.java),
+            products = entryRecord.entryEntity.products?.fromJson(StringList::class.java),
+            targetGender = entryRecord.entryEntity.targetGender,
+            targetAge = entryRecord.entryEntity.targetAge,
         )
 
         fun fromBillboardResponse(billboardResponse: BillboardResponse) = EntryRecord(
@@ -62,7 +73,14 @@ data class EntryRecord(
                 augmentedText = billboardResponse.campaign?.campaignDescription,
                 remoteId = billboardResponse.billboardId,
                 updatedAt = billboardResponse.updatedAt,
-                createdAt = billboardResponse.createdAt
+                createdAt = billboardResponse.createdAt,
+                phone = billboardResponse.campaign?.phone?.toJson(),
+                email = billboardResponse.campaign?.email?.toJson(),
+                campainSocials = billboardResponse.campaign?.campainSocials?.toJson(),
+                siteUrl = billboardResponse.campaign?.siteUrl?.toJson(),
+                products = billboardResponse.campaign?.products?.toJson(),
+                targetGender = billboardResponse.campaign?.targetGender,
+                targetAge = billboardResponse.campaign?.targetAge,
             ),
             otherData = emptyList(),
             location = UserLocationEntity(
@@ -74,7 +92,8 @@ data class EntryRecord(
                 height = billboardResponse.height,
                 width = billboardResponse.width,
                 type = billboardResponse.type,
-                unitOfMeasurement = billboardResponse.unit
+                unitOfMeasurement = billboardResponse.unit,
+                objectType = billboardResponse.objectType
             )
         )
 
@@ -85,6 +104,13 @@ data class EntryRecord(
                 rawText = campaignResponse.campaignDescription,
                 augmentedText = campaignResponse.campaignDescription,
                 remoteId = campaignResponse.billboard?.billboardId,
+                phone = campaignResponse.phone?.toJson(),
+                email = campaignResponse.email?.toJson(),
+                campainSocials = campaignResponse.campainSocials?.toJson(),
+                siteUrl = campaignResponse.siteUrl?.toJson(),
+                products = campaignResponse.products?.toJson(),
+                targetGender = campaignResponse.targetGender,
+                targetAge = campaignResponse.targetAge,
                 updatedAt = campaignResponse.billboard?.updatedAt,
                 createdAt = campaignResponse.billboard?.createdAt
             ),
@@ -98,7 +124,8 @@ data class EntryRecord(
                 height = campaignResponse.billboard?.height,
                 width = campaignResponse.billboard?.width,
                 type = campaignResponse.billboard?.type,
-                unitOfMeasurement = campaignResponse.billboard?.unit
+                unitOfMeasurement = campaignResponse.billboard?.unit,
+                objectType = campaignResponse.billboard?.objectType
             )
         )
 

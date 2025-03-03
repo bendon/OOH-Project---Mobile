@@ -14,6 +14,7 @@ data class BillboardDataEntity(
     val width: Double? = null,
     val unitOfMeasurement: String? = null,
     val owner: String? = null,
+    val objectType: String? = null,
     override var createdAt: Long? = null,
     override var updatedAt: Long? = null
 ): BaseEntity()

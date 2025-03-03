@@ -167,6 +167,8 @@ fun EditRecordMain(
             billboardLength.setTextAndPlaceCursorAtEnd(
                 currentData?.billboardLength.ifEmptySetNull() ?: ""
             )
+
+            selectedUnitOfMeasurement = currentData?.unitOfMeasurement ?: ""
         }
     }
 

@@ -8,11 +8,14 @@ import com.edgetech.bbscout.components.di.IoDispatcher
 import com.edgetech.bbscout.components.di.MainDispatcher
 import com.edgetech.bbscout.components.file_saver.FileSaver
 import com.edgetech.bbscout.components.location.GetLocationInfo
+import com.edgetech.bbscout.components.utils.toJson
 import com.edgetech.bbscout.components.utils.toLong
 import com.edgetech.bbscout.data.data.local.dto.EntryRecord
 import com.edgetech.bbscout.data.data.local.enities.BillboardDataEntity
 import com.edgetech.bbscout.data.data.local.enities.EntryEntity
 import com.edgetech.bbscout.data.data.local.enities.OtherDataEntity
+import com.edgetech.bbscout.data.data.local.utils.LongList
+import com.edgetech.bbscout.data.data.local.utils.StringList
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.FileResponse
 import com.edgetech.bbscout.data.data.remote.gen_ai.llm.FulltextAndImageInference
 import com.edgetech.bbscout.data.repositories.MainRepository
@@ -28,6 +31,7 @@ import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiEvent
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiState
 import com.edgetech.bbscout.features.capture.domain.model.LocationErrorException
+import com.edgetech.bbscout.features.capture.domain.model.NoBillboardFoundException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -281,6 +285,17 @@ class CaptureRecordViewmodel @Inject constructor(
                     augmentedText = _captureUiState.value.billboardData?.brandCampaign,
                     createdAt = LocalDate.now().toLong(),
                     updatedAt = LocalDate.now().toLong(),
+                    phone = LongList.fromList(_captureUiState.value.billboardData?.phone)?.toJson(),
+                    email = StringList.fromList(_captureUiState.value.billboardData?.email)
+                        ?.toJson(),
+                    siteUrl = StringList.fromList(_captureUiState.value.billboardData?.siteUrl)
+                        ?.toJson(),
+                    campainSocials = StringList.fromList(_captureUiState.value.billboardData?.campainSocials)
+                        ?.toJson(),
+                    products = StringList.fromList(_captureUiState.value.billboardData?.products)
+                        ?.toJson(),
+                    targetGender = _captureUiState.value.billboardData?.targetGender,
+                    targetAge = _captureUiState.value.billboardData?.targetAge,
                 ),
                 otherData = (eventSink.qrCode?.map { OtherDataEntity(type = "QrCode", value = it) }
                     ?: emptyList()) +
@@ -296,8 +311,10 @@ class CaptureRecordViewmodel @Inject constructor(
                     height = _captureUiState.value.billboardData?.billboardLength?.toDoubleOrNull(),
                     width = _captureUiState.value.billboardData?.billboardWidth?.toDoubleOrNull(),
                     type = _captureUiState.value.billboardData?.billboardType,
-                    owner = _captureUiState.value.billboardData?.billboardOwner
-                )
+                    owner = _captureUiState.value.billboardData?.billboardOwner,
+                    objectType = _captureUiState.value.billboardData?.objectType,
+
+                    )
             )
             repository.addEntryRecord(newEntry).onSuccess { result ->
                 _captureUiEvent.update {
@@ -401,42 +418,49 @@ class CaptureRecordViewmodel @Inject constructor(
     }
 
     private suspend fun onAnalyseImage(eventSink: CaptureRecordEventSink.OnAnalyseImage) {
-       // viewModelScope.launch(ioDispatcher) {
-            if (_captureUiState.value.billboardData!!.fileUri != null) {
-                val fileMultipart =
-                    buildMutipartBody(File(_captureUiState.value.billboardData!!.fileUri))
-                _captureUiState.update {
-                    it.copy(
-                        analysingLoading = true
-                    )
-                }
-                repository.analyzeFile(fileMultipart)
-                    .onSuccess { res ->
-                        _captureUiState.update {
-                            it.copy(
-                                analysingLoading = false,
-                                billboardData = it.billboardData?.copy(
-                                    brandName = res?.campaign_brand,
-                                    brandSlogan = res?.campaign_description,
-                                    brandCampaign = res?.campaign_description,
-                                    billboardWidth = res?.billboard_measurements?.width?.toString()
-                                        ?: "",
-                                    billboardLength = res?.billboard_measurements?.height?.toString()
-                                        ?: "",
-                                )
-                            )
-                        }
-                    }.onError {
-                        println("Error...${it}")
-                        _captureUiState.update {
-                            it.copy(
-                                analysingLoading = false
-                            )
-                        }
-                    }
-
-
+        // viewModelScope.launch(ioDispatcher) {
+        if (_captureUiState.value.billboardData!!.fileUri != null) {
+            val fileMultipart =
+                buildMutipartBody(File(_captureUiState.value.billboardData!!.fileUri))
+            _captureUiState.update {
+                it.copy(
+                    analysingLoading = true
+                )
             }
+            repository.analyzeFile(fileMultipart)
+                .onSuccess { res ->
+                    if (res?.object_type == null && res?.billboard_type == null)
+                        _captureUiEvent.update {
+                            CaptureRecordUiEvent.Error(
+                                NoBillboardFoundException, eventSink
+                            )
+                        }
+                    _captureUiState.update {
+                        it.copy(
+                            analysingLoading = false,
+                            billboardData = it.billboardData?.copy(
+                                brandName = res?.campaign_brand,
+                                brandSlogan = res?.campaign_description,
+                                brandCampaign = res?.campaign_description,
+                                objectType = res?.object_type,
+                                billboardWidth = res?.billboard_measurements?.width?.toString()
+                                    ?: "",
+                                billboardLength = res?.billboard_measurements?.height?.toString()
+                                    ?: "",
+                            )
+                        )
+                    }
+                }.onError {
+                    println("Error...${it}")
+                    _captureUiState.update {
+                        it.copy(
+                            analysingLoading = false
+                        )
+                    }
+                }
+
+
+        }
         //}
     }
 
