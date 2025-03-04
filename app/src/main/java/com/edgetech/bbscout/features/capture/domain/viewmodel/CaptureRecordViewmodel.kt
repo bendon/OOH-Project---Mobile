@@ -429,7 +429,7 @@ class CaptureRecordViewmodel @Inject constructor(
             }
             repository.analyzeFile(fileMultipart)
                 .onSuccess { res ->
-                    if (res?.object_type == null && res?.billboard_type == null)
+                    if (res?.object_type == null || res?.billboard_type == null)
                         _captureUiEvent.update {
                             CaptureRecordUiEvent.Error(
                                 NoBillboardFoundException, eventSink
@@ -447,6 +447,13 @@ class CaptureRecordViewmodel @Inject constructor(
                                     ?: "",
                                 billboardLength = res?.billboard_measurements?.height?.toString()
                                     ?: "",
+                                phone = res?.contact_information?.phone,
+                                email = res?.contact_information?.email,
+                                siteUrl = res?.site_url,
+                                targetAge = res?.target_age,
+                                targetGender = res?.target_gender,
+                                campainSocials = res?.site_url,
+                                billboardType = res?.billboard_type,
                             )
                         )
                     }

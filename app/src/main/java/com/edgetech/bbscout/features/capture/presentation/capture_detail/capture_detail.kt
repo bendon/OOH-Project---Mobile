@@ -32,7 +32,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -46,8 +48,11 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.R
+import com.edgetech.bbscout.components.utils.fromJson
 import com.edgetech.bbscout.components.utils.ifEmptySetNull
 import com.edgetech.bbscout.data.data.local.dto.EntryRecord
+import com.edgetech.bbscout.data.data.local.utils.LongList
+import com.edgetech.bbscout.data.data.local.utils.StringList
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
@@ -137,7 +142,7 @@ fun CaptureDetailMain(
         }
     ) {
         Column {
-            if (captureUiState.isLoading){
+            if (captureUiState.isLoading) {
                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
             }
             Column(
@@ -255,7 +260,7 @@ fun CaptureDetailMain(
 
 
 @Composable
-fun CaptureBillboardInfo(selectedCapture: EntryRecord?){
+fun CaptureBillboardInfo(selectedCapture: EntryRecord?) {
     Text(
         text = "Campaign information",
         fontSize = 18.sp,
@@ -294,86 +299,32 @@ fun CaptureBillboardInfo(selectedCapture: EntryRecord?){
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(end = 16.dp)
     )
+    CaptureDetailSingleValue("Target age", selectedCapture?.entryEntity?.targetAge.ifEmptySetNull() ?: "N/A")
+    CaptureDetailSingleValue("Target gender", selectedCapture?.entryEntity?.targetGender.ifEmptySetNull() ?: "N/A")
+    CaptureDetailListValue("Products", selectedCapture?.entryEntity?.products?.fromJson<StringList>(StringList::class.java)?.toList() ?: emptyList())
     Text(
         text = "Billboard information",
         fontSize = 18.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(top = 16.dp)
     )
-    Row(
-        modifier = Modifier
-            .padding(top = 8.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = "Billboard owner",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Normal,
-            modifier = Modifier.padding(end = 16.dp)
-        )
-        Text(
-            text = selectedCapture?.billboardData?.owner.ifEmptySetNull() ?: "N/A",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
-        )
-    }
-    Row(
-        modifier = Modifier
-            .padding(top = 6.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = "Billboard type",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Normal,
-            modifier = Modifier.padding(end = 16.dp)
-        )
-        Text(
-            text = selectedCapture?.billboardData?.type.ifEmptySetNull() ?: "N/A",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
-        )
-    }
 
-    Row(
-        modifier = Modifier
-            .padding(top = 6.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = "Billboard height",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Normal,
-            modifier = Modifier.padding(end = 16.dp)
-        )
-        Text(
-            text = "${selectedCapture?.billboardData?.height.toString() ?: "--"} ${selectedCapture?.billboardData?.unitOfMeasurement ?: ""}",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
-        )
-    }
+    CaptureDetailSingleValue("Billboard owner", selectedCapture?.billboardData?.owner.ifEmptySetNull() ?: "N/A")
+    CaptureDetailSingleValue("Billboard type", selectedCapture?.billboardData?.type.ifEmptySetNull() ?: "N/A")
+    CaptureDetailSingleValue(title = "Billboard height", value = "${selectedCapture?.billboardData?.height.toString() ?: "--"} ${selectedCapture?.billboardData?.unitOfMeasurement ?: ""}")
+    CaptureDetailSingleValue(title = "Billboard width", value = "${selectedCapture?.billboardData?.width.toString() ?: "--"} ${selectedCapture?.billboardData?.unitOfMeasurement ?: ""}")
 
-    Row(
-        modifier = Modifier
-            .padding(top = 6.dp)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = "Billboard width",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Normal,
-            modifier = Modifier.padding(end = 16.dp)
-        )
-        Text(
-            text = "${selectedCapture?.billboardData?.width.toString() ?: "--"} ${selectedCapture?.billboardData?.unitOfMeasurement ?: ""}",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
-        )
-    }
+    Text(
+        text = "Campaign communication channels",
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(top = 16.dp)
+    )
+    CaptureDetailListValue("Phone number", selectedCapture?.entryEntity?.phone?.fromJson<LongList>(LongList::class.java)?.map { it.toString() } ?: emptyList())
+    CaptureDetailListValue("Emails", selectedCapture?.entryEntity?.email?.fromJson<StringList>(StringList::class.java)?.toList() ?: emptyList())
+    CaptureDetailListValue("Websites", selectedCapture?.entryEntity?.siteUrl?.fromJson<StringList>(StringList::class.java)?.toList() ?: emptyList())
+    CaptureDetailListValue("Social media", selectedCapture?.entryEntity?.campainSocials?.fromJson<StringList>(StringList::class.java)?.toList() ?: emptyList())
+
     if (!selectedCapture?.otherData.isNullOrEmpty()) {
         Text(
             text = "Others",
@@ -405,6 +356,65 @@ fun CaptureBillboardInfo(selectedCapture: EntryRecord?){
     }
 }
 
+@Composable
+fun CaptureDetailSingleValue(
+    title: String,
+    value: String,
+    modifier: Modifier = Modifier
+        .padding(top = 6.dp)
+        .fillMaxWidth()
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = title,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Normal,
+            modifier = Modifier.padding(end = 16.dp)
+        )
+        Text(
+            text = value,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+        )
+    }
+}
+
+@Composable
+fun CaptureDetailListValue(
+    title: String,
+    values: List<String>,
+    modifier: Modifier = Modifier
+        .padding(top = 6.dp)
+        .fillMaxWidth()
+) {
+    Row(
+        modifier = Modifier
+            .padding(top = 6.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = title,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Normal,
+            modifier = Modifier.padding(end = 16.dp)
+        )
+        Column(
+            horizontalAlignment = Alignment.End
+        ) {
+            values.forEach {
+                Text(
+                    text = it,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        }
+    }
+}
 
 
 @Preview
@@ -412,3 +422,5 @@ fun CaptureBillboardInfo(selectedCapture: EntryRecord?){
 fun CaptureDetailMainPreview() {
     CaptureDetailMain("", null, CaptureRecordUiModel())
 }
+
+

@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CheckCircleOutline
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -559,6 +560,8 @@ fun EditRecordMain(
                         ListItemComp(title = it, onIconClick = {
                             selectedEditTypeList = RecordTypeList.PRODUCT
                             selectedEditValue = it
+                        } , onDeletClick = {
+                            products = products.minus(it)
                         })
                     }
                 }
@@ -680,6 +683,8 @@ fun EditRecordMain(
                         ListItemComp(title = it.toString(), onIconClick = {
                             selectedEditTypeList = RecordTypeList.PHONE
                             selectedEditValue = it.toString()
+                        }, onDeletClick = {
+                            phoneNumbers = phoneNumbers.minus(it)
                         })
                     }
 
@@ -691,6 +696,8 @@ fun EditRecordMain(
                         ListItemComp(title = it, onIconClick = {
                             selectedEditTypeList = RecordTypeList.EMAIL
                             selectedEditValue = it
+                        }, onDeletClick = {
+                            emails = emails.minus(it)
                         })
                     }
                     GroupHeader(title = "Websites", onIconClick = {
@@ -701,6 +708,8 @@ fun EditRecordMain(
                         ListItemComp(title = it, onIconClick = {
                             selectedEditTypeList = RecordTypeList.WEBSITE
                             selectedEditValue = it
+                        }, onDeletClick = {
+                            websites = websites.minus(it)
                         })
                     }
                     GroupHeader(title = "Social media", onIconClick = {
@@ -711,6 +720,8 @@ fun EditRecordMain(
                         ListItemComp(title = it, onIconClick = {
                             selectedEditTypeList = RecordTypeList.SOCIAL_MEDIA
                             selectedEditValue = it
+                        }, onDeletClick = {
+                          socialMedias = socialMedias.minus(it)
                         })
                     }
 
@@ -826,6 +837,7 @@ fun ListItemComp(
     title: String,
     icon: ImageVector? = Icons.Outlined.Edit,
     onIconClick: (() -> Unit)? = null,
+    onDeletClick: () -> Unit,
     modifier: Modifier = Modifier.padding(top = 6.dp)
 ) {
     Row(
@@ -851,6 +863,14 @@ fun ListItemComp(
                     .clickable(onClick = onIconClick ?: {})
             )
         }
+
+        Icon(
+            imageVector = Icons.Outlined.DeleteOutline,
+            contentDescription = null,
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .clickable(onClick = onDeletClick)
+        )
 
 
     }

@@ -1,5 +1,6 @@
 package com.edgetech.bbscout.data.repositories
 
+import com.edgetech.bbscout.components.utils.log
 import com.edgetech.bbscout.data.data.local.BBScoutDao
 import com.edgetech.bbscout.data.data.local.dto.EntryRecord
 import com.edgetech.bbscout.data.data.local.enities.AuthEntity
@@ -58,8 +59,9 @@ class MainRepositoryImplementation @Inject constructor(
 
     override suspend fun addEntryRecord(entryRecord: EntryRecord): SimpleResource<EntryRecord> {
 
+        log("entry db $entryRecord")
         val campaign = EntryRecord.toCampaignResponse(entryRecord)
-
+        log("campaign  $campaign")
         val newBillboard = campaign.billboard
 
         if (newBillboard != null) {

@@ -9,10 +9,10 @@ fun Any.toJson(): String = Gson().toJson(this)
 
 
 
-fun <T> Any.fromJson(t: Type): T? {
+fun <T> String.fromJson(t: Type): T? {
 
     return try {
-        gson().let { Gson().fromJson<T>(it, t) }
+        Gson().fromJson<T>(this, t)
     } catch (e: Exception) {
         log("An error $e when trying to deserialise $this")
         null

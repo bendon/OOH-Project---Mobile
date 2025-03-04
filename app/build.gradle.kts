@@ -47,6 +47,15 @@ android {
 
     }
 
+    signingConfigs {
+        create("bbscout") {
+            storeFile = file("/Users/emery/Documents/Perso/work/bbscout/keystore")
+            storePassword = "bbscout"
+            keyAlias = "key0"
+            keyPassword = "bbscout"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -54,6 +63,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("bbscout")
         }
     }
     compileOptions {
@@ -109,7 +119,7 @@ dependencies {
     implementation(libs.androidx.camera.view)
 
     // ML Kit and Location Services
-    implementation(libs.google.mlkit.`object`.detection)
+   // implementation(libs.google.mlkit.`object`.detection)
    // implementation(libs.mlkit.image.labeling)
    // implementation(libs.mlkit.barcode.scanning)
    // implementation(libs.google.mlkit.text.recognition)
