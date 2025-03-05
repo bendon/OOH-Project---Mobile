@@ -59,6 +59,8 @@ sealed class CaptureRecordUiEvent {
 
     data object BillboardInfoMove: CaptureRecordUiEvent()
 
+    data object BillboardNumberOfSideSet : CaptureRecordUiEvent()
+
     data object BillboardStructureMove : CaptureRecordUiEvent()
 
     data object CampaignSet : CaptureRecordUiEvent()
@@ -119,7 +121,7 @@ sealed class CaptureRecordEventSink : AppEventSink {
 
     data class OnGetCapture(val captureId: String): CaptureRecordEventSink()
 
-    data class OnSetLocation(val location: LatLng, val sideType: BillboardSides) : CaptureRecordEventSink()
+    data class OnSetLocation(val location: LatLng) : CaptureRecordEventSink()
 }
 
 

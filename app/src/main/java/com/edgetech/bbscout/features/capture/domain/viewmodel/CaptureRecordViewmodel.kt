@@ -100,13 +100,25 @@ class CaptureRecordViewmodel @Inject constructor(
             }
 
             is CaptureRecordEventSink.OnSetLocation -> {
-                locationInfo.getLocationInfo(eventSink.location) { loc ->
-                    _captureUiState.update {
-                        it.copy(
-                            selectedLocation = loc
-                        )
+
+                    locationInfo.getLocationInfo(eventSink.location) { loc ->
+                        if (_captureUiState.value.selectedBillboardSidesType != BillboardSides.MAIN) {
+                            _captureUiState.update {
+                                it.copy(
+                                    selectedLocation = loc
+                                )
+                            }
+                        } else {
+                            _captureUiState.update {
+                                it.copy(
+                                    billboardData = _captureUiState.value.billboardData?.copy(
+                                        billboardLocation = loc
+                                    )
+                                )
+                            }
+                        }
                     }
-                }
+
             }
 
             is CaptureRecordEventSink.OnEditCaptureEvent -> {
@@ -134,6 +146,10 @@ class CaptureRecordViewmodel @Inject constructor(
             }
             is CaptureRecordEventSink.StartBillBoardSurvey -> {
                 startBillBoardSurvey(eventSink)
+            }
+
+            is CaptureRecordEventSink.OnRetry -> {
+                TODO()
             }
         }
     }
@@ -203,6 +219,9 @@ class CaptureRecordViewmodel @Inject constructor(
             it.copy(
                 createBillboardSideCount = eventSink.sides
             )
+        }
+        _captureUiEvent.update {
+            CaptureRecordUiEvent.BillboardNumberOfSideSet
         }
     }
 

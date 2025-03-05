@@ -138,7 +138,7 @@ fun CaptureCheckPermission(
         actionType = CheckPermissionType.GPS
     } else if (hasLocationPermission && hasCameraPermission && hasGPSEnabled){
         actionType = CheckPermissionType.ALL_GRANTED
-        appState?.navController?.navigate(AppDestinations.CameraCapture)
+        appState?.navController?.navigate(AppDestinations.CaptureSelectSideType)
     }
 
     Scaffold(
@@ -280,7 +280,7 @@ fun CaptureCheckPermission(
                             }
 
                             CheckPermissionType.ALL_GRANTED -> {
-                                appState?.navController?.navigate(AppDestinations.CameraCapture)
+                                appState?.navController?.navigate(AppDestinations.CaptureSelectSideType)
                             }
                         }
                     },

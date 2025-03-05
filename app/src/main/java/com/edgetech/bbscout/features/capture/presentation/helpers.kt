@@ -373,9 +373,9 @@ fun GetLocationComp(
 
     val shouldGetLocation = alwaysGetEvenIfGottenBefore || !hasLoc
     if (shouldGetLocation)
-    LaunchedEffect(shouldGetLocation) {
+     LaunchedEffect(shouldGetLocation) {
         context.getLocation()
-    }
+     }
     val currentLocation by context.appLocation.observeAsState()
     if (currentLocation != null ) {
 

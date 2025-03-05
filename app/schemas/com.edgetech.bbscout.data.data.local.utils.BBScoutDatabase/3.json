@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "d3a4ca7a67d52d6ec0f152c7c58bf3ea",
+    "identityHash": "bb79e612fe8851b4b7b72c770ec05618",
     "entities": [
       {
         "tableName": "EntryEntity",
@@ -310,7 +310,7 @@
       },
       {
         "tableName": "BillboardDataEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `entryId` INTEGER NOT NULL, `type` TEXT, `typeSecondary` TEXT, `height` REAL, `width` REAL, `unitOfMeasurement` TEXT, `owner` TEXT, `objectType` TEXT, `createdAt` INTEGER, `updatedAt` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `entryId` INTEGER NOT NULL, `remoteId` TEXT, `type` TEXT, `typeSecondary` TEXT, `height` REAL, `width` REAL, `unitOfMeasurement` TEXT, `owner` TEXT, `objectType` TEXT, `closeUpImageId` TEXT, `city` TEXT, `ownerContacts` TEXT, `ownerEmail` TEXT, `structure` TEXT, `material` TEXT, `angle` TEXT, `visibility` TEXT, `illumination` TEXT, `createdAt` INTEGER, `updatedAt` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -323,6 +323,12 @@
             "columnName": "entryId",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "remoteId",
+            "columnName": "remoteId",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "type",
@@ -367,6 +373,60 @@
             "notNull": false
           },
           {
+            "fieldPath": "closeUpImageId",
+            "columnName": "closeUpImageId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "city",
+            "columnName": "city",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ownerContacts",
+            "columnName": "ownerContacts",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ownerEmail",
+            "columnName": "ownerEmail",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "structure",
+            "columnName": "structure",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "material",
+            "columnName": "material",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "angle",
+            "columnName": "angle",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "visibility",
+            "columnName": "visibility",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "illumination",
+            "columnName": "illumination",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
             "fieldPath": "createdAt",
             "columnName": "createdAt",
             "affinity": "INTEGER",
@@ -385,7 +445,17 @@
             "id"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_BillboardDataEntity_remoteId",
+            "unique": true,
+            "columnNames": [
+              "remoteId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_BillboardDataEntity_remoteId` ON `${TABLE_NAME}` (`remoteId`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
@@ -436,7 +506,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd3a4ca7a67d52d6ec0f152c7c58bf3ea')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bb79e612fe8851b4b7b72c770ec05618')"
     ]
   }
 }

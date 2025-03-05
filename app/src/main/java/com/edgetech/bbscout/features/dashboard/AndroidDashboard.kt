@@ -249,7 +249,7 @@ fun navigateToCapture(
             context
         )
     )
-        appState?.navController?.navigate(AppDestinations.CameraCapture)
+        appState?.navController?.navigate(AppDestinations.CaptureSelectSideType)
     else
         appState?.navController?.navigate(AppDestinations.CaptureCheckRequirement)
 }

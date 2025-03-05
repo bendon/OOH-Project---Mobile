@@ -28,6 +28,7 @@ import com.edgetech.bbscout.features.auth.presentation.ChangePasswordScreen
 import com.edgetech.bbscout.features.auth.presentation.LoadingScreen
 import com.edgetech.bbscout.features.auth.presentation.LoginScreen
 import com.edgetech.bbscout.features.auth.presentation.RequestPasswordScreen
+import com.edgetech.bbscout.features.capture.domain.model.BillboardSides
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
 import com.edgetech.bbscout.features.capture.presentation.camera_capture.CaptureBillboardScreen
 import com.edgetech.bbscout.features.capture.presentation.capture_detail.CaptureDetailScreen
@@ -36,7 +37,9 @@ import com.edgetech.bbscout.features.capture.presentation.review_data.EditRecord
 import com.edgetech.bbscout.features.capture.presentation.review_data.OnDataAdded
 import com.edgetech.bbscout.features.capture.presentation.review_data.RecordType
 import com.edgetech.bbscout.features.capture.presentation.review_data.ReviewRecordScreen
+import com.edgetech.bbscout.features.capture_start.BillboardDataUploadDashboardScreen
 import com.edgetech.bbscout.features.capture_start.CaptureCheckPermission
+import com.edgetech.bbscout.features.capture_start.SelectBillboardSidesTypeScreen
 import com.edgetech.bbscout.features.dashboard.BBScoutDashboard
 import com.edgetech.bbscout.features.dashboard.HomeDashboard
 import com.edgetech.bbscout.features.onboarding_screen.OnboardingScreen
@@ -127,6 +130,14 @@ fun DirackAppNavigation(
             RequestPasswordScreen(authViewModel, appState)
         }
 
+        composable<AppDestinations.CaptureSelectSideType> {
+            SelectBillboardSidesTypeScreen(appState, captureRecordViewmodel)
+        }
+
+        composable<AppDestinations.CaptureDashboard> {
+            BillboardDataUploadDashboardScreen(appState, captureRecordViewmodel)
+        }
+
     }
 
 }
@@ -193,7 +204,9 @@ sealed interface AppDestinations {
     data object Dashboard : AppDestinations
 
     @Serializable
-    data object CameraCapture : AppDestinations
+    data class CameraCapture(
+        val side: BillboardSides
+    ) : AppDestinations
 
     @Serializable
     data class CaptureDetail(val id: String) : AppDestinations
@@ -206,6 +219,12 @@ sealed interface AppDestinations {
 
     @Serializable
     data object BillboardAdded :  AppDestinations
+
+    @Serializable
+    data object CaptureSelectSideType : AppDestinations
+
+    @Serializable
+    data object CaptureDashboard : AppDestinations
 
     @Serializable
     data object Login : AppDestinations
