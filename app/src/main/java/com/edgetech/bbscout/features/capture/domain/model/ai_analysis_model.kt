@@ -1,28 +1,31 @@
 package com.edgetech.bbscout.features.capture.domain.model
 
 import android.graphics.Bitmap
+import com.edgetech.bbscout.data.data.local.enities.UserLocationEntity
 import com.edgetech.bbscout.data.data.local.utils.LongList
 import com.edgetech.bbscout.data.data.local.utils.StringList
 
 
 data class BillboardExtractedInfo(
+    val billboardSideInfo: BillboardSides = BillboardSides.MAIN,
+    val parentBillboard: String? = null,
+    val billboardNumberOfSide: Int = 1,
     val fullImage: Bitmap? = null,
     val billboardImage: Bitmap? = null,
     val detectedObjects: List<DetectedObjectWithLabels>? = null,
     val qrCode: List<String>? = null,
     val rawText: String? = null,
-    val imageLabels: List<ImageLabel>? = null,
-    val entityInfos: List<EntityInfo>? = null,
     val brandName: String? = null,
     val brandCampaign: String? = null,
     val brandSlogan: String? = null,
     val fileUri: String? = null,
+    val closedUpUri: String? = null,
     val billboardType: String? = null,
     val billboardOwner: String? = null,
     val billboardWidth: String? = null,
     val billboardLength: String? = null,
     val objectType: String? = null,
-    val unitOfMeasurement: String? = "centimeters",
+    val unitOfMeasurement: String? = "meters",
     val phone: List<Long>? = null,
     val email: List<String>? = null,
     val campainSocials: List<String>? = null,
@@ -30,7 +33,16 @@ data class BillboardExtractedInfo(
     val products: List<String>? = null,
     val targetGender: String? = null,
     val targetAge: String? = null,
-    )
+    val status: Boolean? = null,
+    val billboardLocation: UserLocationEntity? = null,
+    val ownerContacts: List<String>? = null,
+    val ownerEmail: List<String>? = null,
+    val structure: String? = null,
+    val material: String? = null,
+    val angle: String? = null,
+    val visibility: String? = null,
+    val illumination: String? = null,
+)
 
 
 data class DetectedObjectWithLabels(
@@ -67,3 +79,11 @@ data class EntityInfo(
     val type: String,
     val text: String
 )
+
+enum class BillboardSides {
+    SIDE_ONE,
+    SIDE_TWO,
+    SIDE_THREE,
+    SIDE_FOUR,
+    MAIN
+}

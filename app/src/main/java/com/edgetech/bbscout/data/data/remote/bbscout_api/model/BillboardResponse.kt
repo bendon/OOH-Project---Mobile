@@ -1,5 +1,7 @@
 package com.edgetech.bbscout.data.data.remote.bbscout_api.model
 
+import com.edgetech.bbscout.data.data.local.utils.StringList
+
 data class BillboardResponse(
     val id: String? = null,
     val accuracy: Double? = null,
@@ -23,6 +25,15 @@ data class BillboardResponse(
     val staff: UserResponse? = null,
     val type: String? = null,
     val unit: String? = null,
+    val closeUpImageId: String? = null,
+    val city: String? = null,
+    val ownerContacts: StringList? = null,
+    val ownerEmail: StringList? = null,
+    val structure: String? = null,
+    val material: String? = null,
+    val angle: String? = null,
+    val visibility: String? = null,
+    val illumination: String? = null,
     val updatedAt: Long? = null,
     val width: Double? = null,
     val objectType: String? = null

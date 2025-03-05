@@ -50,7 +50,16 @@ data class EntryRecord(
                     longitude = entryRecord.location?.longitude,
                     description = "",
                     accuracy = 1.0,
-                    objectType = entryRecord.billboardData?.objectType
+                    objectType = entryRecord.billboardData?.objectType,
+                    closeUpImageId = entryRecord.billboardData?.closeUpImageId,
+                    city = entryRecord.billboardData?.city,
+                    ownerContacts = entryRecord.billboardData?.ownerContacts?.fromJson(StringList::class.java),
+                    ownerEmail = entryRecord.billboardData?.ownerEmail?.fromJson(StringList::class.java),
+                    structure = entryRecord.billboardData?.structure,
+                    material = entryRecord.billboardData?.material,
+                    angle = entryRecord.billboardData?.angle,
+                    visibility = entryRecord.billboardData?.visibility,
+                    illumination = entryRecord.billboardData?.illumination,
                 ),
             imageId = entryRecord.entryEntity.remoteFileId,
             location = entryRecord.location?.locationName,
@@ -93,7 +102,16 @@ data class EntryRecord(
                 width = billboardResponse.width,
                 type = billboardResponse.type,
                 unitOfMeasurement = billboardResponse.unit,
-                objectType = billboardResponse.objectType
+                objectType = billboardResponse.objectType,
+                closeUpImageId = billboardResponse.closeUpImageId,
+                city = billboardResponse.city,
+                ownerContacts = billboardResponse.ownerContacts?.toJson(),
+                ownerEmail = billboardResponse.ownerEmail?.toJson(),
+                structure = billboardResponse.structure,
+                material = billboardResponse.material,
+                angle = billboardResponse.angle,
+                visibility = billboardResponse.visibility,
+                illumination = billboardResponse.illumination,
             )
         )
 
@@ -125,7 +143,16 @@ data class EntryRecord(
                 width = campaignResponse.billboard?.width,
                 type = campaignResponse.billboard?.type,
                 unitOfMeasurement = campaignResponse.billboard?.unit,
-                objectType = campaignResponse.billboard?.objectType
+                objectType = campaignResponse.billboard?.objectType,
+               closeUpImageId = campaignResponse.billboard?.closeUpImageId,
+            city = campaignResponse.billboard?.city,
+        ownerContacts = campaignResponse.billboard?.ownerContacts?.toJson(),
+        ownerEmail = campaignResponse.billboard?.ownerEmail?.toJson(),
+        structure = campaignResponse.billboard?.structure,
+        material = campaignResponse.billboard?.structure,
+        angle = campaignResponse.billboard?.angle,
+        visibility = campaignResponse.billboard?.visibility,
+        illumination = campaignResponse.billboard?.illumination,
             )
         )
 

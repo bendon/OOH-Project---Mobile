@@ -27,12 +27,25 @@ data class CaptureRecordUiState(
     val analysingLoading: Boolean = false,
     val allCaptures: List<EntryRecord> = emptyList(),
     val recentCaptures: List<EntryRecord> = emptyList(),
+    val createBillboardSideCount: Int = 0,
+    /**
+     * This field will carry the location from far
+     */
     val billboardData: BillboardExtractedInfo? = null,
+    val sideOneExtractedInfo: BillboardExtractedInfo? = null,
+    val sideTwoExtractedInfo: BillboardExtractedInfo? = null,
+    val sideThreeExtractedInfo: BillboardExtractedInfo? = null,
+    val sideFourExtractedInfo: BillboardExtractedInfo? = null,
     val selectedRecord: EntryRecord? = null,
     val userStat: BBScoutUserStat? = null,
     val selectedRecordMainImage: Bitmap? = null,
     val selectedRecordBillboardImage: Bitmap? = null,
+    /**
+     * This field will carry the location from close
+     */
     val selectedLocation: UserLocationEntity? = null,
+    val selectedBillboardSidesType: BillboardSides = BillboardSides.MAIN,
+
 )
 
 sealed class CaptureRecordUiEvent {
@@ -42,12 +55,35 @@ sealed class CaptureRecordUiEvent {
 
     object Empty : CaptureRecordUiEvent()
 
+    data class StartBillBoardSurvey(val billboard: BillboardSides): CaptureRecordUiEvent()
+
+    data object BillboardInfoMove: CaptureRecordUiEvent()
+
+    data object BillboardStructureMove : CaptureRecordUiEvent()
+
+    data object CampaignSet : CaptureRecordUiEvent()
+
     data object CaptureAdded : CaptureRecordUiEvent()
 
 }
 
 
 sealed class CaptureRecordEventSink : AppEventSink {
+
+    data class SetBillboardNumberOfSide(val sides: Int) : CaptureRecordEventSink()
+
+    data object GetBillboardSides : CaptureRecordEventSink()
+
+    data class StartBillBoardSurvey(val billboard: BillboardSides): CaptureRecordEventSink()
+
+    data object OnBillboardInfoMove: CaptureRecordEventSink()
+
+    data object OnBillboardStructureMove : CaptureRecordEventSink()
+
+    data object OnCampaignSet : CaptureRecordEventSink()
+
+    data class OnRetry(val billboardExtractedInfo: BillboardExtractedInfo) : CaptureRecordEventSink()
+
 
     data object OnAnalyseImage : CaptureRecordEventSink()
 
@@ -83,7 +119,7 @@ sealed class CaptureRecordEventSink : AppEventSink {
 
     data class OnGetCapture(val captureId: String): CaptureRecordEventSink()
 
-    data class OnSetLocation(val location: LatLng) : CaptureRecordEventSink()
+    data class OnSetLocation(val location: LatLng, val sideType: BillboardSides) : CaptureRecordEventSink()
 }
 
 
