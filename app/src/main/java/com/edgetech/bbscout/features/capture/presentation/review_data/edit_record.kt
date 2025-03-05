@@ -133,7 +133,7 @@ fun EditRecordMain(
     val context = LocalActivity.current as LocationAwareActivity
 
     val captureRecordUiState by captureRecordUiModel.captureUiState.collectAsState()
-    val currentData = captureRecordUiState.billboardData
+    val currentData = getActiveBillboardData(captureRecordUiState)
 
     val captureRecordUiEvent by captureRecordUiModel.captureUiEvent.collectAsState()
 

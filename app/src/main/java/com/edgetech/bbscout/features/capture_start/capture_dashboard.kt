@@ -67,6 +67,12 @@ fun BillboardDataUploadDashboardMain(
         captureRecordUiModel.captureEventSink(
             CaptureRecordEventSink.ResetState
         )
+    } else if (uiEvent is CaptureRecordUiEvent.ContinueBillBoardSurvey) {
+        val side = (uiEvent as CaptureRecordUiEvent.ContinueBillBoardSurvey).billboard
+        appState?.navController?.navigate(AppDestinations.ReviewBillboardData)
+        captureRecordUiModel.captureEventSink(
+            CaptureRecordEventSink.ResetState
+        )
     }
 
     Scaffold(
@@ -231,7 +237,7 @@ fun BillboardDataUploadDashboardMain(
                         .fillMaxWidth(),
                     onTap = {
                         captureRecordUiModel.captureEventSink(
-                            CaptureRecordEventSink.StartBillBoardSurvey(BillboardSides.SIDE_FOUR)
+                            CaptureRecordEventSink.StartBillBoardSurvey(BillboardSides.MAIN)
                         )
                     },
                     content = {

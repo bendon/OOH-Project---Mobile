@@ -47,8 +47,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation.navOptions
 import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.components.utils.log
+import com.edgetech.bbscout.features.capture.domain.model.BillboardSides
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiEvent
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
@@ -57,6 +59,7 @@ import com.edgetech.bbscout.features.capture.domain.model.EntityInfo
 import com.edgetech.bbscout.features.capture.domain.model.ImageLabel
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
 import com.edgetech.bbscout.features.capture.presentation.GetLocationComp
+import com.edgetech.bbscout.features.capture.presentation.review_data.getActiveBillboardData
 import com.edgetech.bbscout.features.capture.presentation.setupZoomListener
 import com.edgetech.bbscout.features.capture.presentation.takePhoto
 import com.edgetech.bbscout.features.navigation.AppDestinations
@@ -94,9 +97,7 @@ fun CaptureBillboardMain(
 
     GetLocationComp(captureRecordUiModel, true)
 
-    BackHandler {
-        appState?.navController?.popBackStack(AppDestinations.Dashboard, false)
-    }
+
 
 
     val previewView = remember { PreviewView(context) }
@@ -122,9 +123,28 @@ fun CaptureBillboardMain(
     }
 
     val uiEvent by captureRecordUiModel.captureUiEvent.collectAsState()
+    val captureRecordUiState by captureRecordUiModel.captureUiState.collectAsState()
+    val currentData = getActiveBillboardData(captureRecordUiState)
+
 
     if (uiEvent is CaptureRecordUiEvent.CaptureAdded){
-        appState?.navController?.navigate(AppDestinations.ReviewBillboardData)
+        if (captureRecordUiState.selectedBillboardSidesType != BillboardSides.MAIN) {
+            appState?.navController?.navigate(
+                AppDestinations.ReviewBillboardData,
+                navOptions = navOptions {
+                    popUpTo(AppDestinations.CaptureDashboard, {
+                        this.inclusive = false
+                    })
+                })
+        } else {
+            appState?.navController?.navigate(
+                AppDestinations.ReviewBillboardWideShot,
+                navOptions = navOptions {
+                    popUpTo(AppDestinations.CaptureDashboard, {
+                        this.inclusive = false
+                    })
+                })
+        }
         captureRecordUiModel.captureEventSink(
             CaptureRecordEventSink.ResetState
         )

@@ -37,6 +37,7 @@ import com.edgetech.bbscout.features.capture.presentation.review_data.EditRecord
 import com.edgetech.bbscout.features.capture.presentation.review_data.OnDataAdded
 import com.edgetech.bbscout.features.capture.presentation.review_data.RecordType
 import com.edgetech.bbscout.features.capture.presentation.review_data.ReviewRecordScreen
+import com.edgetech.bbscout.features.capture.presentation.review_data.WideShotReviewScreen
 import com.edgetech.bbscout.features.capture_start.BillboardDataUploadDashboardScreen
 import com.edgetech.bbscout.features.capture_start.CaptureCheckPermission
 import com.edgetech.bbscout.features.capture_start.SelectBillboardSidesTypeScreen
@@ -138,6 +139,10 @@ fun DirackAppNavigation(
             BillboardDataUploadDashboardScreen(appState, captureRecordViewmodel)
         }
 
+        composable<AppDestinations.ReviewBillboardWideShot> {
+            WideShotReviewScreen(appState, captureRecordViewmodel)
+        }
+
     }
 
 }
@@ -216,6 +221,9 @@ sealed interface AppDestinations {
 
     @Serializable
     data object ReviewBillboardData : AppDestinations
+
+    @Serializable
+    data object ReviewBillboardWideShot : AppDestinations
 
     @Serializable
     data object BillboardAdded :  AppDestinations

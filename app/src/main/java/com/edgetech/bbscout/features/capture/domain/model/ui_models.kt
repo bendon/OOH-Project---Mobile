@@ -30,6 +30,7 @@ data class CaptureRecordUiState(
     val createBillboardSideCount: Int = 0,
     /**
      * This field will carry the location from far
+     * and the wide shot image
      */
     val billboardData: BillboardExtractedInfo? = null,
     val sideOneExtractedInfo: BillboardExtractedInfo? = null,
@@ -57,13 +58,12 @@ sealed class CaptureRecordUiEvent {
 
     data class StartBillBoardSurvey(val billboard: BillboardSides): CaptureRecordUiEvent()
 
-    data object BillboardInfoMove: CaptureRecordUiEvent()
+    data class ContinueBillBoardSurvey(val billboard: BillboardSides): CaptureRecordUiEvent()
+
+    data object BillboardDataSet: CaptureRecordUiEvent()
 
     data object BillboardNumberOfSideSet : CaptureRecordUiEvent()
 
-    data object BillboardStructureMove : CaptureRecordUiEvent()
-
-    data object CampaignSet : CaptureRecordUiEvent()
 
     data object CaptureAdded : CaptureRecordUiEvent()
 
@@ -74,15 +74,11 @@ sealed class CaptureRecordEventSink : AppEventSink {
 
     data class SetBillboardNumberOfSide(val sides: Int) : CaptureRecordEventSink()
 
-    data object GetBillboardSides : CaptureRecordEventSink()
 
     data class StartBillBoardSurvey(val billboard: BillboardSides): CaptureRecordEventSink()
 
-    data object OnBillboardInfoMove: CaptureRecordEventSink()
 
-    data object OnBillboardStructureMove : CaptureRecordEventSink()
-
-    data object OnCampaignSet : CaptureRecordEventSink()
+    data object OnBillboardDataSet : CaptureRecordEventSink()
 
     data class OnRetry(val billboardExtractedInfo: BillboardExtractedInfo) : CaptureRecordEventSink()
 
