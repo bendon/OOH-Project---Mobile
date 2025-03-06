@@ -14,6 +14,7 @@ import com.edgetech.bbscout.data.data.remote.bbscout_api.model.RegisterRequest
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.UserResponse
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.api_exception.ApiStatusResponse
 import com.edgetech.bbscout.data.data.remote.gen_ai.data_model.bbscout.BBScoutAiAnalyserResponse
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -21,6 +22,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface BBScoutApi {
 
@@ -51,7 +53,10 @@ interface BBScoutApi {
     suspend fun changePassword(@Body request: ChangePasswordRequest): Response<AuthResponse>
 
     @GET("api/v1/en/sl/my/billboardds/uploads")
-    suspend fun getBillboardUploads(): Response<ApiResponsePage<BillboardResponse>>
+    suspend fun getBillboardUploads(
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = Int.MAX_VALUE
+    ): Response<ApiResponsePage<BillboardResponse>>
 
     @GET("api/v1/en/sl/my/billboards/{id}")
     suspend fun getBillboard(@Path("id") id: String): Response<BillboardResponse>

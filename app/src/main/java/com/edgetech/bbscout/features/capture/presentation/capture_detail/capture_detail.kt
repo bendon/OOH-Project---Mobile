@@ -155,7 +155,7 @@ fun CaptureDetailMain(
                     )
             ) {
 
-                if (captureUiState.selectedRecord?.entryEntity?.remoteFileUrl != null) {
+                if (captureUiState.selectedRecord?.billboardData?.remoteFileName != null) {
                     Text(
                         text = "Full image",
                         fontSize = 18.sp,
@@ -170,7 +170,7 @@ fun CaptureDetailMain(
                             .padding(vertical = 8.dp),
                     ) {
                         GlideImage(
-                            model = "https://scout.edgetech.co.ke/api/v1/auth/file/${captureUiState.selectedRecord?.entryEntity?.remoteFileUrl}",
+                            model = "https://scout.edgetech.co.ke/api/v1/auth/file/${captureUiState.selectedRecord?.billboardData?.remoteFileName}",
                             contentDescription = "",
                             modifier = Modifier.fillMaxSize(),
                         )
@@ -183,9 +183,9 @@ fun CaptureDetailMain(
                     }
                 }
 
-                if (captureUiState.selectedRecordBillboardImage != null) {
+                if (captureUiState.selectedRecord?.billboardData?.remoteCloseUpFileName != null) {
                     Text(
-                        text = "Billboard image",
+                        text = "Close up image",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(top = 16.dp)
@@ -197,14 +197,23 @@ fun CaptureDetailMain(
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
                     ) {
-                        Image(
-                            captureUiState.selectedRecordBillboardImage!!.asImageBitmap(),
-                            contentDescription = "Cropped Billboard",
+                        GlideImage(
+                            model = "https://scout.edgetech.co.ke/api/v1/auth/file/${captureUiState.selectedRecord?.billboardData?.remoteCloseUpFileName}",
+                            contentDescription = "",
                             modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.FillBounds
                         )
+//                        Image(
+//                            captureUiState.selectedRecordMainImage!!.asImageBitmap(),
+//                            contentDescription = "Cropped Billboard",
+//                            modifier = Modifier.fillMaxSize(),
+//                            contentScale = ContentScale.FillBounds
+//                        )
                     }
                 }
+
+
+
+
 
                 CaptureBillboardInfo(
                     selectedCapture = selectedCapture

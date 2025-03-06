@@ -79,6 +79,7 @@ import com.edgetech.bbscout.components.ui.ButtonContent
 import com.edgetech.bbscout.components.ui.ErrorShowDialog
 import com.edgetech.bbscout.components.ui.MainLoadingButton
 import com.edgetech.bbscout.components.ui.NonLoadingSecButton
+import com.edgetech.bbscout.components.utils.isDebug
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.api_exception.BadRequestException
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.api_exception.UnAuthenticatedException
 import com.edgetech.bbscout.data.utils.DataConstants
@@ -383,7 +384,8 @@ fun LoginScreenContent(
                 contentDescription = null,
                 //colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
                 modifier = Modifier
-                    .size(32.dp).padding(vertical = 8.dp)
+                    .size(32.dp)
+                    .padding(vertical = 8.dp)
             )
             Text(
                 "Login with Google", color =
@@ -608,7 +610,8 @@ fun SignUpScreen(
                 contentDescription = null,
                 //colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
                 modifier = Modifier
-                    .size(32.dp).padding(vertical = 8.dp)
+                    .size(32.dp)
+                    .padding(vertical = 8.dp)
             )
             Text(
                 "Create an account with Google", color =
@@ -626,7 +629,7 @@ private fun launchGoogleSignIn(
     launcher: ActivityResultLauncher<Intent>
 ) {
     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-        .requestIdToken(DataConstants.GOOGLE_CLIENT_ID) // Replace with your client ID
+        .requestIdToken(if (isDebug) DataConstants.GOOGLE_DEBUG_CLIENT_ID else DataConstants.GOOGLE_RELEASE_CLIENT_ID) // Replace with your client ID
         .requestEmail()
         .build()
 
