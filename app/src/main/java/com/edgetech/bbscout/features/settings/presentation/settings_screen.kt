@@ -39,6 +39,7 @@ import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.R
 import com.edgetech.bbscout.components.ui.StatusDialog
 import com.edgetech.bbscout.components.ui.WarningIcon
+import com.edgetech.bbscout.components.utils.isDebug
 import com.edgetech.bbscout.data.utils.DataConstants
 import com.edgetech.bbscout.features.auth.domain.model.AuthEventSink
 import com.edgetech.bbscout.features.auth.domain.model.AuthUiEvent
@@ -91,7 +92,7 @@ fun SettingsMain(
             onConfirmation = {
                 showLogOutWarning = false
                 val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestIdToken(DataConstants.GOOGLE_CLIENT_ID) // Replace with your client ID
+                    .requestIdToken(if (isDebug) DataConstants.GOOGLE_DEBUG_CLIENT_ID else DataConstants.GOOGLE_RELEASE_CLIENT_ID)  // Replace with your client ID
                     .requestEmail()
                     .build()
 
@@ -99,7 +100,7 @@ fun SettingsMain(
                 client.signOut()
                 authEventSink(AuthEventSink.Logout)
             },
-            title = "Log Out",
+            title = "Logout",
             message = "Are you sure you want to log out?",
             posText = "Logout",
             negText = "Cancel",

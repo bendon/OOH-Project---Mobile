@@ -80,6 +80,7 @@ import com.edgetech.bbscout.components.ui.ErrorShowDialog
 import com.edgetech.bbscout.components.ui.MainLoadingButton
 import com.edgetech.bbscout.components.ui.NonLoadingSecButton
 import com.edgetech.bbscout.components.utils.isDebug
+import com.edgetech.bbscout.components.utils.logD
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.api_exception.BadRequestException
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.api_exception.UnAuthenticatedException
 import com.edgetech.bbscout.data.utils.DataConstants
@@ -152,7 +153,7 @@ fun LoginScreenMain(
 
             }
         } catch (e: ApiException) {
-
+            //logD("Error getting Google account ${e.message}")
         }
     }
 

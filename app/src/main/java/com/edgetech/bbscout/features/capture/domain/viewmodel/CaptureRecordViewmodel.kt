@@ -631,12 +631,16 @@ class CaptureRecordViewmodel @Inject constructor(
             repository.analyzeFile(fileMultipart)
                 .onSuccess { res ->
 
-                    if (res?.object_type == null || res?.billboard_type == null)
+                    if (res?.object_type == null || res?.billboard_type == null) {
                         _captureUiEvent.update {
                             CaptureRecordUiEvent.Error(
                                 NoBillboardFoundException, eventSink
                             )
                         }
+                       val bill = getBillboardSideToUpdate()
+                        updateBillBoardState(bill.copy(closedUpUri = null, billboardImage = null))
+
+                    }
 
                     val billboard = getBillboardSideToUpdate()
                     val updatedBillboard = updateBillboardSideAiData(billboard, res)

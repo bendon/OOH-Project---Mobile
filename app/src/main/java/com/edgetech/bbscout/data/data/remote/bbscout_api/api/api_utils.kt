@@ -123,7 +123,7 @@ suspend fun checkIfErrorIsInvalidToken(api: BBScoutApi, dao: BBScoutDao, error: 
                 return false
             }
         } catch (e: Exception) {
-
+            logD("An error occurred $e")
             return false
         }
 
