@@ -15,7 +15,7 @@ class GeminiInference : FulltextAndImageInference {
     ): SimpleResource<GenAIResponse> {
         val generativeModel = GenerativeModel(
             modelName = "gemini-2.0-flash-lite-preview-02-05",
-            apiKey = "AIzaSyA_ToWGRu2qLYbfy3CrFlipGdyNIzEqwls"  //BuildConfig.GEMINI_API_KEY
+            apiKey = ""  //BuildConfig.GEMINI_API_KEY
         )
 
         val prompt = """
