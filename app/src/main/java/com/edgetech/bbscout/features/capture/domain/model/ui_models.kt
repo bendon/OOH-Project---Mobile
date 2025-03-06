@@ -7,6 +7,7 @@ import com.edgetech.bbscout.data.data.local.enities.BillboardDataEntity
 import com.edgetech.bbscout.data.data.local.enities.UserLocationEntity
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.BBScoutUserStat
 import com.edgetech.bbscout.data.utils.BBScoutException
+import com.edgetech.bbscout.features.capture.presentation.capture_flow.create_new_record.NewCaptureDestinations
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,7 +44,20 @@ data class CaptureRecordUiState(
      * This field will carry the location from close
      */
     val selectedLocation: UserLocationEntity? = null,
-    val selectedBillboardSidesType: BillboardSides = BillboardSides.MAIN,
+    //val selectedBillboardSidesType: BillboardSides = BillboardSides.MAIN,
+
+    val newCaptureSelectedScreen: NewCaptureDestinations = NewCaptureDestinations.BillboardLocation,
+    val newCaptureSelectedSide: BillboardSides = BillboardSides.MAIN,
+
+    val newCaptureNextIsEnabled: Boolean = false,
+    val newCaptureBackEnabled: Boolean = false,
+    val newCaptureNextText: String = "Next",
+
+    val newCaptureNumberOfSteps: Int? = null,
+    val newCaptureCurrentStep: Int = 1,
+
+    val newBillboardType: String? = null
+
 
 )
 
@@ -72,7 +86,7 @@ sealed class CaptureRecordEventSink : AppEventSink {
     data class SetBillboardNumberOfSide(val sides: Int) : CaptureRecordEventSink()
 
 
-    data class StartBillBoardSurvey(val billboard: BillboardSides): CaptureRecordEventSink()
+    data class StartBillBoardSurvey(val billboard: BillboardSides, val type: String): CaptureRecordEventSink()
 
 
     data object OnBillboardDataSet : CaptureRecordEventSink()
@@ -117,6 +131,10 @@ sealed class CaptureRecordEventSink : AppEventSink {
     data class OnGetCapture(val captureId: String): CaptureRecordEventSink()
 
     data class OnSetLocation(val location: LatLng) : CaptureRecordEventSink()
+
+    data object OnUiNext : CaptureRecordEventSink()
+
+    data object OnUiBack : CaptureRecordEventSink()
 }
 
 
