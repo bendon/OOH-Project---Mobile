@@ -15,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.components.ui.CompSelectableState
 import com.edgetech.bbscout.components.ui.MainLoadingButton
@@ -62,12 +62,18 @@ fun SelectBillboardSidesTypeMain(
     }
 
     val uiEvent by captureRecordUiModel.captureUiEvent.collectAsState()
-     if (uiEvent is CaptureRecordUiEvent.BillboardNumberOfSideSet){
-         appState?.navController?.navigate(AppDestinations.CaptureDashboard)
-         captureRecordUiModel.captureEventSink(
-             CaptureRecordEventSink.ResetState
-         )
-     }
+    if (uiEvent is CaptureRecordUiEvent.BillboardNumberOfSideSet) {
+        appState?.navController?.navigate(AppDestinations.CaptureDashboard)
+        captureRecordUiModel.captureEventSink(
+            CaptureRecordEventSink.ResetUiEvent
+        )
+    }
+
+    LaunchedEffect(true) {
+        captureRecordUiModel.captureEventSink(
+            CaptureRecordEventSink.ResetCreatingCapture
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -87,12 +93,13 @@ fun SelectBillboardSidesTypeMain(
                         )
                     }
                 },
-
-                )
+            )
         }
     ) {
         Column(
-            modifier = Modifier.padding(it).padding(horizontal = 16.dp)
+            modifier = Modifier
+                .padding(it)
+                .padding(horizontal = 16.dp)
         ) {
             Text(
                 text = "How many sides does this billboard have",
@@ -148,7 +155,9 @@ fun SelectBillboardSidesTypeMain(
             MainLoadingButton(
                 loadOnTap = false,
                 disableOnTap = false,
-                modifier = Modifier.padding(top = 16.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .fillMaxWidth(),
                 onTap = {
                     captureRecordUiModel.captureEventSink(
                         CaptureRecordEventSink.SetBillboardNumberOfSide(selectedType)

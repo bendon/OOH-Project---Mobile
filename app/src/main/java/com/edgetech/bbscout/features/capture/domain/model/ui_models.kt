@@ -1,13 +1,11 @@
 package com.edgetech.bbscout.features.capture.domain.model
 
 import android.graphics.Bitmap
-import com.edgetech.bbscout.components.domain_util.AppBasicUiEvent
 import com.edgetech.bbscout.components.domain_util.AppEventSink
 import com.edgetech.bbscout.data.data.local.dto.EntryRecord
 import com.edgetech.bbscout.data.data.local.enities.BillboardDataEntity
 import com.edgetech.bbscout.data.data.local.enities.UserLocationEntity
 import com.edgetech.bbscout.data.data.remote.bbscout_api.model.BBScoutUserStat
-import com.edgetech.bbscout.data.data.remote.bbscout_api.model.BBScoutUserStatResponse
 import com.edgetech.bbscout.data.utils.BBScoutException
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -64,7 +62,6 @@ sealed class CaptureRecordUiEvent {
 
     data object BillboardNumberOfSideSet : CaptureRecordUiEvent()
 
-
     data object CaptureAdded : CaptureRecordUiEvent()
 
 }
@@ -113,7 +110,9 @@ sealed class CaptureRecordEventSink : AppEventSink {
 
     data object GetRecentCaptures : CaptureRecordEventSink()
 
-    data object ResetState : CaptureRecordEventSink()
+    data object ResetUiEvent : CaptureRecordEventSink()
+
+    data object ResetCreatingCapture : CaptureRecordEventSink()
 
     data class OnGetCapture(val captureId: String): CaptureRecordEventSink()
 

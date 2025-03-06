@@ -20,6 +20,8 @@ data class BillboardExtractedInfo(
     val brandSlogan: String? = null,
     val fileUri: String? = null,
     val closedUpUri: String? = null,
+    val remoteFileId: String? = null,
+    val remoteCloseUpId: String? = null,
     val billboardType: String? = null,
     val billboardOwner: String? = null,
     val billboardWidth: String? = null,

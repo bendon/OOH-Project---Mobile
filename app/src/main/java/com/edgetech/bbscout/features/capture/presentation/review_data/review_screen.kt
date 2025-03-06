@@ -1,6 +1,5 @@
 package com.edgetech.bbscout.features.capture.presentation.review_data
 
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,8 +25,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircleOutline
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -36,7 +33,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
@@ -47,9 +43,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -62,7 +56,6 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -83,8 +76,6 @@ import com.edgetech.bbscout.features.capture.domain.model.NoBillboardFoundExcept
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
 import com.edgetech.bbscout.features.capture.presentation.GetLocationComp
 import com.edgetech.bbscout.features.navigation.AppDestinations
-import com.example.core.core.utils.components.LocationAwareActivity
-import com.example.core.core.utils.components.toLatLng
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
@@ -151,14 +142,14 @@ fun ReviewRecordMain(
             appState?.navController?.popBackStack(AppDestinations.Dashboard, false)
         }
         captureRecordUiModel.captureEventSink(
-            CaptureRecordEventSink.ResetState
+            CaptureRecordEventSink.ResetUiEvent
         )
 
     }
     if (currentBillBoadUiEvent is CaptureRecordUiEvent.BillboardDataSet){
        appState?.navController?.navigateUp()
         captureRecordUiModel.captureEventSink(
-            CaptureRecordEventSink.ResetState
+            CaptureRecordEventSink.ResetUiEvent
         )
     }
     else if (currentBillBoadUiEvent is CaptureRecordUiEvent.Error) {
@@ -190,7 +181,7 @@ fun ReviewRecordMain(
                 event = request.eventSink,
                 onDismiss = {
                     captureRecordUiModel.captureEventSink(
-                        CaptureRecordEventSink.ResetState
+                        CaptureRecordEventSink.ResetUiEvent
                     )
                     if (request.exception is NoBillboardFoundException) {
                         appState?.navController?.navigateUp()
@@ -198,7 +189,7 @@ fun ReviewRecordMain(
                 },
                 onPositive = { eventSink, ex ->
                     captureRecordUiModel.captureEventSink(
-                        CaptureRecordEventSink.ResetState
+                        CaptureRecordEventSink.ResetUiEvent
                     )
 //                if (ex !is EmptyCredentialsException && eventSink != null){
 //                    authUiModel.authEventSink(eventSink as AuthEventSink)
@@ -344,7 +335,9 @@ fun ReviewRecordMain(
 //                }
                 MainLoadingButton(
                     onTap = {
-                        appState?.navController?.navigateUp()
+                        captureRecordUiModel.captureEventSink(
+                            CaptureRecordEventSink.OnBillboardDataSet
+                        )
                     },
                     modifier = Modifier.weight(1f),
                     pIsLoading = captureRecordUiState.isLoading

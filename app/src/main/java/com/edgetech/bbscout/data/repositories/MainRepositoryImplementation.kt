@@ -74,7 +74,8 @@ class MainRepositoryImplementation @Inject constructor(
                     bbScoutApi.createCampaign(newCampaign)
                 }
                 if (campaignResponse.data != null){
-                    val newRecord = EntryRecord.fromCampaignResponse(campaignResponse.data!!)
+                    val uploadedCampaign = campaignResponse.data!!.copy(billboard = billBoardResponse.data!!.copy(campaign = null))
+                    val newRecord = EntryRecord.fromCampaignResponse(uploadedCampaign)
                     insertRecord(newRecord)
                     return SimpleResource.Success(newRecord)
                 }

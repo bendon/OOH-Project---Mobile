@@ -2,6 +2,7 @@ package com.edgetech.bbscout.data.data.remote.bbscout_api.api
 
 
 import com.edgetech.bbscout.components.utils.log
+import com.edgetech.bbscout.components.utils.logD
 import com.edgetech.bbscout.components.utils.toLong
 import com.edgetech.bbscout.data.data.local.BBScoutDao
 import com.edgetech.bbscout.data.data.local.utils.BBScoutDatabase
@@ -37,6 +38,7 @@ class RepositoryHelper @Inject constructor(
             } else {
                 val invalidToken =
                     checkIfErrorIsInvalidToken(arSpringApi, database.bbScoutDao, response.code())
+                logD("invalid token ${response.code()}")
                 if (invalidToken && numberCall < 2) {
                     return apiDbRequestOrFail(numberCall + 1, call)
                 }
@@ -99,6 +101,7 @@ class RepositoryHelper @Inject constructor(
 }
 
 suspend fun checkIfErrorIsInvalidToken(api: BBScoutApi, dao: BBScoutDao, error: Int): Boolean {
+
     if (error == 401) {
         try {
             val authObject = dao.getAuth()
@@ -120,10 +123,12 @@ suspend fun checkIfErrorIsInvalidToken(api: BBScoutApi, dao: BBScoutDao, error: 
                 return false
             }
         } catch (e: Exception) {
+
             return false
         }
 
-    } else {
+    }
+    else {
         return false
     }
 }

@@ -94,6 +94,7 @@ fun MainLoadingButton(
     pIsLoading: Boolean = false,
     loadOnTap: Boolean = true,
     disableOnTap: Boolean = true,
+    isEnabled: Boolean = true,
     timeOut: Duration = 1.minutes,
     onTap: () -> Unit,
     content: @Composable RowScope.() -> Unit,
@@ -110,6 +111,7 @@ fun MainLoadingButton(
                 containerColor = MaterialTheme.colorScheme.primary,
                 disabledContainerColor = MaterialTheme.colorScheme.primaryContainer
             ),
+            isEnabled = isEnabled,
             shape = RoundedCornerShape(20),
             onTap = onTap,
             content = content
@@ -128,6 +130,7 @@ fun LoadingButton(
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
     border: BorderStroke? = null,
+    isEnabled: Boolean = true,
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable RowScope.() -> Unit,
@@ -175,7 +178,7 @@ fun LoadingButton(
                 enabledButton = false
 
         },
-        enabled = enabledButton
+        enabled = enabledButton && isEnabled
     ) {
         if (isLoading) {
             CircularProgressIndicator(
