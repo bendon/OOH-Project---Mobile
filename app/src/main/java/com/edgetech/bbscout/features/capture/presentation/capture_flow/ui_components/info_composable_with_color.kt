@@ -37,6 +37,10 @@ fun InfoComposableContainer(
             InfoComposableType.RED -> {
                 Color.Red.copy(alpha = 0.2f)
             }
+
+            InfoComposableType.BLUE_CONTAINER -> {
+                lightBlue
+            }
         },
         border = BorderStroke(
             width = 2.dp,
@@ -56,6 +60,10 @@ fun InfoComposableContainer(
                 InfoComposableType.RED -> {
                     Color.Red
                 }
+
+                InfoComposableType.BLUE_CONTAINER -> {
+                    lightBlue
+                }
             }
         ),
         shape = MaterialTheme.shapes.small
@@ -69,5 +77,6 @@ enum class InfoComposableType{
     BLUE,
     ALL_GRAY,
     BORDER_GRAY,
-    RED
+    RED,
+    BLUE_CONTAINER
 }
