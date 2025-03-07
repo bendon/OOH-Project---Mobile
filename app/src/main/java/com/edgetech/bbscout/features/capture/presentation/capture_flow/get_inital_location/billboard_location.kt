@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.diracks.app.app.app_state.BBScoutAppState
+import com.edgetech.bbscout.components.utils.logD
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
 import com.edgetech.bbscout.features.capture.presentation.GetLocation
@@ -27,6 +28,7 @@ fun BillboardLocation(
 ){
 
     GetLocation{
+
         captureRecordUiModel.captureEventSink(CaptureRecordEventSink.OnSetLocation(it))
     }
 

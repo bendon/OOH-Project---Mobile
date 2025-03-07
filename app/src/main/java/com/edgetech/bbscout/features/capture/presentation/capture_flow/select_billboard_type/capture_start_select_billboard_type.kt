@@ -18,6 +18,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -45,12 +46,19 @@ fun SelectCaptureTypeMain(
     captureRecordUiModel: CaptureRecordUiModel
 ) {
 
+    val uiState by captureRecordUiModel.captureUiState.collectAsState()
+
     var selectedType by rememberSaveable {
         mutableStateOf<String>("")
     }
 
     var selectedNumberOfSide by rememberSaveable {
         mutableStateOf<BillboardSides>(BillboardSides.SIDE_ONE)
+    }
+
+    LaunchedEffect(true){
+        selectedType = uiState.newBillboardType ?: ""
+        selectedNumberOfSide = BillboardSides.fromCode(uiState.createBillboardSideCount) ?: BillboardSides.SIDE_ONE
     }
 
     LaunchedEffect(
@@ -63,7 +71,6 @@ fun SelectCaptureTypeMain(
     }
 
     Column(
-        modifier = Modifier.padding(16.dp)
     ) {
 
         BoxWithConstraints {
@@ -109,7 +116,7 @@ fun SelectCaptureTypeMain(
                         name = BillboardType.entries[it].displayName,
                         description = BillboardType.entries[it].description,
                         itemIcon = BillboardType.entries[it].icon,
-                        isSelected = selectedType == it.toString(),
+                        isSelected = selectedType == BillboardType.entries[it].displayName,
                         onClick = {
                             selectedType = BillboardType.entries[it].displayName
                         },

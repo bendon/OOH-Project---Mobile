@@ -43,7 +43,7 @@ fun InfoComposableContainer(
             }
         },
         border = BorderStroke(
-            width = 2.dp,
+            width = 1.dp,
             color = when(type){
                 InfoComposableType.GREEN -> {
                     mainGreen

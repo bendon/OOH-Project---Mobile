@@ -107,5 +107,31 @@ enum class BillboardSides(
     MAIN(
         displayName = "Main",
         code = 0
-    )
+    );
+
+    companion object {
+        fun fromName(name: String): BillboardSides? {
+            return when (name) {
+                "Side 1" -> SIDE_ONE
+                "Side 2" -> SIDE_TWO
+                "Side 3" -> SIDE_THREE
+                "Side 4" -> SIDE_FOUR
+                else -> {
+                    null
+                }
+            }
+        }
+
+        fun fromCode(code: Int): BillboardSides? {
+            return when (code) {
+                1 -> SIDE_ONE
+                2 -> SIDE_TWO
+                3 -> SIDE_THREE
+                4 -> SIDE_FOUR
+                else -> {
+                    null
+                }
+            }
+        }
+    }
 }

@@ -14,6 +14,7 @@ import com.edgetech.bbscout.features.capture.presentation.capture_flow.capture_d
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.get_inital_location.BillboardLocation
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.new_capture_review.ReviewCaptures
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.new_capture_review.SubmitNewCapture
+import com.edgetech.bbscout.features.capture.presentation.capture_flow.select_billboard_type.SelectCaptureTypeMain
 import com.edgetech.bbscout.features.capture_start.SelectBillboardSidesTypeMain
 import com.edgetech.bbscout.features.navigation.AppDestinations
 import kotlinx.serialization.Serializable
@@ -39,7 +40,7 @@ fun NewCaptureNavHost(
         }
 
         composable<NewCaptureDestinations.SelectBillboardType> {
-            SelectBillboardSidesTypeMain(appState, captureRecordUiModel)
+            SelectCaptureTypeMain(appState, captureRecordUiModel)
         }
 
         composable<NewCaptureDestinations.BillboardLongShot> {

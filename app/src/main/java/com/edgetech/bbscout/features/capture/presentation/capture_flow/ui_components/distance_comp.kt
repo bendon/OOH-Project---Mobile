@@ -45,7 +45,6 @@ fun DistanceComposable(
                 color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier
-                    .padding(top = 4.dp)
                     .fillMaxWidth(),
             )
 

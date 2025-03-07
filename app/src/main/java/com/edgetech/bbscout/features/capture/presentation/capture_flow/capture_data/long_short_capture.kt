@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.diracks.app.app.app_state.BBScoutAppState
+import com.edgetech.bbscout.components.utils.logD
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
 import com.edgetech.bbscout.features.capture.presentation.GetLocation
@@ -19,7 +20,9 @@ import com.edgetech.bbscout.features.capture.presentation.capture_flow.ui_compon
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.ui_components.CapturedImage
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.ui_components.CreateCaptureGroupHeading
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.ui_components.DistanceComposable
+import com.edgetech.bbscout.features.capture.presentation.capture_flow.ui_components.GpsLocationComp
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.ui_components.InPageAlert
+import com.example.core.core.utils.components.toLatLng
 
 
 @Composable
@@ -30,6 +33,7 @@ fun LongSortCapture(
 
     GetLocation {
         captureRecordUiModel.captureEventSink(CaptureRecordEventSink.OnSetLocation(it))
+        logD("Location captured: ${it}")
     }
     val uiState by captureRecordUiModel.captureUiState.collectAsState()
 
@@ -37,10 +41,17 @@ fun LongSortCapture(
         modifier = Modifier.fillMaxSize()
     ) {
 
+
+
         CreateCaptureGroupHeading(
             Icons.Outlined.CameraAlt,
             "Capture Long short",
             modifier = Modifier.padding(vertical = 8.dp)
+        )
+        GpsLocationComp(
+            lat = uiState.billboardData?.billboardLocation?.latitude,
+            lng = uiState.billboardData?.billboardLocation?.longitude,
+            modifier = Modifier.padding(bottom = 8.dp)
         )
 
         DistanceComposable(
@@ -52,7 +63,7 @@ fun LongSortCapture(
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        if (uiState.billboardData?.status != true) {
+        if (uiState.billboardData?.closedUpUri == null) {
             CameraComp(
                 onCaptureTaken = { uri ->
                     captureRecordUiModel.captureEventSink(
@@ -65,21 +76,20 @@ fun LongSortCapture(
                     .padding(bottom = 8.dp)
                     .height(220.dp)
             )
-        } else {
-            if (uiState.billboardData?.billboardImage != null) {
-                CapturedImage(
-                    image = uiState.billboardData?.billboardImage!!,
-                    modifier = Modifier
-                        .padding(bottom = 8.dp)
-                        .height(220.dp)
-                )
-            }
+        } else if (uiState.billboardData?.billboardImage != null) {
+            CapturedImage(
+                image = uiState.billboardData?.billboardImage!!,
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .height(220.dp)
+            )
         }
+
 
         InPageAlert(
             isSuccess = false,
             isError = false,
-            title = "Take a log short photo",
+            title = "Take a long short photo",
             message = "Take a photo of the billboard from a distance of 20-100 meters",
             modifier = Modifier.padding(bottom = 16.dp)
         )

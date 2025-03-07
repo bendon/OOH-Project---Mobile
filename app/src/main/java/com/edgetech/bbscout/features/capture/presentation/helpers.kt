@@ -13,10 +13,13 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.view.PreviewView
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import com.edgetech.bbscout.components.location.AppLocation
+import com.edgetech.bbscout.components.utils.logD
 import com.edgetech.bbscout.components.utils.toLong
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
@@ -389,8 +392,18 @@ fun GetLocation(
     onLocation: (LatLng) -> Unit
 ){
     val context = LocalActivity.current as LocationAwareActivity
-    val currentLocation by context.appLocation.observeAsState()
+    val currentLocation by context.appLocation.observeAsState(AppLocation())
+    LaunchedEffect(currentLocation) {
+        context.getLocation()
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            context.stopLocationUpdates()
+        }
+    }
     if (currentLocation?.toLatLng() != null ) {
+
         onLocation(currentLocation!!.toLatLng()!!)
     }
 }

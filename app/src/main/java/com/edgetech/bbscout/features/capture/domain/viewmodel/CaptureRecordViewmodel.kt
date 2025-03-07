@@ -7,6 +7,7 @@ import com.edgetech.bbscout.components.di.IoDispatcher
 import com.edgetech.bbscout.components.di.MainDispatcher
 import com.edgetech.bbscout.components.file_saver.FileSaver
 import com.edgetech.bbscout.components.location.GetLocationInfo
+import com.edgetech.bbscout.components.utils.logD
 import com.edgetech.bbscout.components.utils.toJson
 import com.edgetech.bbscout.components.utils.toLong
 import com.edgetech.bbscout.data.data.local.dto.EntryRecord
@@ -98,7 +99,6 @@ class CaptureRecordViewmodel @Inject constructor(
             is CaptureRecordEventSink.OnSetLocation -> {
 
                 onSetLocation(eventSink)
-
 
 
             }
@@ -279,6 +279,7 @@ class CaptureRecordViewmodel @Inject constructor(
                             )
                         )
                     }
+                    logD("billboad  viewmodel is ${_captureUiState.value.billboardData} and loc is $loc")
                 }
 
                 else -> {
@@ -523,9 +524,10 @@ class CaptureRecordViewmodel @Inject constructor(
         _captureUiState.update {
             it.copy(
                 newCaptureSelectedSide = eventSink.billboard,
-                newBillboardType = eventSink.type
-
-                )
+                newBillboardType = eventSink.type,
+                createBillboardSideCount = eventSink.billboard.code,
+                billboardData = BillboardExtractedInfo(billboardSideInfo = BillboardSides.MAIN)
+            )
         }
         when (eventSink.billboard) {
             BillboardSides.SIDE_ONE -> {
@@ -615,6 +617,7 @@ class CaptureRecordViewmodel @Inject constructor(
                 }
             }
         }
+        logD("billboard survey started")
         checkBillboardStatus()
     }
 
@@ -937,18 +940,28 @@ class CaptureRecordViewmodel @Inject constructor(
 
             if (fileBitMap.data != null) {
 
+                val uiState = _captureUiState.value
+                if (uiState.newCaptureSelectedScreen == NewCaptureDestinations.BillboardLongShot) {
+                    _captureUiState.update {
+                        it.copy(
+                            billboardData = it.billboardData?.copy(
+                                billboardImage = fileBitMap.data!!,
+                                closedUpUri = eventSink.fileUri
+                            )
+                        )
+                    }
+                    checkBillboardStatus()
+                } else {
+                    val billboard = getBillboardSideToUpdate().copy(
+                        billboardImage = fileBitMap.data!!,
+                        closedUpUri = eventSink.fileUri
+                    )
+                    updateBillBoardState(billboard)
+                    onAnalyseImage(CaptureRecordEventSink.OnAnalyseImage)
 
-                val billboard = getBillboardSideToUpdate().copy(
-                    billboardImage = fileBitMap.data!!,
-                    closedUpUri = eventSink.fileUri
-                )
-                updateBillBoardState(billboard)
-
+                }
                 _captureUiEvent.update {
                     CaptureRecordUiEvent.CaptureAdded
-                }
-                if (billboard.billboardSideInfo != BillboardSides.MAIN) {
-                    onAnalyseImage(CaptureRecordEventSink.OnAnalyseImage)
                 }
             }
 
@@ -1081,7 +1094,7 @@ class CaptureRecordViewmodel @Inject constructor(
             }
 
             BillboardSides.SIDE_THREE -> {
-                 _captureUiState.update {
+                _captureUiState.update {
                     it.copy(
                         sideThreeExtractedInfo = billboardExtractedInfo
                     )
@@ -1107,13 +1120,14 @@ class CaptureRecordViewmodel @Inject constructor(
         checkBillboardStatus()
     }
 
-    private fun checkBillboardStatus(){
+    private fun checkBillboardStatus() {
         val state = _captureUiState.value
-        when(state.newCaptureSelectedScreen){
+        when (state.newCaptureSelectedScreen) {
             NewCaptureDestinations.BillboardCloseUpShot -> {
-                when(state.newCaptureSelectedSide){
+                when (state.newCaptureSelectedSide) {
                     BillboardSides.SIDE_ONE -> {
-                        val valid = state.sideOneExtractedInfo?.closedUpUri != null && state.sideOneExtractedInfo.isDistanceValid == true && state.sideOneExtractedInfo.billboardLocation != null
+                        val valid =
+                            state.sideOneExtractedInfo?.closedUpUri != null && state.sideOneExtractedInfo.isDistanceValid == true && state.sideOneExtractedInfo.billboardLocation != null
                         _captureUiState.update {
                             it.copy(
                                 newCaptureNextIsEnabled = valid,
@@ -1123,8 +1137,10 @@ class CaptureRecordViewmodel @Inject constructor(
                             )
                         }
                     }
+
                     BillboardSides.SIDE_TWO -> {
-                        val valid = state.sideTwoExtractedInfo?.closedUpUri != null && state.sideTwoExtractedInfo.isDistanceValid == true && state.sideTwoExtractedInfo.billboardLocation != null
+                        val valid =
+                            state.sideTwoExtractedInfo?.closedUpUri != null && state.sideTwoExtractedInfo.isDistanceValid == true && state.sideTwoExtractedInfo.billboardLocation != null
                         _captureUiState.update {
                             it.copy(
                                 newCaptureNextIsEnabled = valid,
@@ -1135,8 +1151,10 @@ class CaptureRecordViewmodel @Inject constructor(
                         }
 
                     }
+
                     BillboardSides.SIDE_THREE -> {
-                        val valid = state.sideThreeExtractedInfo?.closedUpUri != null && state.sideThreeExtractedInfo.isDistanceValid == true && state.sideThreeExtractedInfo.billboardLocation != null
+                        val valid =
+                            state.sideThreeExtractedInfo?.closedUpUri != null && state.sideThreeExtractedInfo.isDistanceValid == true && state.sideThreeExtractedInfo.billboardLocation != null
                         _captureUiState.update {
                             it.copy(
                                 newCaptureNextIsEnabled = valid,
@@ -1146,8 +1164,10 @@ class CaptureRecordViewmodel @Inject constructor(
                             )
                         }
                     }
+
                     BillboardSides.SIDE_FOUR -> {
-                        val valid = state.sideFourExtractedInfo?.closedUpUri != null && state.sideFourExtractedInfo.isDistanceValid == true && state.sideFourExtractedInfo.billboardLocation != null
+                        val valid =
+                            state.sideFourExtractedInfo?.closedUpUri != null && state.sideFourExtractedInfo.isDistanceValid == true && state.sideFourExtractedInfo.billboardLocation != null
                         _captureUiState.update {
                             it.copy(
                                 newCaptureNextIsEnabled = valid,
@@ -1157,12 +1177,14 @@ class CaptureRecordViewmodel @Inject constructor(
                             )
                         }
                     }
+
                     BillboardSides.MAIN -> {
 
                     }
                 }
 
             }
+
             NewCaptureDestinations.BillboardLocation -> {
                 _captureUiState.update {
                     it.copy(
@@ -1171,13 +1193,15 @@ class CaptureRecordViewmodel @Inject constructor(
                     )
                 }
             }
+
             NewCaptureDestinations.BillboardLongShot -> {
                 _captureUiState.update {
                     it.copy(
-                        newCaptureNextIsEnabled = it.billboardData?.isDistanceValid == true && it.billboardData.billboardLocation != null
+                        newCaptureNextIsEnabled = it.billboardData?.isDistanceValid == true && it.billboardData.billboardLocation != null && it.billboardData.closedUpUri != null
                     )
                 }
             }
+
             NewCaptureDestinations.ConfirmAllDataCapture -> {
                 _captureUiState.update {
                     it.copy(
@@ -1185,6 +1209,7 @@ class CaptureRecordViewmodel @Inject constructor(
                     )
                 }
             }
+
             NewCaptureDestinations.SelectBillboardType -> {
                 _captureUiState.update {
                     it.copy(
@@ -1192,6 +1217,7 @@ class CaptureRecordViewmodel @Inject constructor(
                     )
                 }
             }
+
             NewCaptureDestinations.SubmitPhysicalData -> {
                 _captureUiState.update {
                     it.copy(

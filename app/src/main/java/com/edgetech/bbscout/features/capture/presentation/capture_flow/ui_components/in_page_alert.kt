@@ -108,7 +108,7 @@ fun InPageAlert(
                     onClick = onNext,
                     modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
                     shape = MaterialTheme.shapes.small,
-                    colors = ButtonDefaults.buttonColors(containerColor = mainGreen, contentColor = MaterialTheme.colorScheme.onBackground)
+                    colors = ButtonDefaults.buttonColors(containerColor = mainGreen, contentColor = Color.White)
                 ) {
                     Text(text = nextText)
                 }
