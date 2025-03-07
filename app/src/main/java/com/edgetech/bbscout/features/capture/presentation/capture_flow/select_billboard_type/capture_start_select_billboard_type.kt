@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -31,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.R
+import com.edgetech.bbscout.features.capture.domain.model.BillboardSides
+import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
 import com.edgetech.bbscout.ui.theme.BBScoutTheme
@@ -47,7 +50,16 @@ fun SelectCaptureTypeMain(
     }
 
     var selectedNumberOfSide by rememberSaveable {
-        mutableStateOf(1)
+        mutableStateOf<BillboardSides>(BillboardSides.SIDE_ONE)
+    }
+
+    LaunchedEffect(
+        selectedType,
+        selectedNumberOfSide
+    ) {
+        captureRecordUiModel.captureEventSink(
+            CaptureRecordEventSink.StartBillBoardSurvey(selectedNumberOfSide, selectedType)
+        )
     }
 
     Column(
@@ -92,14 +104,14 @@ fun SelectCaptureTypeMain(
                         )
                     }
                 }
-                items(8) {
+                items(BillboardType.entries.size) {
                     BillboardTypeComp(
-                        name = "Billboard",
-                        description = "Large outdoor advertising structure",
-                        itemIcon = R.drawable.ic_billboard,
+                        name = BillboardType.entries[it].displayName,
+                        description = BillboardType.entries[it].description,
+                        itemIcon = BillboardType.entries[it].icon,
                         isSelected = selectedType == it.toString(),
                         onClick = {
-                            selectedType = it.toString()
+                            selectedType = BillboardType.entries[it].displayName
                         },
                         modifier = Modifier.padding(4.dp)
                     )
@@ -137,33 +149,33 @@ fun SelectCaptureTypeMain(
                         ) {
                             BillboardSideCountComp(
                                 text = "1 side",
-                                isSelected = selectedNumberOfSide == 1,
+                                isSelected = selectedNumberOfSide == BillboardSides.SIDE_ONE,
                                 onClick = {
-                                    selectedNumberOfSide = 1
+                                    selectedNumberOfSide = BillboardSides.SIDE_ONE
                                 },
                                 modifier = Modifier.padding(end = 16.dp)
                             )
                             BillboardSideCountComp(
                                 text = "2 sides",
-                                isSelected = selectedNumberOfSide == 2,
+                                isSelected = selectedNumberOfSide == BillboardSides.SIDE_TWO,
                                 onClick = {
-                                    selectedNumberOfSide = 2
+                                    selectedNumberOfSide = BillboardSides.SIDE_TWO
                                 },
                                 modifier = Modifier.padding(end = 16.dp)
                             )
                             BillboardSideCountComp(
                                 text = "3 sides",
-                                isSelected = selectedNumberOfSide == 3,
+                                isSelected = selectedNumberOfSide == BillboardSides.SIDE_THREE,
                                 onClick = {
-                                    selectedNumberOfSide = 3
+                                    selectedNumberOfSide = BillboardSides.SIDE_THREE
                                 },
                                 modifier = Modifier.padding(end = 16.dp)
                             )
                             BillboardSideCountComp(
                                 text = "4 sides",
-                                isSelected = selectedNumberOfSide == 4,
+                                isSelected = selectedNumberOfSide == BillboardSides.SIDE_FOUR,
                                 onClick = {
-                                    selectedNumberOfSide = 4
+                                    selectedNumberOfSide = BillboardSides.SIDE_FOUR
                                 },
                                 modifier = Modifier.padding(end = 8.dp)
                             )
@@ -199,6 +211,21 @@ fun BillboardSideCountComp(
             modifier = Modifier.padding(start = 8.dp)
             )
     }
+}
+
+enum class  BillboardType(val displayName: String, val description: String, val icon: Int){
+
+    StaticBillboard("Static Billboard", "Large outdoor advertising structure", R.drawable.ic_billboard),
+    DigitalBillboard("Digital Billboard", "Electronic display for advertising", R.drawable.ic_billboard),
+    BannerAds("Banner Ads", "Rectangular advertisements on websites", R.drawable.ic_billboard),
+    Wallscapes("Wallscapes", "Large murals or paintings on walls", R.drawable.ic_billboard),
+    MobileBillboards("Mobile Billboards", "Advertising vehicles on wheels", R.drawable.ic_billboard),
+    LampPosts("Lamp Posts", "Advertising affixed to streetlights", R.drawable.ic_billboard),
+    InteractiveBillboards("Interactive Billboards", "Billboards with interactive features", R.drawable.ic_billboard);
+
+
+
+
 }
 
 @Preview
