@@ -84,10 +84,28 @@ data class EntityInfo(
     val text: String
 )
 
-enum class BillboardSides {
-    SIDE_ONE,
-    SIDE_TWO,
-    SIDE_THREE,
-    SIDE_FOUR,
-    MAIN
+enum class BillboardSides(
+    val displayName: String,
+    val code: Int
+) {
+    SIDE_ONE(
+        displayName = "Side 1",
+        code = 1
+    ),
+    SIDE_TWO(
+        displayName = "Side 2",
+        code = 2
+    ),
+    SIDE_THREE(
+        displayName = "Side 3",
+        code = 3
+    ),
+    SIDE_FOUR(
+        displayName = "Side 4",
+        code = 4
+    ),
+    MAIN(
+        displayName = "Main",
+        code = 0
+    )
 }

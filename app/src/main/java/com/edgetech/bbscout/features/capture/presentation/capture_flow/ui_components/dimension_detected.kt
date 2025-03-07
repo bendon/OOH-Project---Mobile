@@ -33,6 +33,7 @@ fun DimensionDetectedComp(
     width: Double?,
     height: Double?,
     onConfirm: (width: Double?, height: Double?) -> Unit,
+    modifier: Modifier = Modifier
 ){
 
     val widthTextState = rememberTextFieldState(initialText = width?.toString() ?: "")
@@ -41,7 +42,7 @@ fun DimensionDetectedComp(
 
 
 
-    InfoComposableContainer(InfoComposableType.ALL_GRAY) {
+    InfoComposableContainer(InfoComposableType.ALL_GRAY, modifier = modifier) {
             Column(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally

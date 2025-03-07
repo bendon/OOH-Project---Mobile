@@ -32,9 +32,10 @@ fun DistanceComposable(
     maxDistance: Double? = null,
     minDistance: Double? = null,
     isValid: Boolean? = null,
+    modifier: Modifier = Modifier
 ){
 
-    InfoComposableContainer(InfoComposableType.ALL_GRAY) {
+    InfoComposableContainer(InfoComposableType.ALL_GRAY, modifier = modifier) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
