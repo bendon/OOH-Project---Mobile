@@ -43,7 +43,8 @@ fun DimensionDetectedComp(
 
     InfoComposableContainer(InfoComposableType.ALL_GRAY) {
             Column(
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = "Dimensions detected",
