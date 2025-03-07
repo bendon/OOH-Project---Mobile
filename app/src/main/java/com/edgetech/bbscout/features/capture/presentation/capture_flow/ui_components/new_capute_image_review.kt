@@ -69,7 +69,7 @@ fun NewCaptureImageReview(
                         .weight(1f),
                 )
                 Row(
-                    modifier = Modifier.padding(top = 8.dp),
+                    modifier = Modifier,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Image(

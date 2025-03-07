@@ -33,6 +33,8 @@ import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiEvent
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiState
 import com.edgetech.bbscout.features.capture.domain.model.NoBillboardFoundException
+import com.edgetech.bbscout.features.capture.domain.model.closeUpDistance
+import com.edgetech.bbscout.features.capture.domain.model.longShotDistance
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.create_new_record.NewCaptureDestinations
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -158,7 +160,7 @@ class CaptureRecordViewmodel @Inject constructor(
                                 it.copy(
                                     sideOneExtractedInfo = it.sideOneExtractedInfo?.copy(
                                         distanceFromBillboard = distanceFromBillboard.toDouble(),
-                                        isDistanceValid = distanceFromBillboard.toDouble() in 1.0..20.0
+                                        isDistanceValid = distanceFromBillboard.toDouble() in closeUpDistance
                                     )
                                 )
                             }
@@ -169,7 +171,7 @@ class CaptureRecordViewmodel @Inject constructor(
                                 it.copy(
                                     sideTwoExtractedInfo = it.sideTwoExtractedInfo?.copy(
                                         distanceFromBillboard = distanceFromBillboard.toDouble(),
-                                        isDistanceValid = distanceFromBillboard.toDouble() in 1.0..20.0
+                                        isDistanceValid = distanceFromBillboard.toDouble() in closeUpDistance
                                     )
                                 )
                             }
@@ -180,7 +182,7 @@ class CaptureRecordViewmodel @Inject constructor(
                                 it.copy(
                                     sideThreeExtractedInfo = it.sideThreeExtractedInfo?.copy(
                                         distanceFromBillboard = distanceFromBillboard.toDouble(),
-                                        isDistanceValid = distanceFromBillboard.toDouble() in 1.0..20.0
+                                        isDistanceValid = distanceFromBillboard.toDouble() in closeUpDistance
                                     )
                                 )
                             }
@@ -191,7 +193,7 @@ class CaptureRecordViewmodel @Inject constructor(
                                 it.copy(
                                     sideFourExtractedInfo = it.sideFourExtractedInfo?.copy(
                                         distanceFromBillboard = distanceFromBillboard.toDouble(),
-                                        isDistanceValid = distanceFromBillboard.toDouble() in 1.0..20.0
+                                        isDistanceValid = distanceFromBillboard.toDouble() in closeUpDistance
                                     )
                                 )
                             }
@@ -206,7 +208,7 @@ class CaptureRecordViewmodel @Inject constructor(
                         it.copy(
                             billboardData = it.billboardData?.copy(
                                 distanceFromBillboard = distanceFromBillboard.toDouble(),
-                                isDistanceValid = distanceFromBillboard.toDouble() in 20.0..100.0
+                                isDistanceValid = distanceFromBillboard.toDouble() in longShotDistance
                             )
                         )
                     }

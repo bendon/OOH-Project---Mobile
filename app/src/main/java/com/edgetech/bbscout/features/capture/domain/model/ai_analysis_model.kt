@@ -1,6 +1,7 @@
 package com.edgetech.bbscout.features.capture.domain.model
 
 import android.graphics.Bitmap
+import com.edgetech.bbscout.components.utils.isDebug
 import com.edgetech.bbscout.data.data.local.enities.UserLocationEntity
 import com.edgetech.bbscout.data.data.local.utils.LongList
 import com.edgetech.bbscout.data.data.local.utils.StringList
@@ -135,3 +136,7 @@ enum class BillboardSides(
         }
     }
 }
+
+
+val closeUpDistance = if (isDebug) 0.0..20.0 else 0.0..20.0
+val longShotDistance = if (isDebug) 0.0..100.0 else 20.0..100.0

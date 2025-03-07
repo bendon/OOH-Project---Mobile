@@ -53,7 +53,7 @@ fun SubmitNewCapture(
             modifier = Modifier.padding(bottom = 8.dp)
         ) {
             Column(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
@@ -81,7 +81,7 @@ fun SubmitNewCapture(
                 ) {
                     ButtonContent(
                         "Continue to content identification",
-                        contentColor = MaterialTheme.colorScheme.primary
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 }
 
@@ -103,7 +103,7 @@ fun SubmitNewCapture(
 
         InfoComposableContainer(
             InfoComposableType.BORDER_GRAY,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp).fillMaxWidth()
         ){
             Column(
                 modifier = Modifier.padding(8.dp)

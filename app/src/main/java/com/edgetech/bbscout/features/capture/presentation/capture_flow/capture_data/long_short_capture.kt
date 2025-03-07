@@ -15,6 +15,8 @@ import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.components.utils.logD
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
+import com.edgetech.bbscout.features.capture.domain.model.closeUpDistance
+import com.edgetech.bbscout.features.capture.domain.model.longShotDistance
 import com.edgetech.bbscout.features.capture.presentation.GetLocation
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.ui_components.CameraComp
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.ui_components.CapturedImage
@@ -57,8 +59,8 @@ fun LongSortCapture(
         DistanceComposable(
             title = "GPS Location",
             distance = uiState.billboardData?.distanceFromBillboard,
-            minDistance = 20.0,
-            maxDistance = 100.0,
+            minDistance = longShotDistance.start,
+            maxDistance = longShotDistance.endInclusive,
             isValid = uiState.billboardData?.isDistanceValid ?: false,
             modifier = Modifier.padding(bottom = 8.dp)
         )

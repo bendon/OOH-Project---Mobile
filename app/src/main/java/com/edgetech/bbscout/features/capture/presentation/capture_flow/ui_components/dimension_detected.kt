@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldState
@@ -49,7 +50,7 @@ fun DimensionDetectedComp(
             ) {
                 Text(
                     text = "Dimensions detected",
-                    fontSize = 14.sp,
+                    fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(vertical = 16.dp)
@@ -106,8 +107,8 @@ fun DimensionDetectedMeasurement(
         OutlinedTextField(
             state = textFieldState,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.padding(start = 8.dp, end = 2.dp).wrapContentWidth().height(50.dp),
-            contentPadding  = PaddingValues(14.dp),
+            modifier = Modifier.padding(start = 8.dp, end = 4.dp).width(70.dp).height(30.dp),
+            contentPadding  = PaddingValues(2.dp),
         )
         Text(
             text = unit,
