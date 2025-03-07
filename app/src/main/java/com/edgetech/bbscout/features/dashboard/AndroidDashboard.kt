@@ -33,13 +33,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.diracks.app.app.app_state.BBScoutAppState
+import com.edgetech.bbscout.components.ui.ButtonContent
+import com.edgetech.bbscout.components.ui.MainLoadingButton
+import com.edgetech.bbscout.components.ui.NonLoadingSecButton
+import com.edgetech.bbscout.components.ui.StatusDialog
+import com.edgetech.bbscout.components.ui.WarningIcon
 import com.edgetech.bbscout.components.utils.defaultZoneId
 import com.edgetech.bbscout.components.utils.getFullDateAndTimeFromLong
+import com.edgetech.bbscout.components.utils.isDebug
 import com.edgetech.bbscout.data.data.local.dto.EntryRecord
+import com.edgetech.bbscout.data.utils.DataConstants
+import com.edgetech.bbscout.features.auth.domain.model.AuthEventSink
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
+import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiState
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
 import com.edgetech.bbscout.features.capture.presentation.capture_listing.BillboardListingItem
 import com.edgetech.bbscout.features.capture_start.checkCameraPermission
@@ -48,6 +58,9 @@ import com.edgetech.bbscout.features.capture_start.isGPSEnabled
 import com.edgetech.bbscout.features.navigation.AppDestinations
 import com.edgetech.bbscout.features.navigation.DashboardScreenOption
 import com.edgetech.bbscout.ui.theme.BBScoutTheme
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import kotlin.time.Duration.Companion.seconds
 
 
 @Composable
@@ -71,6 +84,8 @@ fun HomeDashboard(
     onPageTap: (DashboardScreenOption) -> Unit = {},
 ) {
 
+    val context = LocalContext.current
+
     val capturesUiState by captureRecordUiModel.captureUiState.collectAsState()
 
     val recentEntries = capturesUiState.allCaptures.take(5)
@@ -82,6 +97,92 @@ fun HomeDashboard(
         captureRecordUiModel.captureEventSink(
             CaptureRecordEventSink.GetRecentCaptures
         )
+    }
+
+    var continueCreatingBillboard by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    if (continueCreatingBillboard) {
+        Dialog(onDismissRequest = { continueCreatingBillboard = false }) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentWidth()
+                    .wrapContentHeight(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
+            ) {
+                Column(
+                    modifier = Modifier.padding(8.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = "Create new billboard", style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(16.dp),
+                    )
+                    Text(
+                        text = "It seems you were already creating a new billboard, do you want to continue with that or create a new one.",
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(16.dp),
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth()
+                            .padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+
+                        NonLoadingSecButton(
+                            modifier = Modifier
+                                .padding(end = 4.dp)
+                                .weight(1f),
+                            onTap = {
+                               navigateToCapture(appState, context)
+                                continueCreatingBillboard = false
+                            }) {
+                            ButtonContent(
+                                "Continue",
+                                MaterialTheme.colorScheme.onBackground,
+
+                                )
+
+                        }
+
+
+
+                        MainLoadingButton(
+                            onTap = {
+                                captureRecordUiModel.captureEventSink(
+                                    CaptureRecordEventSink.ResetCreatingCapture
+                                )
+                               navigateToCapture(appState, context)
+                                continueCreatingBillboard = false
+                            },
+                            modifier = Modifier
+                                .padding(start = 4.dp)
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            loadOnTap = false,
+                            timeOut = 2.seconds
+                        ) {
+                            Text(
+                                text = "Create new one",
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+
+
+                    }
+
+                }
+            }
+        }
     }
 
     Column {
@@ -100,13 +201,26 @@ fun HomeDashboard(
             Column(
                 modifier = Modifier.padding(horizontal = 16.dp)
             ) {
-                HeaderSection(numberOfCaptures = capturesUiState.allCaptures.size, monthlystat = capturesUiState.userStat?.billboardCount)
+                HeaderSection(
+                    numberOfCaptures = capturesUiState.allCaptures.size,
+                    monthlystat = capturesUiState.userStat?.billboardCount
+                )
                 Spacer(modifier = Modifier.height(16.dp))
-                ChallengeCard(appState)
+                ChallengeCard(appState, onContinueCapture = {
+                    continueCreatingBillboard = checkExitingCapture(
+                        capturesUiState,
+                        appState,
+                        context
+                    )
+                })
                 Spacer(modifier = Modifier.height(16.dp))
-                QuickActions(appState, onPageTap = onPageTap)
-                //            Spacer(modifier = Modifier.height(16.dp))
-                //            NearbyBillboards()
+                QuickActions(appState, onPageTap = onPageTap, onContinueCapture = {
+                    continueCreatingBillboard = checkExitingCapture(
+                        capturesUiState,
+                        appState,
+                        context
+                    )
+                })
                 Spacer(modifier = Modifier.height(16.dp))
                 if (recentEntries.isNotEmpty())
                     RecentActivity(recentEntries, appState)
@@ -178,8 +292,10 @@ fun HeaderSection(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.secondary
             )
-            Text(text = "Captures this month", fontSize = 14.sp,
-                textAlign = TextAlign.Center,)
+            Text(
+                text = "Captures this month", fontSize = 14.sp,
+                textAlign = TextAlign.Center,
+            )
 
             //Text(text = "96% Accuracy", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4CAF50))
             // Text(text = "Level 12", fontSize = 18.sp, fontWeight = FontWeight.Bold)
@@ -189,7 +305,8 @@ fun HeaderSection(
 
 @Composable
 fun ChallengeCard(
-    appState: BBScoutAppState?
+    appState: BBScoutAppState?,
+    onContinueCapture: () -> Unit = {}
 ) {
     val context = LocalContext.current
 
@@ -232,7 +349,7 @@ fun ChallengeCard(
                     modifier = Modifier
                         .padding(vertical = 8.dp)
                         .clickable {
-                            navigateToCapture(appState, context)
+                            onContinueCapture()
                         }
                 )
             }
@@ -241,10 +358,24 @@ fun ChallengeCard(
     }
 }
 
+fun checkExitingCapture(
+    state: CaptureRecordUiState,
+    appState: BBScoutAppState?,
+    context: Context
+): Boolean {
+    if (state.billboardData != null && !state.newBillboardType.isNullOrEmpty())
+        return true
+    else {
+        navigateToCapture(appState, context)
+    }
+    return false
+}
+
+
 fun navigateToCapture(
     appState: BBScoutAppState?,
     context: Context
-){
+) {
     if (checkCameraPermission(context) && checkLocationPermission(context) && isGPSEnabled(
             context
         )
@@ -255,7 +386,11 @@ fun navigateToCapture(
 }
 
 @Composable
-fun QuickActions(appState: BBScoutAppState?, onPageTap: (DashboardScreenOption) -> Unit = {}) {
+fun QuickActions(
+    appState: BBScoutAppState?,
+    onPageTap: (DashboardScreenOption) -> Unit = {},
+    onContinueCapture: () -> Unit = {}
+) {
 
     val context = LocalContext.current
 
@@ -274,7 +409,7 @@ fun QuickActions(appState: BBScoutAppState?, onPageTap: (DashboardScreenOption) 
                 modifier = Modifier.weight(1f),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
                 onClick = {
-                    navigateToCapture(appState, context)
+                    onContinueCapture()
                 }
             ) {
                 Column(
@@ -421,9 +556,13 @@ fun RecentActivity(recentCaptures: List<EntryRecord>, appState: BBScoutAppState?
                     }",
                     hasDivider = index != recentCaptures.lastIndex,
                     modifier = Modifier.clickable {
-                        appState?.navController?.navigate(AppDestinations.CaptureDetail(item.entryEntity.remoteId ?: ""))
+                        appState?.navController?.navigate(
+                            AppDestinations.CaptureDetail(
+                                item.entryEntity.remoteId ?: ""
+                            )
+                        )
                     }
-                    )
+                )
 
             }
 

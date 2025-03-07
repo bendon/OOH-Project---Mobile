@@ -26,11 +26,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.components.ui.ButtonContent
+import com.edgetech.bbscout.components.ui.ErrorShowDialog
 import com.edgetech.bbscout.components.ui.MainLoadingButton
 import com.edgetech.bbscout.components.ui.NonLoadingSecButton
+import com.edgetech.bbscout.components.ui.StatusDialog
+import com.edgetech.bbscout.components.ui.SuccessIcon
+import com.edgetech.bbscout.features.capture.domain.model.BillboardTypeErrorException
+import com.edgetech.bbscout.features.capture.domain.model.BrandDescriptionErrorException
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
+import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiEvent
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
+import com.edgetech.bbscout.features.capture.domain.model.LocationErrorException
+import com.edgetech.bbscout.features.capture.domain.model.NoBillboardFoundException
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
+import com.edgetech.bbscout.features.capture.presentation.review_data.RecordType
+import com.edgetech.bbscout.features.navigation.AppDestinations
 
 
 @Composable
@@ -52,6 +62,66 @@ fun NewCaptureParentMain(
 ){
 
     val uiState by captureRecordUiModel.captureUiState.collectAsState()
+
+    val uiEvent by captureRecordUiModel.captureUiEvent.collectAsState()
+
+    if (uiEvent is CaptureRecordUiEvent.Error) {
+        val request = (uiEvent as CaptureRecordUiEvent.Error)
+        if (request.exception is BillboardTypeErrorException){
+            appState?.navController?.navigate(
+                AppDestinations.EditCapture(
+                    null,
+                    RecordType.BILLBOARD_INFO
+                )
+            )
+        }
+        else {
+            ErrorShowDialog(
+                showErrorMessage = true,
+                customError = mapOf(
+                    BillboardTypeErrorException to "Billboard type is required",
+                    LocationErrorException to "Location is required",
+                    BrandDescriptionErrorException to "Brand description is required",
+                    NoBillboardFoundException to "No billboard detected"
+                ),
+                error = request.exception,
+                event = request.eventSink,
+                onDismiss = {
+                    captureRecordUiModel.captureEventSink(
+                        CaptureRecordEventSink.ResetUiEvent
+                    )
+                },
+                onPositive = { eventSink, ex ->
+                    captureRecordUiModel.captureEventSink(
+                        CaptureRecordEventSink.ResetUiEvent
+                    )
+                }
+
+            )
+        }
+    } else if (uiEvent is CaptureRecordUiEvent.CaptureRecordCreated){
+        StatusDialog(
+            icon = {
+                SuccessIcon()
+            },
+            isVisible = true,
+            title = "Success",
+            message = "Capture record created successfully",
+            onDismissRequest = {
+                captureRecordUiModel.captureEventSink(
+                    CaptureRecordEventSink.ResetUiEvent
+                )
+                captureRecordUiModel.captureEventSink(
+                    CaptureRecordEventSink.ResetCreatingCapture
+                )
+                appState?.navController?.navigateUp()
+            },
+            posText = "Ok",
+            onConfirmation = {
+
+            }
+        )
+    }
 
     Scaffold(
         topBar = {

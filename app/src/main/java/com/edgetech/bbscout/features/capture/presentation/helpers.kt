@@ -369,16 +369,17 @@ fun takePhoto(
 fun GetLocationComp(
     captureRecordUiModel: CaptureRecordUiModel,
     alwaysGetEvenIfGottenBefore: Boolean = false
-){
+) {
 
     val userLoc by captureRecordUiModel.captureUiState.collectAsState()
 
-    val hasLoc = userLoc.selectedLocation?.latitude != null && userLoc.selectedLocation?.longitude != null
+    val hasLoc =
+        userLoc.selectedLocation?.latitude != null && userLoc.selectedLocation?.longitude != null
 
     val shouldGetLocation = alwaysGetEvenIfGottenBefore || !hasLoc
 
-    if (shouldGetLocation){
-        GetLocation{
+    if (shouldGetLocation) {
+        GetLocation {
             captureRecordUiModel.captureEventSink(
                 CaptureRecordEventSink.OnSetLocation(it)
             )
@@ -390,20 +391,24 @@ fun GetLocationComp(
 @Composable
 fun GetLocation(
     onLocation: (LatLng) -> Unit
-){
+) {
     val context = LocalActivity.current as LocationAwareActivity
     val currentLocation by context.appLocation.observeAsState(AppLocation())
-    LaunchedEffect(currentLocation) {
+
+    LaunchedEffect(
+        key1 = currentLocation
+    ) {
         context.getLocation()
     }
 
-    DisposableEffect(Unit) {
-        onDispose {
-            context.stopLocationUpdates()
-        }
-    }
-    if (currentLocation?.toLatLng() != null ) {
 
+//    DisposableEffect(Unit) {
+//        onDispose {
+//            context.stopLocationUpdates()
+//        }
+//    }
+    if (currentLocation?.toLatLng() != null) {
+        logD("Location: ${currentLocation?.toLatLng()}")
         onLocation(currentLocation!!.toLatLng()!!)
     }
 }

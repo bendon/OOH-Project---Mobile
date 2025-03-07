@@ -106,6 +106,9 @@ fun LongSortCapture(
                 onNext = {
                     captureRecordUiModel.captureEventSink(CaptureRecordEventSink.OnUiNext)
                 },
+                onRetry = {
+                    captureRecordUiModel.captureEventSink(CaptureRecordEventSink.OnRecapture)
+                }
             )
 
     }

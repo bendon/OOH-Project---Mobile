@@ -1,5 +1,6 @@
 package com.edgetech.bbscout.components.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,9 +31,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.edgetech.bbscout.R
 import com.edgetech.bbscout.ui.theme.mainBlue
 import kotlin.time.Duration.Companion.seconds
 
@@ -133,7 +137,7 @@ fun StatusDialog(
                                 loadOnTap = false,
                                 timeOut = 2.seconds
                             ) {
-                                Text(text = posText, color = Color.White)
+                                Text(text = posText, color = MaterialTheme.colorScheme.onPrimary)
                             }
                         }
 
@@ -176,9 +180,9 @@ fun ShowErrorDialog(
 
 @Composable
 fun SuccessIcon() {
-    Icon(
-        Icons.Default.CheckCircle,
-        tint = mainBlue,
+    Image(
+        painterResource(R.drawable.check_circle_svgrepo_com),
+        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
         contentDescription = "Success",
         modifier = Modifier.size(78.dp)
     )

@@ -140,6 +140,37 @@ class CaptureRecordViewmodel @Inject constructor(
             CaptureRecordEventSink.OnUiNext -> {
                 onUiNext()
             }
+
+            CaptureRecordEventSink.OnRecapture -> {
+                onRecapture(eventSink)
+            }
+        }
+    }
+
+    private fun onRecapture(eventSink: CaptureRecordEventSink) {
+        val uiState = _captureUiState.value
+        if (uiState.newCaptureSelectedScreen == NewCaptureDestinations.BillboardLongShot) {
+            _captureUiState.update {
+                it.copy(
+                    billboardData = it.billboardData?.copy(
+                        closedUpUri = null,
+                        billboardImage = null
+                    ),
+                    sideOneExtractedInfo = it.sideOneExtractedInfo?.copy(
+                        fileUri = null
+                    )
+                )
+            }
+        } else if (uiState.newCaptureSelectedScreen == NewCaptureDestinations.BillboardCloseUpShot) {
+            val info = getBillboardSideToUpdate().copy(
+                closedUpUri = null,
+                billboardImage = null,
+                objectType = null,
+                billboardType = null
+            )
+
+            updateBillBoardState(info)
+
         }
     }
 
@@ -310,7 +341,8 @@ class CaptureRecordViewmodel @Inject constructor(
                     newCaptureCurrentStep = 3,
                 )
             }
-        } else if (state.newCaptureSelectedScreen == NewCaptureDestinations.BillboardLongShot) {
+        }
+        else if (state.newCaptureSelectedScreen == NewCaptureDestinations.BillboardLongShot) {
             _captureUiState.update {
                 it.copy(
                     newCaptureSelectedScreen = NewCaptureDestinations.BillboardCloseUpShot,
@@ -318,17 +350,20 @@ class CaptureRecordViewmodel @Inject constructor(
                     newCaptureCurrentStep = 4,
                 )
             }
-        } else if (state.newCaptureSelectedScreen == NewCaptureDestinations.BillboardCloseUpShot) {
+        }
+        else if (state.newCaptureSelectedScreen == NewCaptureDestinations.BillboardCloseUpShot) {
 
             if (state.newCaptureSelectedSide == BillboardSides.SIDE_ONE) {
-                if (state.createBillboardSideCount > 1)
+                if (state.createBillboardSideCount > 1) {
                     _captureUiState.update {
                         it.copy(
+                            newCaptureSelectedScreen = NewCaptureDestinations.BillboardCloseUpShot,
                             newCaptureSelectedSide = BillboardSides.SIDE_TWO,
                             newCaptureCurrentStep = 5,
                         )
                     }
-                else
+
+                } else
                     _captureUiState.update {
                         it.copy(
                             newCaptureSelectedScreen = NewCaptureDestinations.ConfirmAllDataCapture,
@@ -339,6 +374,7 @@ class CaptureRecordViewmodel @Inject constructor(
                 if (state.createBillboardSideCount > 2)
                     _captureUiState.update {
                         it.copy(
+                            newCaptureSelectedScreen = NewCaptureDestinations.BillboardCloseUpShot,
                             newCaptureSelectedSide = BillboardSides.SIDE_THREE,
                             newCaptureCurrentStep = 6,
                         )
@@ -354,6 +390,7 @@ class CaptureRecordViewmodel @Inject constructor(
                 if (state.createBillboardSideCount > 3)
                     _captureUiState.update {
                         it.copy(
+                            newCaptureSelectedScreen = NewCaptureDestinations.BillboardCloseUpShot,
                             newCaptureSelectedSide = BillboardSides.SIDE_FOUR,
                             newCaptureCurrentStep = 7,
                         )
@@ -378,6 +415,7 @@ class CaptureRecordViewmodel @Inject constructor(
                 it.copy(
                     newCaptureSelectedScreen = NewCaptureDestinations.SubmitPhysicalData,
                     newCaptureCurrentStep = it.newCaptureCurrentStep + 1,
+                    newCaptureNextIsEnabled = false
                 )
             }
         }
@@ -480,6 +518,7 @@ class CaptureRecordViewmodel @Inject constructor(
                     it.copy(
                         newCaptureSelectedScreen = NewCaptureDestinations.ConfirmAllDataCapture,
                         newCaptureCurrentStep = state.createBillboardSideCount + 4,
+                        newCaptureNextText = "Next"
                     )
                 }
             }
@@ -499,6 +538,12 @@ class CaptureRecordViewmodel @Inject constructor(
                 sideThreeExtractedInfo = null,
                 sideFourExtractedInfo = null,
                 billboardData = null,
+                selectedLocation = null,
+                newBillboardType = null,
+                newCaptureCurrentStep = 1,
+                newCaptureNumberOfSteps = null,
+                newCaptureNextText = "Next",
+                newCaptureSelectedScreen = NewCaptureDestinations.BillboardLocation
             )
         }
     }
@@ -525,100 +570,79 @@ class CaptureRecordViewmodel @Inject constructor(
     private fun startBillBoardSurvey(eventSink: CaptureRecordEventSink.StartBillBoardSurvey) {
         _captureUiState.update {
             it.copy(
-                newCaptureSelectedSide = eventSink.billboard,
+               // newCaptureSelectedSide = eventSink.billboard,
                 newBillboardType = eventSink.type,
                 createBillboardSideCount = eventSink.billboard.code,
                 billboardData = BillboardExtractedInfo(billboardSideInfo = BillboardSides.MAIN)
             )
         }
-        when (eventSink.billboard) {
-            BillboardSides.SIDE_ONE -> {
-                if (_captureUiState.value.sideOneExtractedInfo?.closedUpUri == null) {
-                    _captureUiState.update {
-                        it.copy(
-                            sideOneExtractedInfo = BillboardExtractedInfo(billboardSideInfo = eventSink.billboard)
-                        )
-                    }
-                    _captureUiEvent.update {
-                        CaptureRecordUiEvent.StartBillBoardSurvey(eventSink.billboard)
-                    }
-                } else {
-                    _captureUiEvent.update {
-                        CaptureRecordUiEvent.ContinueBillBoardSurvey(eventSink.billboard)
-                    }
-                }
 
+        if (_captureUiState.value.sideOneExtractedInfo?.closedUpUri == null) {
+            _captureUiState.update {
+                it.copy(
+                    sideOneExtractedInfo = BillboardExtractedInfo(
+                        billboardSideInfo = BillboardSides.SIDE_ONE,
+                        billboardType = eventSink.type
+                    ),
 
+                    )
             }
 
-            BillboardSides.SIDE_TWO -> {
-                if (_captureUiState.value.sideTwoExtractedInfo?.closedUpUri == null) {
-                    _captureUiState.update {
-                        it.copy(
-                            sideTwoExtractedInfo = BillboardExtractedInfo(billboardSideInfo = eventSink.billboard)
-                        )
-                    }
-                    _captureUiEvent.update {
-                        CaptureRecordUiEvent.StartBillBoardSurvey(eventSink.billboard)
-                    }
-                } else {
-                    _captureUiEvent.update {
-                        CaptureRecordUiEvent.ContinueBillBoardSurvey(eventSink.billboard)
-                    }
-                }
-            }
-
-            BillboardSides.SIDE_THREE -> {
-                if (_captureUiState.value.sideThreeExtractedInfo?.closedUpUri == null) {
-                    _captureUiState.update {
-                        it.copy(
-                            sideThreeExtractedInfo = BillboardExtractedInfo(billboardSideInfo = eventSink.billboard)
-                        )
-                    }
-                    _captureUiEvent.update {
-                        CaptureRecordUiEvent.StartBillBoardSurvey(eventSink.billboard)
-                    }
-                } else {
-                    _captureUiEvent.update {
-                        CaptureRecordUiEvent.ContinueBillBoardSurvey(eventSink.billboard)
-                    }
-                }
-            }
-
-            BillboardSides.SIDE_FOUR -> {
-                if (_captureUiState.value.sideFourExtractedInfo?.closedUpUri == null) {
-                    _captureUiState.update {
-                        it.copy(
-                            sideFourExtractedInfo = BillboardExtractedInfo(billboardSideInfo = eventSink.billboard)
-                        )
-                    }
-                    _captureUiEvent.update {
-                        CaptureRecordUiEvent.StartBillBoardSurvey(eventSink.billboard)
-                    }
-                } else {
-                    _captureUiEvent.update {
-                        CaptureRecordUiEvent.ContinueBillBoardSurvey(eventSink.billboard)
-                    }
-                }
-            }
-
-            BillboardSides.MAIN -> {
-                if (_captureUiState.value.billboardData?.fileUri == null) {
-                    _captureUiState.update {
-                        it.copy(
-                            billboardData = BillboardExtractedInfo(billboardSideInfo = eventSink.billboard)
-                        )
-                    }
-                    _captureUiEvent.update {
-                        CaptureRecordUiEvent.StartBillBoardSurvey(eventSink.billboard)
-                    }
-                } else {
-                    _captureUiEvent.update {
-                        CaptureRecordUiEvent.ContinueBillBoardSurvey(eventSink.billboard)
-                    }
-                }
-            }
         }
+
+
+
+        if (_captureUiState.value.sideTwoExtractedInfo?.closedUpUri == null) {
+            _captureUiState.update {
+                it.copy(
+                    sideTwoExtractedInfo = BillboardExtractedInfo(
+                        billboardSideInfo = BillboardSides.SIDE_TWO,
+                        billboardType = eventSink.type
+                    )
+                )
+            }
+
+        }
+
+
+
+        if (_captureUiState.value.sideThreeExtractedInfo?.closedUpUri == null) {
+            _captureUiState.update {
+                it.copy(
+                    sideThreeExtractedInfo = BillboardExtractedInfo(
+                        billboardSideInfo = BillboardSides.SIDE_THREE,
+                        billboardType = eventSink.type
+                    )
+                )
+            }
+
+        }
+
+
+
+        if (_captureUiState.value.sideFourExtractedInfo?.closedUpUri == null) {
+            _captureUiState.update {
+                it.copy(
+                    sideFourExtractedInfo = BillboardExtractedInfo(
+                        billboardSideInfo = BillboardSides.SIDE_FOUR,
+                        billboardType = eventSink.type
+                    )
+                )
+            }
+
+        }
+
+
+
+        if (_captureUiState.value.billboardData?.fileUri == null) {
+            _captureUiState.update {
+                it.copy(
+                    billboardData = BillboardExtractedInfo(billboardSideInfo = eventSink.billboard)
+                )
+            }
+
+        }
+
         logD("billboard survey started")
         checkBillboardStatus()
     }
@@ -949,6 +973,9 @@ class CaptureRecordViewmodel @Inject constructor(
                             billboardData = it.billboardData?.copy(
                                 billboardImage = fileBitMap.data!!,
                                 closedUpUri = eventSink.fileUri
+                            ),
+                            sideOneExtractedInfo = it.sideOneExtractedInfo?.copy(
+                                fileUri = eventSink.fileUri
                             )
                         )
                     }
@@ -986,7 +1013,7 @@ class CaptureRecordViewmodel @Inject constructor(
             repository.analyzeFile(fileMultipart)
                 .onSuccess { res ->
 
-                    if (res?.object_type == null || res?.billboard_type == null) {
+                    if (res?.object_type == null || res.billboard_type == null) {
                         _captureUiEvent.update {
                             CaptureRecordUiEvent.Error(
                                 NoBillboardFoundException, eventSink
@@ -1002,7 +1029,6 @@ class CaptureRecordViewmodel @Inject constructor(
                     updateBillBoardState(updatedBillboard)
 
                 }.onError {
-                    println("Error...${it}")
 
                 }
             _captureUiState.update {
@@ -1067,12 +1093,7 @@ class CaptureRecordViewmodel @Inject constructor(
             campainSocials = res?.site_url,
             billboardType = res?.billboard_type,
         )
-        if (billboard.billboardSideInfo != BillboardSides.MAIN && !billboard.billboardType.isNullOrEmpty()) {
-            billboard = billboard.copy(
-                status = true
-            )
-
-        }
+      checkBillboardStatus()
         return billboard
 
     }
@@ -1129,7 +1150,7 @@ class CaptureRecordViewmodel @Inject constructor(
                 when (state.newCaptureSelectedSide) {
                     BillboardSides.SIDE_ONE -> {
                         val valid =
-                            state.sideOneExtractedInfo?.closedUpUri != null && state.sideOneExtractedInfo.isDistanceValid == true && state.sideOneExtractedInfo.billboardLocation != null
+                            state.sideOneExtractedInfo?.closedUpUri != null && state.sideOneExtractedInfo.isDistanceValid == true && state.sideOneExtractedInfo.billboardLocation != null && !state.sideOneExtractedInfo.objectType.isNullOrEmpty() && !state.sideOneExtractedInfo.billboardType.isNullOrEmpty()
                         _captureUiState.update {
                             it.copy(
                                 newCaptureNextIsEnabled = valid,
@@ -1142,7 +1163,7 @@ class CaptureRecordViewmodel @Inject constructor(
 
                     BillboardSides.SIDE_TWO -> {
                         val valid =
-                            state.sideTwoExtractedInfo?.closedUpUri != null && state.sideTwoExtractedInfo.isDistanceValid == true && state.sideTwoExtractedInfo.billboardLocation != null
+                            state.sideTwoExtractedInfo?.closedUpUri != null && state.sideTwoExtractedInfo.isDistanceValid == true && state.sideTwoExtractedInfo.billboardLocation != null && !state.sideTwoExtractedInfo.objectType.isNullOrEmpty() && !state.sideTwoExtractedInfo.billboardType.isNullOrEmpty()
                         _captureUiState.update {
                             it.copy(
                                 newCaptureNextIsEnabled = valid,
@@ -1156,7 +1177,7 @@ class CaptureRecordViewmodel @Inject constructor(
 
                     BillboardSides.SIDE_THREE -> {
                         val valid =
-                            state.sideThreeExtractedInfo?.closedUpUri != null && state.sideThreeExtractedInfo.isDistanceValid == true && state.sideThreeExtractedInfo.billboardLocation != null
+                            state.sideThreeExtractedInfo?.closedUpUri != null && state.sideThreeExtractedInfo.isDistanceValid == true && state.sideThreeExtractedInfo.billboardLocation != null && !state.sideThreeExtractedInfo.objectType.isNullOrEmpty() && !state.sideThreeExtractedInfo.billboardType.isNullOrEmpty()
                         _captureUiState.update {
                             it.copy(
                                 newCaptureNextIsEnabled = valid,
@@ -1169,7 +1190,7 @@ class CaptureRecordViewmodel @Inject constructor(
 
                     BillboardSides.SIDE_FOUR -> {
                         val valid =
-                            state.sideFourExtractedInfo?.closedUpUri != null && state.sideFourExtractedInfo.isDistanceValid == true && state.sideFourExtractedInfo.billboardLocation != null
+                            state.sideFourExtractedInfo?.closedUpUri != null && state.sideFourExtractedInfo.isDistanceValid == true && state.sideFourExtractedInfo.billboardLocation != null && !state.sideFourExtractedInfo.objectType.isNullOrEmpty() && !state.sideFourExtractedInfo.billboardType.isNullOrEmpty()
                         _captureUiState.update {
                             it.copy(
                                 newCaptureNextIsEnabled = valid,
@@ -1223,7 +1244,7 @@ class CaptureRecordViewmodel @Inject constructor(
             NewCaptureDestinations.SubmitPhysicalData -> {
                 _captureUiState.update {
                     it.copy(
-                        newCaptureNextIsEnabled = true,
+                        //newCaptureNextIsEnabled = true,
                         newCaptureNextText = "Submit"
                     )
                 }

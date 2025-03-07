@@ -59,6 +59,7 @@ data class CaptureRecordUiState(
     val newBillboardType: String? = null
 
 
+
 )
 
 sealed class CaptureRecordUiEvent {
@@ -77,6 +78,8 @@ sealed class CaptureRecordUiEvent {
     data object BillboardNumberOfSideSet : CaptureRecordUiEvent()
 
     data object CaptureAdded : CaptureRecordUiEvent()
+
+
 
 }
 
@@ -135,6 +138,8 @@ sealed class CaptureRecordEventSink : AppEventSink {
     data object OnUiNext : CaptureRecordEventSink()
 
     data object OnUiBack : CaptureRecordEventSink()
+
+    data object OnRecapture :  CaptureRecordEventSink()
 }
 
 

@@ -140,6 +140,9 @@ fun CloseUpCapture(
                 onNext = {
                     captureRecordUiModel.captureEventSink(CaptureRecordEventSink.OnUiNext)
                 },
+                onRetry = {
+                    captureRecordUiModel.captureEventSink(CaptureRecordEventSink.OnRecapture)
+                }
             )
 
     }
