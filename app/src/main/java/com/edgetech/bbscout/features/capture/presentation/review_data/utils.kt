@@ -25,7 +25,7 @@ enum class RecordTypeList {
 
 
 fun getActiveBillboardData(state: CaptureRecordUiState): BillboardExtractedInfo?{
-    when(state.selectedBillboardSidesType){
+    when(state.newCaptureSelectedSide){
         BillboardSides.SIDE_ONE -> {
             return state.sideOneExtractedInfo
         }

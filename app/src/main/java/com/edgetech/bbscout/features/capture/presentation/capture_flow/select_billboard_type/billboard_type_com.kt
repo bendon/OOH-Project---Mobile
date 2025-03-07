@@ -1,4 +1,4 @@
-package com.edgetech.bbscout.features.capture.presentation.capture_flow
+package com.edgetech.bbscout.features.capture.presentation.capture_flow.select_billboard_type
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -16,6 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.edgetech.bbscout.features.capture.presentation.capture_flow.InfoComposableContainer
+import com.edgetech.bbscout.features.capture.presentation.capture_flow.InfoComposableType
 
 
 @Composable
@@ -24,17 +27,18 @@ fun BillboardTypeComp(
     name: String,
     description: String,
     onClick: () -> Unit,
-    isSelected: Boolean = false
+    isSelected: Boolean = false,
+    modifier: Modifier = Modifier
 ) {
     InfoComposableContainer(
         type = if (isSelected) InfoComposableType.BLUE else InfoComposableType.BORDER_GRAY,
-        modifier = Modifier.clickable {
+        modifier = modifier.clickable {
             onClick()
         }
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
                 painter = painterResource(itemIcon),

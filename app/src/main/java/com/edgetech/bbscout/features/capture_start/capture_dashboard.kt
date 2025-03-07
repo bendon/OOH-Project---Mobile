@@ -183,9 +183,9 @@ fun BillboardDataUploadDashboardMain(
                         .padding(vertical = 4.dp)
                         .fillMaxWidth(),
                     onTap = {
-                        captureRecordUiModel.captureEventSink(
-                            CaptureRecordEventSink.StartBillBoardSurvey(BillboardSides.SIDE_ONE)
-                        )
+//                        captureRecordUiModel.captureEventSink(
+//                            CaptureRecordEventSink.StartBillBoardSurvey(BillboardSides.SIDE_ONE)
+//                        )
                     },
                     content = {
                         Column {
@@ -223,9 +223,9 @@ fun BillboardDataUploadDashboardMain(
                             .padding(vertical = 4.dp)
                             .fillMaxWidth(),
                         onTap = {
-                            captureRecordUiModel.captureEventSink(
-                                CaptureRecordEventSink.StartBillBoardSurvey(BillboardSides.SIDE_TWO)
-                            )
+//                            captureRecordUiModel.captureEventSink(
+//                                CaptureRecordEventSink.StartBillBoardSurvey(BillboardSides.SIDE_TWO)
+//                            )
                         },
                         content = {
                             Column {
@@ -261,9 +261,9 @@ fun BillboardDataUploadDashboardMain(
                             .padding(vertical = 4.dp)
                             .fillMaxWidth(),
                         onTap = {
-                            captureRecordUiModel.captureEventSink(
-                                CaptureRecordEventSink.StartBillBoardSurvey(BillboardSides.SIDE_THREE)
-                            )
+//                            captureRecordUiModel.captureEventSink(
+//                                CaptureRecordEventSink.StartBillBoardSurvey(BillboardSides.SIDE_THREE)
+//                            )
                         },
                         content = {
                             Column {
@@ -299,9 +299,9 @@ fun BillboardDataUploadDashboardMain(
                             .padding(vertical = 4.dp)
                             .fillMaxWidth(),
                         onTap = {
-                            captureRecordUiModel.captureEventSink(
-                                CaptureRecordEventSink.StartBillBoardSurvey(BillboardSides.SIDE_FOUR)
-                            )
+//                            captureRecordUiModel.captureEventSink(
+//                                CaptureRecordEventSink.StartBillBoardSurvey(BillboardSides.SIDE_FOUR)
+//                            )
                         },
                         content = {
                             Column(
@@ -349,10 +349,10 @@ fun BillboardDataUploadDashboardMain(
                         .padding(vertical = 4.dp)
                         .fillMaxWidth(),
                     onTap = {
-                        if (shouldEnableWidePic(uiState))
-                        captureRecordUiModel.captureEventSink(
-                            CaptureRecordEventSink.StartBillBoardSurvey(BillboardSides.MAIN)
-                        )
+                        //if (shouldEnableWidePic(uiState))
+//                        captureRecordUiModel.captureEventSink(
+//                            CaptureRecordEventSink.StartBillBoardSurvey(BillboardSides.MAIN)
+//                        )
                     },
                     content = {
                         Row(

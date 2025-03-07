@@ -115,7 +115,7 @@ fun CaptureBillboardMain(
 
 
     if (uiEvent is CaptureRecordUiEvent.CaptureAdded){
-        if (captureRecordUiState.selectedBillboardSidesType != BillboardSides.MAIN) {
+        if (captureRecordUiState.newCaptureSelectedSide != BillboardSides.MAIN) {
             appState?.navController?.navigate(
                 AppDestinations.ReviewBillboardData,
                 navOptions = navOptions {

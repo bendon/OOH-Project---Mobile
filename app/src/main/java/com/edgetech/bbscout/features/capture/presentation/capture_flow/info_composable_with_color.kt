@@ -56,7 +56,8 @@ fun InfoComposableContainer(
                     Color.Red
                 }
             }
-        )
+        ),
+        shape = MaterialTheme.shapes.small
     ) {
         content()
     }
