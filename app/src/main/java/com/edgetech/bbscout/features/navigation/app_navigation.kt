@@ -32,6 +32,7 @@ import com.edgetech.bbscout.features.capture.domain.model.BillboardSides
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
 import com.edgetech.bbscout.features.capture.presentation.camera_capture.CaptureBillboardScreen
 import com.edgetech.bbscout.features.capture.presentation.capture_detail.CaptureDetailScreen
+import com.edgetech.bbscout.features.capture.presentation.capture_flow.create_new_record.NewCaptureScreen
 import com.edgetech.bbscout.features.capture.presentation.capture_listing.CapturesListingScreen
 import com.edgetech.bbscout.features.capture.presentation.review_data.EditRecordScreen
 import com.edgetech.bbscout.features.capture.presentation.review_data.OnDataAdded
@@ -143,6 +144,10 @@ fun DirackAppNavigation(
             WideShotReviewScreen(appState, captureRecordViewmodel)
         }
 
+        composable<AppDestinations.NewCaptureFlow> {
+            NewCaptureScreen(appState, captureRecordViewmodel)
+        }
+
     }
 
 }
@@ -248,5 +253,8 @@ sealed interface AppDestinations {
 
     @Serializable
     data object ForgotPassword : AppDestinations
+
+    @Serializable
+    data object NewCaptureFlow: AppDestinations
 
 }
