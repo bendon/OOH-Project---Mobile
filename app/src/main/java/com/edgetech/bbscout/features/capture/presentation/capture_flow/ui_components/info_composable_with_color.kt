@@ -1,4 +1,4 @@
-package com.edgetech.bbscout.features.capture.presentation.capture_flow
+package com.edgetech.bbscout.features.capture.presentation.capture_flow.ui_components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.MaterialTheme
@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.edgetech.bbscout.ui.theme.lightBlue
 import com.edgetech.bbscout.ui.theme.mainBlue
+import com.edgetech.bbscout.ui.theme.mainGreen
 
 
 @Composable
@@ -17,12 +18,12 @@ fun InfoComposableContainer(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 
-){
+    ){
     Surface(
         modifier = modifier,
         color = when(type){
             InfoComposableType.GREEN -> {
-                Color.Green.copy(alpha = 0.2f)
+                mainGreen.copy(alpha = 0.2f)
             }
             InfoComposableType.BLUE -> {
                 lightBlue
@@ -41,7 +42,7 @@ fun InfoComposableContainer(
             width = 2.dp,
             color = when(type){
                 InfoComposableType.GREEN -> {
-                    Color.Green
+                    mainGreen
                 }
                 InfoComposableType.BLUE -> {
                     mainBlue

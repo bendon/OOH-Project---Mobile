@@ -17,8 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.edgetech.bbscout.features.capture.presentation.capture_flow.InfoComposableContainer
-import com.edgetech.bbscout.features.capture.presentation.capture_flow.InfoComposableType
+import com.edgetech.bbscout.features.capture.presentation.capture_flow.ui_components.InfoComposableContainer
+import com.edgetech.bbscout.features.capture.presentation.capture_flow.ui_components.InfoComposableType
 
 
 @Composable
