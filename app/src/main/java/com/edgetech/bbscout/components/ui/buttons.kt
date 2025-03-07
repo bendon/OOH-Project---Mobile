@@ -69,6 +69,8 @@ fun NonLoadingSecButton(
     modifier: Modifier = Modifier,
     disableOnTap: Boolean = true,
     timeOut: Duration = 3.seconds,
+    isEnabled: Boolean = true,
+    isLoading: Boolean = false,
     onTap: () -> Unit,
     content: @Composable RowScope.() -> Unit,
 ) {
@@ -76,6 +78,8 @@ fun NonLoadingSecButton(
         modifier = modifier
             .sizeIn(minHeight = 40.dp),
         loadOnTap = false,
+        isEnabled = isEnabled,
+        pIsLoading = isLoading,
         disableOnTap = disableOnTap,
         timeOut = timeOut,
         onTap = onTap,
