@@ -680,7 +680,6 @@ class CaptureRecordViewmodel @Inject constructor(
         }
     }
 
-
     private fun getCapture(eventSink: CaptureRecordEventSink.OnGetCapture) {
         viewModelScope.launch(ioDispatcher) {
             _captureUiState.update {
@@ -1102,6 +1101,15 @@ class CaptureRecordViewmodel @Inject constructor(
             targetGender = res?.target_gender,
             campainSocials = res?.site_url,
             billboardType = res?.billboard_type,
+            ownerContacts = res?.owner?.owner_phone,
+            ownerEmail = res?.owner?.owner_email,
+            billboardOwner = res?.owner?.owner_name,
+            structure = res?.structure,
+            material = res?.material,
+            angle = res?.angle,
+            visibility = res?.visibility,
+            illumination = res?.illumination,
+            ownerWebsite = res?.owner?.owner_website
         )
       checkBillboardStatus()
         return billboard
@@ -1291,7 +1299,7 @@ class CaptureRecordViewmodel @Inject constructor(
                 owner = info.billboardOwner,
                 objectType = info.objectType,
                 city = userLocationEntity.locationCity,
-                ownerContacts = StringList.fromList(info.ownerContacts)?.toJson(),
+                ownerContacts = LongList.fromList(info.ownerContacts)?.toJson(),
                 ownerEmail = StringList.fromList(info.ownerEmail)?.toJson(),
                 structure = info.structure,
                 material = info.material,

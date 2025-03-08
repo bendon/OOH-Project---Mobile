@@ -40,13 +40,14 @@ data class BillboardExtractedInfo(
     val billboardLocation: UserLocationEntity? = null,
     val distanceFromBillboard: Double? = null,
     val isDistanceValid: Boolean? = null,
-    val ownerContacts: List<String>? = null,
+    val ownerContacts: List<Long>? = null,
     val ownerEmail: List<String>? = null,
     val structure: String? = null,
     val material: String? = null,
     val angle: String? = null,
     val visibility: String? = null,
     val illumination: String? = null,
+    val ownerWebsite: String? = null,
 )
 
 

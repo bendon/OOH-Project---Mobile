@@ -17,5 +17,11 @@ data class BBScoutAiAnalyserResponse(
     val target_audience: String? = null,
     val target_gender: String? = null,
     val object_type: String? = null,
-    val billboard_type: String? = null
+    val billboard_type: String? = null,
+    val owner : OwnerInformation? = null,
+    val structure: String? = null,
+    val material: String? = null,
+    val illumination: String? = null,
+    val visibility: String? = null,
+    val angle: String? = null,
 ): ApiResponse
