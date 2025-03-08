@@ -32,6 +32,7 @@ import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.ui_components.CreateCaptureGroupHeading
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.ui_components.InfoComposableContainer
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.ui_components.InfoComposableType
+import com.edgetech.bbscout.features.navigation.AppDestinations
 import com.edgetech.bbscout.ui.theme.mainBlue
 
 
@@ -76,7 +77,9 @@ fun SubmitNewCapture(
                 MainLoadingButton(
                     pIsLoading = uiState.isLoading,
                     onTap = {
-
+                        captureRecordUiModel.captureEventSink(
+                            CaptureRecordEventSink.OnUiNext
+                        )
                     },
                     modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp).fillMaxWidth()
                 ) {

@@ -139,6 +139,8 @@ sealed class CaptureRecordEventSink : AppEventSink {
     data object OnUiBack : CaptureRecordEventSink()
 
     data object OnRecapture :  CaptureRecordEventSink()
+
+    data class OnStartSideContentVerification(val side: BillboardSides):  CaptureRecordEventSink()
 }
 
 

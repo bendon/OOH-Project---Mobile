@@ -716,7 +716,8 @@ fun EditRecordMain(
                             isOccupied == true,
                             onClick = {
                                 isOccupied = true
-                            }
+                            },
+                            modifier = Modifier.padding(end = 8.dp)
                         )
                         BillboardSideCountComp(
                             "No",
@@ -736,6 +737,13 @@ fun EditRecordMain(
                         onItemSelected = { index, item ->
                             billboardType = item
                         },
+                    )
+                    SubTitleComp(
+                        "Owner website",
+                    )
+                    ExtractedInfoEditText(
+                        textState = ownerWebsite,
+                        placeholder = "Owner website"
                     )
                     GroupHeader(title = "Phone numbers", onIconClick = {
                         selectedEditTypeList = RecordTypeList.OWNNER_PHONE
@@ -762,10 +770,7 @@ fun EditRecordMain(
                             ownerEmail = ownerEmail.minus(it)
                         })
                     }
-                    ExtractedInfoEditText(
-                        textState = ownerWebsite,
-                        placeholder = "Owner website"
-                    )
+
 
 
                 }

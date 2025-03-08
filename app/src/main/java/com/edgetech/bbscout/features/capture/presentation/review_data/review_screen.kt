@@ -408,6 +408,12 @@ fun BillboardCaptureComp(
                 value = currentData?.billboardType?.ifEmptySetNull() ?: "N/A",
 
                 )
+
+            DetailDataOneValue(
+                title = "Billboard occupied",
+                value = if (currentData?.isOccupied == true) "Yes" else if (currentData?.isOccupied == false) "No" else "N/A",
+
+                )
             DataDetailMultipleValues(
                 "Owner email",
                 currentData?.ownerEmail
@@ -429,7 +435,7 @@ fun BillboardCaptureComp(
     ReviewDataCard(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp),
+            .padding(top = 8.dp, bottom = 16.dp),
     ) {
         Column(
             modifier = Modifier.padding(16.dp)

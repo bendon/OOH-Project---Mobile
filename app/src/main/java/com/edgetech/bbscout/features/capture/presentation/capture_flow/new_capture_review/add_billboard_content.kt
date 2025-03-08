@@ -19,11 +19,13 @@ import androidx.compose.ui.unit.dp
 import com.diracks.app.app.app_state.BBScoutAppState
 import com.edgetech.bbscout.components.ui.ButtonContent
 import com.edgetech.bbscout.components.ui.MainLoadingButton
+import com.edgetech.bbscout.features.capture.domain.model.BillboardSides
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.ui_components.CreateCaptureGroupHeading
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.ui_components.InPageAlert
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.ui_components.NewCaptureImageReview
+import com.edgetech.bbscout.features.navigation.AppDestinations
 
 
 @Composable
@@ -55,28 +57,44 @@ fun AddBillboardContent(
                         NewCaptureImageReview(
                             uiState.sideOneExtractedInfo?.billboardImage,
                             "Side 1",
-                            modifier = Modifier.padding(2.dp)
+                            modifier = Modifier.padding(2.dp),
+                            onTap = {
+                                captureRecordUiModel.captureEventSink(CaptureRecordEventSink.OnStartSideContentVerification(BillboardSides.SIDE_ONE))
+                                appState?.navController?.navigate(AppDestinations.ReviewBillboardData)
+                            }
                         )
                     }
                     1 -> {
                         NewCaptureImageReview(
                             uiState.sideTwoExtractedInfo?.billboardImage,
                             "Side 2",
-                            modifier = Modifier.padding(2.dp)
+                            modifier = Modifier.padding(2.dp),
+                            onTap = {
+                                captureRecordUiModel.captureEventSink(CaptureRecordEventSink.OnStartSideContentVerification(BillboardSides.SIDE_TWO))
+                                appState?.navController?.navigate(AppDestinations.ReviewBillboardData)
+                            }
                         )
                     }
                     2 -> {
                         NewCaptureImageReview(
                             uiState.sideThreeExtractedInfo?.billboardImage,
                             "Side 3",
-                            modifier = Modifier.padding(2.dp)
+                            modifier = Modifier.padding(2.dp),
+                            onTap = {
+                                captureRecordUiModel.captureEventSink(CaptureRecordEventSink.OnStartSideContentVerification(BillboardSides.SIDE_THREE))
+                                appState?.navController?.navigate(AppDestinations.ReviewBillboardData)
+                            }
                         )
                     }
                     3 -> {
                         NewCaptureImageReview(
                             uiState.sideFourExtractedInfo?.billboardImage,
                             "Side 4",
-                            modifier = Modifier.padding(2.dp)
+                            modifier = Modifier.padding(2.dp),
+                            onTap = {
+                                captureRecordUiModel.captureEventSink(CaptureRecordEventSink.OnStartSideContentVerification(BillboardSides.SIDE_FOUR))
+                                appState?.navController?.navigate(AppDestinations.ReviewBillboardData)
+                            }
                         )
                     }
                 }

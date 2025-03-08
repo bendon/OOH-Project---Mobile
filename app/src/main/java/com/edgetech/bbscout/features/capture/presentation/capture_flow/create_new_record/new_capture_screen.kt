@@ -176,6 +176,7 @@ fun NewCaptureParentMain(
             Row(
                 modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
             ) {
+                if (uiState.newCaptureCurrentStep != 1)
                 NonLoadingSecButton(
                     isEnabled = uiState.newCaptureBackEnabled,
                     onTap = {
@@ -188,6 +189,7 @@ fun NewCaptureParentMain(
                     )
                 }
                 Spacer(modifier = Modifier.weight(1f))
+                if (uiState.newCaptureCurrentStep != uiState.newCaptureNumberOfSteps)
                 MainLoadingButton (
                     isEnabled = uiState.newCaptureNextIsEnabled,
                     onTap = {

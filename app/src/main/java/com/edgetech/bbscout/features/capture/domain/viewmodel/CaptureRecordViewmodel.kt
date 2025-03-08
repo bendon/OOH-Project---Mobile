@@ -145,6 +145,14 @@ class CaptureRecordViewmodel @Inject constructor(
             CaptureRecordEventSink.OnRecapture -> {
                 onRecapture(eventSink)
             }
+
+            is CaptureRecordEventSink.OnStartSideContentVerification -> {
+                _captureUiState.update {
+                    it.copy(
+                        newCaptureSelectedSide = eventSink.side
+                    )
+                }
+            }
         }
     }
 
@@ -576,12 +584,12 @@ class CaptureRecordViewmodel @Inject constructor(
             }
             return
         }
-        if (getBillboardSideToUpdate().brandCampaign.isNullOrEmpty()) {
-            _captureUiEvent.update {
-                CaptureRecordUiEvent.Error(BrandDescriptionErrorException, eventSink)
-            }
-            return
-        }
+//        if (getBillboardSideToUpdate().brandCampaign.isNullOrEmpty()) {
+//            _captureUiEvent.update {
+//                CaptureRecordUiEvent.Error(BrandDescriptionErrorException, eventSink)
+//            }
+//            return
+//        }
         _captureUiEvent.update {
             CaptureRecordUiEvent.BillboardDataSet
         }
@@ -1100,7 +1108,7 @@ class CaptureRecordViewmodel @Inject constructor(
             targetAge = res?.target_age,
             targetGender = res?.target_gender,
             campainSocials = res?.site_url,
-            billboardType = res?.billboard_type,
+           // billboardType = res?.billboard_type,
             ownerContacts = res?.owner?.owner_phone,
             ownerEmail = res?.owner?.owner_email,
             billboardOwner = res?.owner?.owner_name,
