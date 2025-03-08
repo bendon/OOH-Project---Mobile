@@ -393,8 +393,6 @@ fun BillboardCaptureComp(
                         )
                     )
                 }
-
-
             )
 
             DetailDataOneValue(
@@ -410,6 +408,46 @@ fun BillboardCaptureComp(
                 value = currentData?.billboardType?.ifEmptySetNull() ?: "N/A",
 
                 )
+            DataDetailMultipleValues(
+                "Owner email",
+                currentData?.ownerEmail
+            )
+
+            DataDetailMultipleValues(
+                "Owner phone number",
+                currentData?.phone?.map { it.toString() }
+            )
+
+            DetailDataOneValue(
+                "Owner website",
+                value = currentData?.ownerWebsite.ifEmptySetNull() ?: "N/A",
+            )
+
+        }
+    }
+
+    ReviewDataCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp),
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+
+            DataDetailHeading(
+                R.drawable.billboard_svgrepo_com,
+                "Billboard structure",
+                true,
+                onEditClick = {
+                    appState?.navController?.navigate(
+                        AppDestinations.EditCapture(
+                            null,
+                            RecordType.BILLBOARD_STRUCTURE
+                        )
+                    )
+                }
+            )
 
             DetailDataOneValue(
                 title = "Billboard height",
@@ -422,6 +460,36 @@ fun BillboardCaptureComp(
                 value = currentData?.billboardWidth?.ifEmptySetNull() ?: "N/A",
 
                 )
+
+            DetailDataOneValue(
+                title = "Billboard structure",
+                value = currentData?.structure.ifEmptySetNull() ?: "N/A",
+
+                )
+
+            DetailDataOneValue(
+                title = "Billboard material",
+                value = currentData?.material.ifEmptySetNull() ?: "N/A",
+
+                )
+
+            DetailDataOneValue(
+                title = "Billboard illumination",
+                value = currentData?.illumination.ifEmptySetNull() ?: "N/A",
+            )
+
+            DetailDataOneValue(
+                title = "Billboard visibility",
+                value = currentData?.visibility.ifEmptySetNull() ?: "N/A",
+
+                )
+
+            DetailDataOneValue(
+                title = "Billboard angle",
+                value = currentData?.angle.ifEmptySetNull() ?: "N/A",
+
+                )
+
 
         }
     }

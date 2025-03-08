@@ -9,6 +9,7 @@ enum class RecordType {
     CAMPAIGN,
     BILLBOARD_INFO,
     CONTACT,
+    BILLBOARD_STRUCTURE,
     OTHERS_NEW,
     OTHERS_OLD,
 }
