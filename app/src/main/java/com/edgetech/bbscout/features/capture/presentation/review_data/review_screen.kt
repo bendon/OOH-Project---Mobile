@@ -75,6 +75,9 @@ import com.edgetech.bbscout.features.capture.domain.model.LocationErrorException
 import com.edgetech.bbscout.features.capture.domain.model.NoBillboardFoundException
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
 import com.edgetech.bbscout.features.capture.presentation.GetLocationComp
+import com.edgetech.bbscout.features.capture.presentation.capture_detail.DataDetailHeading
+import com.edgetech.bbscout.features.capture.presentation.capture_detail.DataDetailMultipleValues
+import com.edgetech.bbscout.features.capture.presentation.capture_detail.DetailDataOneValue
 import com.edgetech.bbscout.features.navigation.AppDestinations
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -123,8 +126,12 @@ fun ReviewRecordMain(
         position = CameraPosition.fromLatLngZoom(selectedLocation ?: LatLng(-0.0236, 37.9062), 5f)
     }
 
-    selectedLocation = LatLng(captureRecordUiState.selectedLocation?.latitude ?: 0.0, captureRecordUiState.selectedLocation?.longitude ?: 0.0)
-    cameraPositionState.position = CameraPosition.fromLatLngZoom(selectedLocation ?: LatLng(-0.0236, 37.9062), 5f)
+    selectedLocation = LatLng(
+        captureRecordUiState.selectedLocation?.latitude ?: 0.0,
+        captureRecordUiState.selectedLocation?.longitude ?: 0.0
+    )
+    cameraPositionState.position =
+        CameraPosition.fromLatLngZoom(selectedLocation ?: LatLng(-0.0236, 37.9062), 5f)
     LaunchedEffect(recordId) {
 //        captureRecordUiModel.captureEventSink(
 //            CaptureRecordEventSink.OnAnalyseImage
@@ -146,22 +153,21 @@ fun ReviewRecordMain(
         )
 
     }
-    if (currentBillBoadUiEvent is CaptureRecordUiEvent.BillboardDataSet){
-       appState?.navController?.navigateUp()
+    if (currentBillBoadUiEvent is CaptureRecordUiEvent.BillboardDataSet) {
+        appState?.navController?.navigateUp()
         captureRecordUiModel.captureEventSink(
             CaptureRecordEventSink.ResetUiEvent
         )
-    }
-    else if (currentBillBoadUiEvent is CaptureRecordUiEvent.Error) {
+    } else if (currentBillBoadUiEvent is CaptureRecordUiEvent.Error) {
         val request = (currentBillBoadUiEvent as CaptureRecordUiEvent.Error)
-        if (request.exception is BrandDescriptionErrorException){
+        if (request.exception is BrandDescriptionErrorException) {
             appState?.navController?.navigate(
                 AppDestinations.EditCapture(
                     null,
                     RecordType.CAMPAIGN
                 )
             )
-        } else if (request.exception is BillboardTypeErrorException){
+        } else if (request.exception is BillboardTypeErrorException) {
             appState?.navController?.navigate(
                 AppDestinations.EditCapture(
                     null,
@@ -366,128 +372,57 @@ fun BillboardCaptureComp(
     currentData: BillboardExtractedInfo?
 ) {
 
-    Card(
-        shape = MaterialTheme.shapes.small,
+    ReviewDataCard(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 8.dp)
-            .padding(top = 16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+            .padding(top = 8.dp),
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Row(
-                verticalAlignment = CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Surface(
-                    shape = CircleShape,
-                    modifier = Modifier.size(28.dp)
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_billboard),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(6.dp),
-                        colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.primary)
-                    )
-                }
-                Text(
-                    text = "Billboard information",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .weight(1f)
-                )
-                Icon(Icons.Outlined.Edit, "", tint = Color.Gray, modifier = Modifier.clickable {
+
+            DataDetailHeading(
+                R.drawable.ic_billboard,
+                "Billboard information",
+                true,
+                onEditClick = {
                     appState?.navController?.navigate(
                         AppDestinations.EditCapture(
                             null,
                             RecordType.BILLBOARD_INFO
                         )
                     )
-                })
-            }
+                }
 
-            Row(
+
+            )
+
+            DetailDataOneValue(
+                title = "Billboard owner",
+                value = currentData?.billboardOwner.ifEmptySetNull() ?: "N/A",
                 modifier = Modifier
                     .padding(top = 16.dp, bottom = 4.dp)
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Billboard owner",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier.padding(end = 16.dp)
-                )
-                Text(
-                    text = currentData?.billboardOwner.ifEmptySetNull() ?: "N/A",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .padding(top = 6.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Billboard type",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier.padding(end = 16.dp)
-                )
-                Text(
-                    text = currentData?.billboardType?.ifEmptySetNull() ?: "N/A",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            )
 
-            Row(
-                modifier = Modifier
-                    .padding(top = 6.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Billboard height",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier.padding(end = 16.dp)
-                )
-                Text(
-                    text = currentData?.billboardLength.ifEmptySetNull() ?: "N/A",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            DetailDataOneValue(
+                title = "Billboard type",
+                value = currentData?.billboardType?.ifEmptySetNull() ?: "N/A",
 
-            Row(
-                modifier = Modifier
-                    .padding(top = 6.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Billboard width",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier.padding(end = 16.dp)
                 )
-                Text(
-                    text = currentData?.billboardWidth?.ifEmptySetNull() ?: "N/A",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
+
+            DetailDataOneValue(
+                title = "Billboard height",
+                value = currentData?.billboardLength.ifEmptySetNull() ?: "N/A",
+
                 )
-            }
+
+            DetailDataOneValue(
+                title = "Billboard width",
+                value = currentData?.billboardWidth?.ifEmptySetNull() ?: "N/A",
+
+                )
+
         }
     }
 
@@ -497,73 +432,38 @@ fun BillboardCaptureComp(
 fun CampaignCapture(
     appState: BBScoutAppState?,
     currentData: BillboardExtractedInfo?
-){
-    Card(
-        shape = MaterialTheme.shapes.small,
+) {
+    ReviewDataCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Row(
-                verticalAlignment = CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Surface(
-                    shape = CircleShape,
-                    modifier = Modifier.size(28.dp)
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.megaphone_line_svgrepo_com),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(6.dp),
-                        colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.primary)
-                    )
-                }
-                Text(
-                    text = "Campaign information",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .weight(1f)
-                )
-                Icon(Icons.Outlined.Edit, "", tint = Color.Gray, modifier = Modifier.clickable {
+
+            DataDetailHeading(
+                R.drawable.megaphone_line_svgrepo_com,
+                "Campaign information",
+                true,
+                onEditClick = {
                     appState?.navController?.navigate(
                         AppDestinations.EditCapture(
                             null,
                             RecordType.CAMPAIGN
                         )
                     )
-                })
-            }
+                }
+            )
 
-            Row(
+            DetailDataOneValue(
+                title = "Campaign brand",
+                value = currentData?.brandName?.ifEmptySetNull() ?: "Unknown",
                 modifier = Modifier
                     .padding(top = 16.dp, bottom = 4.dp)
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Campaign brand",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier.padding(end = 16.dp)
-                )
-                Text(
-                    text = currentData?.brandName?.ifEmptySetNull()
-                        ?: "Unknown",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            )
+
             Text(
                 text = "Campaign",
                 fontSize = 14.sp,
@@ -577,265 +477,70 @@ fun CampaignCapture(
                 modifier = Modifier.padding(end = 16.dp)
             )
 
-            Row(
-                modifier = Modifier
-                    .padding(top = 6.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Target age",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier.padding(end = 16.dp)
-                )
-                Text(
-                    text = currentData?.targetAge?.ifEmptySetNull()
-                        ?: "Unknown",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            DetailDataOneValue(
+                title = "Target age",
+                value = currentData?.targetAge?.ifEmptySetNull()
+                    ?: "Unknown",
 
-            Row(
-                modifier = Modifier
-                    .padding(top = 6.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Target gender",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier.padding(end = 16.dp)
                 )
-                Text(
-                    text = currentData?.targetGender?.ifEmptySetNull()
-                        ?: "Unknown",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
 
-            Row(
-                modifier = Modifier
-                    .padding(top = 6.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Products",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier.padding(end = 16.dp)
+            DetailDataOneValue(
+                title = "Target gender",
+                value = currentData?.targetGender?.ifEmptySetNull()
+                    ?: "Unknown",
+
                 )
-                Column(
-                    horizontalAlignment = Alignment.End
-                ) {
-                    currentData?.products?.forEach {
-                        Text(
-                            text = it,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(vertical = 4.dp)
-                        )
-                    }
-                    if (currentData?.products.isNullOrEmpty()){
-                        Text(
-                            text = "N/A",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                        )
-                    }
-                }
-            }
+
+            DataDetailMultipleValues(
+                "Products",
+                currentData?.products,
+            )
+
         }
 
     }
-    Card(
-        shape = MaterialTheme.shapes.small,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp)
-            .padding(top = 16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-    ) {
+    ReviewDataCard {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Row(
-                verticalAlignment = CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Surface(
-                    shape = CircleShape,
-                    modifier = Modifier.size(28.dp)
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.communication_global_internet_svgrepo_com),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(6.dp),
-                        colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.primary)
-                    )
-                }
-                Text(
-                    text = "Campain communication channel",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .weight(1f)
-                )
-                Icon(Icons.Outlined.Edit, "", tint = Color.Gray, modifier = Modifier.clickable {
+            DataDetailHeading(
+                R.drawable.communication_global_internet_svgrepo_com,
+                "Communication channel",
+                true,
+                onEditClick = {
                     appState?.navController?.navigate(
                         AppDestinations.EditCapture(
                             null,
                             RecordType.CONTACT
                         )
                     )
-                })
-            }
-            Row(
+                }
+            )
+
+
+            DataDetailMultipleValues(
+                title = "Phone number",
+                values = currentData?.phone?.map { it.toString() },
                 modifier = Modifier
                     .padding(top = 16.dp)
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Phone number",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier.padding(end = 16.dp)
-                )
-                Column(
-                    horizontalAlignment = Alignment.End
-                ) {
-                    currentData?.phone?.forEach {
-                        Text(
-                            text = it.toString(),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(vertical = 4.dp)
-                        )
-                    }
-                    if (currentData?.phone.isNullOrEmpty()){
-                        Text(
-                            text = "N/A",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                        )
-                    }
 
-                }
-            }
-
-            Row(
-                modifier = Modifier
-                    .padding(top = 6.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Email",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier.padding(end = 16.dp)
                 )
-                Column(
-                    horizontalAlignment = Alignment.End
-                ) {
-                    currentData?.email?.forEach {
-                        Text(
-                            text = it,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(vertical = 4.dp)
-                        )
-                    }
-                    if (currentData?.email.isNullOrEmpty()){
-                        Text(
-                            text = "N/A",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                        )
-                    }
-                }
-            }
 
-            Row(
-                modifier = Modifier
-                    .padding(top = 6.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Website",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier.padding(end = 16.dp)
-                )
-                Column(
-                    horizontalAlignment = Alignment.End
-                ) {
-                    currentData?.siteUrl?.forEach {
-                        Text(
-                            text = it,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(vertical = 4.dp)
-                        )
-                    }
-                    if (currentData?.siteUrl.isNullOrEmpty()){
-                        Text(
-                            text = "N/A",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                        )
-                    }
-                }
-            }
+            DataDetailMultipleValues(
+                title = "Email",
+                values = currentData?.email
+            )
 
-            Row(
-                modifier = Modifier
-                    .padding(top = 6.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Social media",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier.padding(end = 16.dp)
-                )
-                Column(
-                    horizontalAlignment = Alignment.End
-                ) {
-                    currentData?.campainSocials?.forEach {
-                        Text(
-                            text = it,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(vertical = 4.dp)
-                        )
-                    }
-                    if (currentData?.campainSocials.isNullOrEmpty()){
-                        Text(
-                            text = "N/A",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                        )
-                    }
-                }
-            }
+            DataDetailMultipleValues(
+                title = "Website",
+                values = currentData?.siteUrl
+            )
+
+            DataDetailMultipleValues(
+                title = "Social media",
+                values = currentData?.campainSocials
+            )
 
         }
     }
@@ -847,13 +552,10 @@ fun BillboardLocationComp(
     selectedLoc: LatLng,
     cameraPositionState: CameraPositionState
 ) {
-    Card(
-        shape = MaterialTheme.shapes.small,
+    ReviewDataCard(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+            .padding(top = 8.dp),
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -904,14 +606,11 @@ fun BillboardLocationComp(
         }
     }
 
-    Card(
-        shape = MaterialTheme.shapes.small,
+    ReviewDataCard(
         modifier = Modifier
             .fillMaxWidth()
             .height(200.dp)
             .padding(top = 16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
     ) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
