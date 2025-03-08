@@ -80,7 +80,6 @@ sealed class CaptureRecordUiEvent {
     data object CaptureAdded : CaptureRecordUiEvent()
 
 
-
 }
 
 

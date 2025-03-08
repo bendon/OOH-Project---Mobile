@@ -35,6 +35,7 @@ import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiState
 import com.edgetech.bbscout.features.capture.domain.model.NoBillboardFoundException
 import com.edgetech.bbscout.features.capture.domain.model.closeUpDistance
 import com.edgetech.bbscout.features.capture.domain.model.longShotDistance
+import com.edgetech.bbscout.features.capture.domain.use_cases.isBillboardValid
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.create_new_record.NewCaptureDestinations
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -941,20 +942,8 @@ class CaptureRecordViewmodel @Inject constructor(
 
     private fun onEditCapture(eventSink: CaptureRecordEventSink.OnEditCaptureEvent) {
 
-//        val billboard = getBillboardSideToUpdate().copy(
-//            fullImage = fileBitMap.data!!,
-//            fileUri = eventSink.fileUri
-//        )
         updateBillBoardState(eventSink.billboardData)
 
-//        _captureUiState.update {
-//            it.copy(
-//                billboardData = eventSink.billboardData
-//            )
-//        }
-//        _captureUiEvent.update {
-//            CaptureRecordUiEvent.CaptureAdded
-//        }
     }
 
 
@@ -1013,16 +1002,16 @@ class CaptureRecordViewmodel @Inject constructor(
             repository.analyzeFile(fileMultipart)
                 .onSuccess { res ->
 
-                    if (res?.object_type == null || res.billboard_type == null) {
-                        _captureUiEvent.update {
-                            CaptureRecordUiEvent.Error(
-                                NoBillboardFoundException, eventSink
-                            )
-                        }
-                        val bill = getBillboardSideToUpdate()
-                        updateBillBoardState(bill.copy(closedUpUri = null, billboardImage = null))
-
-                    }
+//                    if (res?.object_type == null || res.billboard_type == null) {
+//                        _captureUiEvent.update {
+//                            CaptureRecordUiEvent.Error(
+//                                NoBillboardFoundException, eventSink
+//                            )
+//                        }
+//                        val bill = getBillboardSideToUpdate()
+//                        updateBillBoardState(bill.copy(closedUpUri = null, billboardImage = null))
+//
+//                    }
 
                     val billboard = getBillboardSideToUpdate()
                     val updatedBillboard = updateBillboardSideAiData(billboard, res)
@@ -1149,8 +1138,7 @@ class CaptureRecordViewmodel @Inject constructor(
             NewCaptureDestinations.BillboardCloseUpShot -> {
                 when (state.newCaptureSelectedSide) {
                     BillboardSides.SIDE_ONE -> {
-                        val valid =
-                            state.sideOneExtractedInfo?.closedUpUri != null && state.sideOneExtractedInfo.isDistanceValid == true && state.sideOneExtractedInfo.billboardLocation != null && !state.sideOneExtractedInfo.objectType.isNullOrEmpty() && !state.sideOneExtractedInfo.billboardType.isNullOrEmpty()
+                        val valid = isBillboardValid(state.sideOneExtractedInfo)
                         _captureUiState.update {
                             it.copy(
                                 newCaptureNextIsEnabled = valid,
@@ -1162,8 +1150,7 @@ class CaptureRecordViewmodel @Inject constructor(
                     }
 
                     BillboardSides.SIDE_TWO -> {
-                        val valid =
-                            state.sideTwoExtractedInfo?.closedUpUri != null && state.sideTwoExtractedInfo.isDistanceValid == true && state.sideTwoExtractedInfo.billboardLocation != null && !state.sideTwoExtractedInfo.objectType.isNullOrEmpty() && !state.sideTwoExtractedInfo.billboardType.isNullOrEmpty()
+                        val valid = isBillboardValid(state.sideTwoExtractedInfo)
                         _captureUiState.update {
                             it.copy(
                                 newCaptureNextIsEnabled = valid,
@@ -1176,8 +1163,7 @@ class CaptureRecordViewmodel @Inject constructor(
                     }
 
                     BillboardSides.SIDE_THREE -> {
-                        val valid =
-                            state.sideThreeExtractedInfo?.closedUpUri != null && state.sideThreeExtractedInfo.isDistanceValid == true && state.sideThreeExtractedInfo.billboardLocation != null && !state.sideThreeExtractedInfo.objectType.isNullOrEmpty() && !state.sideThreeExtractedInfo.billboardType.isNullOrEmpty()
+                        val valid = isBillboardValid(state.sideThreeExtractedInfo)
                         _captureUiState.update {
                             it.copy(
                                 newCaptureNextIsEnabled = valid,
@@ -1189,8 +1175,7 @@ class CaptureRecordViewmodel @Inject constructor(
                     }
 
                     BillboardSides.SIDE_FOUR -> {
-                        val valid =
-                            state.sideFourExtractedInfo?.closedUpUri != null && state.sideFourExtractedInfo.isDistanceValid == true && state.sideFourExtractedInfo.billboardLocation != null && !state.sideFourExtractedInfo.objectType.isNullOrEmpty() && !state.sideFourExtractedInfo.billboardType.isNullOrEmpty()
+                        val valid = isBillboardValid(state.sideFourExtractedInfo)
                         _captureUiState.update {
                             it.copy(
                                 newCaptureNextIsEnabled = valid,

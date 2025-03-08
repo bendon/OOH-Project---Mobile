@@ -396,7 +396,7 @@ fun GetLocation(
     val currentLocation by context.appLocation.observeAsState(AppLocation())
 
     LaunchedEffect(
-        key1 = currentLocation
+        key1 = Unit
     ) {
         context.getLocation()
     }

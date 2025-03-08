@@ -24,16 +24,35 @@ abstract class LocationAwareActivity : ComponentActivity() {
 
 
     val appLocation = MutableLiveData(AppLocation())
-
+    var loc: AppLocation? = null
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(p0: LocationResult) {
 
-            for (location in p0.locations){
 
-                appLocation.postValue(AppLocation(location.accuracy.toInt(), location.latitude, location.longitude))
-                log(appLocation.toString())
+            p0.locations.forEachIndexed { index, location ->
 
+                    if (loc == null) {
+
+                        appLocation.postValue(AppLocation(location.accuracy.toInt(), location.latitude, location.longitude))
+                        loc = AppLocation(
+                            location.accuracy.toInt(),
+                            location.latitude,
+                            location.longitude
+                        )
+
+                    } else {
+                        appLocation.postValue(AppLocation())
+                        loc = null
+                    }
+                log("Location source: $loc")
             }
+
+//            for (location in p0.locations){
+//                appLocation.postValue(AppLocation())
+//
+//                appLocation.postValue(AppLocation(location.accuracy.toInt(), location.latitude, location.longitude))
+//
+//            }
         }
     }
 
