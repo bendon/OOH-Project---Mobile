@@ -8,6 +8,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 
 
@@ -37,8 +38,8 @@ modifier: Modifier = Modifier
 ){
     Surface(
         modifier = modifier.fillMaxHeight(),
-        color = if(isComplete) MaterialTheme.colorScheme.surface else Color.Transparent,
-        shape = MaterialTheme.shapes.small
+        color = if(isComplete) MaterialTheme.colorScheme.primary else Color.Transparent,
+        shape = RectangleShape
     ) {
 
     }

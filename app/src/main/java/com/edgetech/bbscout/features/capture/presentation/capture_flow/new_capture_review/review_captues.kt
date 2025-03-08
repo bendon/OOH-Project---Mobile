@@ -133,6 +133,7 @@ fun ReviewCaptures(
                         NewCaptureImageReview(
                             uiState.sideOneExtractedInfo?.billboardImage,
                             "Side 1",
+                            modifier = Modifier.padding(2.dp)
                         )
                     }
                     1 -> {

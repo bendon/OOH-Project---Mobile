@@ -28,7 +28,6 @@ abstract class LocationAwareActivity : ComponentActivity() {
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(p0: LocationResult) {
 
-
             p0.locations.forEachIndexed { index, location ->
 
                     if (loc == null) {

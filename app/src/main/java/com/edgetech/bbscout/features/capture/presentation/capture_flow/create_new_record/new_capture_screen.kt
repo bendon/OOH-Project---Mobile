@@ -148,7 +148,6 @@ fun NewCaptureParentMain(
         Column(
             modifier = Modifier
                 .padding(it)
-                .padding(horizontal = 16.dp)
         ) {
             if(uiState.newCaptureNumberOfSteps != null){
                 Text(
@@ -156,26 +155,26 @@ fun NewCaptureParentMain(
                     fontSize = 14.sp,
                     color = Color.Gray,
                     modifier = Modifier
-                        .padding(top = 4.dp)
+                        .padding(top = 4.dp, ).padding(horizontal = 16.dp)
                         .fillMaxWidth(),
                 )
                 BBScoutStepper(
                     numberOfSteps = uiState.newCaptureNumberOfSteps!!,
                     currentStep = uiState.newCaptureCurrentStep,
-                    modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth()
+                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp).fillMaxWidth()
                 )
             }
             NewCaptureNavHost(
                 appState,
                 captureRecordUiModel,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f).padding(horizontal = 16.dp)
             )
             HorizontalDivider(
                 thickness = 2.dp,
                 color = MaterialTheme.colorScheme.surface,
             )
             Row(
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
             ) {
                 NonLoadingSecButton(
                     isEnabled = uiState.newCaptureBackEnabled,

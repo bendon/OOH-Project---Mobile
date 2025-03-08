@@ -12,6 +12,7 @@ import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.capture_data.CloseUpCapture
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.capture_data.LongSortCapture
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.get_inital_location.BillboardLocation
+import com.edgetech.bbscout.features.capture.presentation.capture_flow.new_capture_review.AddBillboardContent
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.new_capture_review.ReviewCaptures
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.new_capture_review.SubmitNewCapture
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.select_billboard_type.SelectCaptureTypeMain
@@ -59,6 +60,11 @@ fun NewCaptureNavHost(
             SubmitNewCapture(captureRecordUiModel, appState)
         }
 
+        composable<NewCaptureDestinations.SelectBillboardToAddContentTo> {
+            AddBillboardContent(captureRecordUiModel, appState)
+        }
+
+
     }
 }
 
@@ -83,6 +89,9 @@ sealed interface NewCaptureDestinations {
 
     @Serializable
     data object SubmitPhysicalData : NewCaptureDestinations
+
+    @Serializable
+    data object SelectBillboardToAddContentTo : NewCaptureDestinations
 
 
 

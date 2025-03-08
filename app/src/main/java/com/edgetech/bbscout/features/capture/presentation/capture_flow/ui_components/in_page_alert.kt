@@ -35,12 +35,12 @@ fun InPageAlert(
     isError: Boolean,
     title: String?,
     message: String?,
-    onRetry: (() -> Unit)?  = null,
-    onNext: (() -> Unit)?  = null,
+    onRetry: (() -> Unit)? = null,
+    onNext: (() -> Unit)? = null,
     retryText: String = "Retry",
     nextText: String = "Next",
     modifier: Modifier = Modifier
-){
+) {
     InfoComposableContainer(
         type = if (isSuccess) InfoComposableType.GREEN else if (isError) InfoComposableType.RED else InfoComposableType.BLUE,
         modifier = modifier
@@ -59,29 +59,31 @@ fun InPageAlert(
                         modifier = Modifier.size(24.dp)
                     )
                 else
-                Icon(
-                    imageVector =  if (isError) Icons.Outlined.Error else Icons.Outlined.Info,
-                    contentDescription = null,
-                    tint = if (isError) Color.Red else MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
+                    Icon(
+                        imageVector = if (isError) Icons.Outlined.Error else Icons.Outlined.Info,
+                        contentDescription = null,
+                        tint = if (isError) Color.Red else MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
                 Column(
-                    modifier = Modifier.padding(start = 8.dp).weight(1f),
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .weight(1f),
 
-                ) {
+                    ) {
                     if (!title.isNullOrEmpty())
                         Text(
                             text = title,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if(isSuccess) mainGreen else if (isError) Color.Red else MaterialTheme.colorScheme.onBackground,
+                            color = if (isSuccess) mainGreen else if (isError) Color.Red else MaterialTheme.colorScheme.onBackground,
                             modifier = Modifier.fillMaxWidth(),
                         )
                     if (!message.isNullOrEmpty())
                         Text(
                             text = message,
                             fontSize = 14.sp,
-                            color = if(isSuccess) mainGreen else if (isError) Color.Red else MaterialTheme.colorScheme.onBackground,
+                            color = if (isSuccess) mainGreen else if (isError) Color.Red else MaterialTheme.colorScheme.onBackground,
                             modifier = Modifier
                                 .padding(top = 4.dp)
                                 .fillMaxWidth(),
@@ -92,23 +94,33 @@ fun InPageAlert(
 
             }
 
-            if (onRetry != null){
+            if (onRetry != null) {
                 Button(
                     onClick = onRetry,
-                    modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .fillMaxWidth(),
                     shape = MaterialTheme.shapes.small,
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background,  contentColor = mainGreen),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        contentColor = mainGreen
+                    ),
                     border = BorderStroke(1.dp, mainGreen)
                 ) {
                     Text(text = retryText)
                 }
             }
-            if (onNext != null){
+            if (onNext != null) {
                 Button(
                     onClick = onNext,
-                    modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .fillMaxWidth(),
                     shape = MaterialTheme.shapes.small,
-                    colors = ButtonDefaults.buttonColors(containerColor = mainGreen, contentColor = Color.White)
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isSuccess) mainGreen else MaterialTheme.colorScheme.primary,
+                        contentColor = if (isSuccess) Color.White else MaterialTheme.colorScheme.onPrimary
+                    )
                 ) {
                     Text(text = nextText)
                 }
@@ -120,12 +132,12 @@ fun InPageAlert(
 
 @Preview
 @Composable
-fun InPageAlertPreview(){
+fun InPageAlertPreview() {
     InPageAlert(
         isSuccess = false,
         isError = true,
         title = "Alert Title",
         message = "Alert Message",
-       // onRetry = {},
+        // onRetry = {},
     )
 }

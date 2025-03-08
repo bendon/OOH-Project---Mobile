@@ -335,7 +335,8 @@ class CaptureRecordViewmodel @Inject constructor(
 
                     )
             }
-        } else if (state.newCaptureSelectedScreen == NewCaptureDestinations.SelectBillboardType) {
+        }
+        else if (state.newCaptureSelectedScreen == NewCaptureDestinations.SelectBillboardType) {
             _captureUiState.update {
                 it.copy(
                     newCaptureSelectedScreen = NewCaptureDestinations.BillboardLongShot,
@@ -411,10 +412,19 @@ class CaptureRecordViewmodel @Inject constructor(
                     )
                 }
             }
-        } else if (state.newCaptureSelectedScreen == NewCaptureDestinations.ConfirmAllDataCapture) {
+        }
+        else if (state.newCaptureSelectedScreen == NewCaptureDestinations.ConfirmAllDataCapture) {
             _captureUiState.update {
                 it.copy(
                     newCaptureSelectedScreen = NewCaptureDestinations.SubmitPhysicalData,
+                    newCaptureCurrentStep = it.newCaptureCurrentStep + 1,
+                )
+            }
+        }
+        else if (state.newCaptureSelectedScreen == NewCaptureDestinations.SubmitPhysicalData) {
+            _captureUiState.update {
+                it.copy(
+                    newCaptureSelectedScreen = NewCaptureDestinations.SelectBillboardToAddContentTo,
                     newCaptureCurrentStep = it.newCaptureCurrentStep + 1,
                     newCaptureNextIsEnabled = false
                 )
@@ -523,6 +533,16 @@ class CaptureRecordViewmodel @Inject constructor(
                     )
                 }
             }
+
+            NewCaptureDestinations.SelectBillboardToAddContentTo -> {
+                _captureUiState.update {
+                    it.copy(
+                        newCaptureSelectedScreen = NewCaptureDestinations.SubmitPhysicalData,
+                        newCaptureCurrentStep = state.createBillboardSideCount + 5,
+                        newCaptureNextText = "Next"
+                    )
+                }
+            }
         }
         checkBillboardStatus()
     }
@@ -574,6 +594,7 @@ class CaptureRecordViewmodel @Inject constructor(
                // newCaptureSelectedSide = eventSink.billboard,
                 newBillboardType = eventSink.type,
                 createBillboardSideCount = eventSink.billboard.code,
+                newCaptureNumberOfSteps = eventSink.billboard.code + 6 ,
                 billboardData = BillboardExtractedInfo(billboardSideInfo = BillboardSides.MAIN)
             )
         }
@@ -1227,6 +1248,14 @@ class CaptureRecordViewmodel @Inject constructor(
             }
 
             NewCaptureDestinations.SubmitPhysicalData -> {
+                _captureUiState.update {
+                    it.copy(
+                        newCaptureNextIsEnabled = true
+                    )
+                }
+            }
+
+            NewCaptureDestinations.SelectBillboardToAddContentTo -> {
                 _captureUiState.update {
                     it.copy(
                         //newCaptureNextIsEnabled = true,

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.InsertDriveFile
+import androidx.compose.material.icons.outlined.TextSnippet
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -43,7 +44,7 @@ fun SubmitNewCapture(
 
     Column {
         CreateCaptureGroupHeading(
-            Icons.Outlined.InsertDriveFile,
+            Icons.Outlined.TextSnippet,
             "Content identification",
             modifier = Modifier.padding(vertical = 8.dp)
         )
@@ -69,7 +70,7 @@ fun SubmitNewCapture(
                     InfoComposableType.BLUE_CONTAINER,
                     modifier = Modifier.padding(8.dp)
                 ){
-                    Icon(Icons.Outlined.InsertDriveFile, contentDescription = null, tint = mainBlue, modifier = Modifier.padding(8.dp).size(48.dp))
+                    Icon(Icons.Outlined.TextSnippet, contentDescription = null, tint = mainBlue, modifier = Modifier.padding(8.dp).size(48.dp))
                 }
 
                 MainLoadingButton(
@@ -116,7 +117,7 @@ fun SubmitNewCapture(
                 )
                 Text(buildAnnotatedString {
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append("Type:")
+                        append("Type: ")
                     }
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Normal)) {
                         append(uiState.newBillboardType ?: "")
@@ -124,7 +125,7 @@ fun SubmitNewCapture(
                 }, fontSize = 16.sp, modifier = Modifier.padding(bottom = 8.dp))
                 Text(buildAnnotatedString {
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append("Sides:")
+                        append("Sides: ")
                     }
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Normal)) {
                         append(uiState.createBillboardSideCount.toString() ?: "")
@@ -133,7 +134,7 @@ fun SubmitNewCapture(
 
                 Text(buildAnnotatedString {
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append("Long short GPS:")
+                        append("Long short GPS: ")
                     }
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Normal)) {
                         append("${uiState.billboardData?.billboardLocation?.latitude}, ${uiState.billboardData?.billboardLocation?.longitude}")
