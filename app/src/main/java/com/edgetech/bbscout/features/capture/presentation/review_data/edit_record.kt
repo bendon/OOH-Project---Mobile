@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.foundation.verticalScroll
@@ -69,6 +70,8 @@ import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiEvent
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordUiModel
 import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
+import com.edgetech.bbscout.features.capture.presentation.capture_detail.SubTitleComp
+import com.edgetech.bbscout.features.capture.presentation.capture_flow.select_billboard_type.BillboardSideCountComp
 import com.edgetech.bbscout.features.navigation.AppDestinations
 import com.example.core.core.utils.components.LocationAwareActivity
 import kotlinx.coroutines.launch
@@ -121,6 +124,8 @@ fun EditRecordMain(
 
     var billboardLength = rememberTextFieldState()
 
+    var ownerWebsite = rememberTextFieldState()
+
     val billboardTypes = listOf(
         "Static Billboard",
         "Digital Billboard",
@@ -136,6 +141,56 @@ fun EditRecordMain(
     var selectedUnitOfMeasurement by rememberSaveable {
         mutableStateOf("")
     }
+
+    val structureTypes = listOf(
+        "Bridge",
+        "digital",
+        "free standing",
+        "Gantry",
+        "hoarding",
+        "Hooding",
+        "Right",
+        "Sky",
+        "sky sign",
+        "wall wrap"
+    )
+
+    val materialTypes = listOf(
+        "backlit", "digital", "flex", "LED", "Vinyl", "Sticker", "Metal", "Mesh"
+    )
+
+    val angleType = listOf(
+        "double decker", "Head On", "Left", "Right"
+    )
+
+    val visibilityTypes = listOf(
+        "Average", "Excellent", "Good", "Poor"
+    )
+
+    val illuminationTypes = listOf(
+        "front", "none"
+    )
+
+    var selectedStructureType by rememberSaveable {
+        mutableStateOf("")
+    }
+
+    var selectedMaterialType by rememberSaveable {
+        mutableStateOf("")
+    }
+
+    var selectedAngleType by rememberSaveable {
+        mutableStateOf("")
+    }
+
+    var selectedVisibilityType by rememberSaveable {
+        mutableStateOf("")
+    }
+
+    var selectedIlluminationType by rememberSaveable {
+        mutableStateOf("")
+    }
+
 
     var targetAge = rememberTextFieldState()
 
@@ -161,12 +216,24 @@ fun EditRecordMain(
         mutableStateOf(listOf<String>())
     }
 
+    var ownerPhone by remember {
+        mutableStateOf(listOf<Long>())
+    }
+
+    var ownerEmail by remember {
+        mutableStateOf(listOf<String>())
+    }
+
     var selectedEditTypeList by rememberSaveable {
         mutableStateOf<RecordTypeList?>(null)
     }
 
     var selectedEditValue by rememberSaveable {
         mutableStateOf<String?>(null)
+    }
+
+    var isOccupied by rememberSaveable {
+        mutableStateOf<Boolean?>(null)
     }
 
     if (selectedEditTypeList != null) {
@@ -189,6 +256,11 @@ fun EditRecordMain(
                 null -> {
                     ""
                 }
+
+                RecordTypeList.OWNNER_PHONE ->
+                    "Phone number"
+
+                RecordTypeList.OWNNER_EMAIL -> "Email"
             }
             Card(
                 modifier = Modifier
@@ -209,17 +281,9 @@ fun EditRecordMain(
                         modifier = Modifier.padding(16.dp),
                     )
 
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground
-                        ),
-                        keyboardOptions = KeyboardOptions(keyboardType = if (selectedEditTypeList == RecordTypeList.PHONE) KeyboardType.Phone else KeyboardType.Text),
-                        contentPadding = PaddingValues(14.dp),
-                        state = dialogValue,
+                    ExtractedInfoEditText(
+                        keyboardType = if (selectedEditTypeList == RecordTypeList.PHONE) KeyboardType.Phone else KeyboardType.Text,
+                        textState = dialogValue,
                     )
                     Button(
                         onClick = {
@@ -234,6 +298,27 @@ fun EditRecordMain(
                                     selectedEditTypeList = null
                                     selectedEditValue = null
 
+                                }
+
+                                RecordTypeList.OWNNER_PHONE -> {
+                                    if (ownerPhone.contains(selectedEditValue?.toLongOrNull()))
+                                        ownerPhone =
+                                            ownerPhone.minus(selectedEditValue!!.toLong())
+                                    if (dialogValue.text.toString().toLongOrNull() != null)
+                                        ownerPhone =
+                                            ownerPhone.plus(dialogValue.text.toString().toLong())
+                                    selectedEditTypeList = null
+                                    selectedEditValue = null
+
+                                }
+
+                                RecordTypeList.OWNNER_EMAIL -> {
+                                    if (ownerEmail.contains(selectedEditValue))
+                                        ownerEmail = ownerEmail.minus(selectedEditValue!!)
+                                    if (dialogValue.text.toString().isNotEmpty())
+                                        ownerEmail = ownerEmail.plus(dialogValue.text.toString())
+                                    selectedEditTypeList = null
+                                    selectedEditValue = null
                                 }
 
                                 RecordTypeList.EMAIL -> {
@@ -320,6 +405,17 @@ fun EditRecordMain(
                 currentData?.targetAge.ifEmptySetNull() ?: ""
             )
 
+            ownerWebsite.setTextAndPlaceCursorAtEnd(
+                currentData?.ownerWebsite.ifEmptySetNull() ?: ""
+            )
+
+            isOccupied = currentData?.isOccupied
+            selectedStructureType = currentData?.structure ?: ""
+            selectedMaterialType = currentData?.material ?: ""
+            selectedAngleType = currentData?.angle ?: ""
+            selectedVisibilityType = currentData?.visibility ?: ""
+            selectedIlluminationType = currentData?.illumination ?: ""
+
             selectedUnitOfMeasurement = currentData?.unitOfMeasurement ?: ""
 
             phoneNumbers = currentData?.phone ?: listOf()
@@ -327,6 +423,8 @@ fun EditRecordMain(
             websites = currentData?.siteUrl ?: listOf()
             socialMedias = currentData?.campainSocials ?: listOf()
             products = currentData?.products ?: listOf()
+            ownerPhone = currentData?.ownerContacts ?: listOf()
+            ownerEmail = currentData?.ownerEmail ?: listOf()
         }
     }
 
@@ -435,145 +533,65 @@ fun EditRecordMain(
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(top = 16.dp)
                     )
-                    Text(
+                    SubTitleComp(
                         "Brand name",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier
-                            .padding(bottom = 2.dp, top = 8.dp)
-                            .align(Alignment.Start)
                     )
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground
-                        ),
-                        contentPadding = PaddingValues(14.dp),
-                        state = campaignBrand,
-                        placeholder = { Text("Campaign brand") }
+                    ExtractedInfoEditText(
+                        textState = campaignBrand,
+                        placeholder = "Campaign brand"
                     )
-                    Text(
+                    SubTitleComp(
                         "Campaign description",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier
-                            .padding(bottom = 2.dp, top = 8.dp)
-                            .align(Alignment.Start)
-                    )
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(120.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground
-                        ),
-                        contentPadding = PaddingValues(14.dp),
-                        state = campaignDescription,
-                        placeholder = { Text("Campaign description") })
 
-                    Text(
+                        )
+                    ExtractedInfoEditText(
+                        textState = campaignDescription,
+                        placeholder = "Campaign description"
+                    )
+
+                    SubTitleComp(
                         "Target gender",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier
-                            .padding(bottom = 2.dp, top = 8.dp)
-                            .align(Alignment.Start)
-                    )
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground
-                        ),
-                        contentPadding = PaddingValues(14.dp),
-                        state = targetGender,
-                        placeholder = { Text("Target gender") }
+
+                        )
+                    ExtractedInfoEditText(
+                        textState = targetGender,
+                        placeholder = "Target gender"
                     )
 
-                    Text(
+                    SubTitleComp(
                         "Target age",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier
-                            .padding(bottom = 2.dp, top = 8.dp)
-                            .align(Alignment.Start)
-                    )
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground
-                        ),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        contentPadding = PaddingValues(14.dp),
-                        state = targetAge,
-                        placeholder = { Text("Target age") }
+
+                        )
+                    ExtractedInfoEditText(
+                        keyboardType = KeyboardType.Number,
+                        textState = targetAge,
+                        placeholder = "Target age"
                     )
                     GroupHeader(title = "Products", onIconClick = {
                         selectedEditTypeList = RecordTypeList.PRODUCT
                         selectedEditValue = null
                     })
                     products.forEach {
-                        ListItemComp(title = it, onIconClick = {
-                            selectedEditTypeList = RecordTypeList.PRODUCT
-                            selectedEditValue = it
-                        } , onDeletClick = {
-                            products = products.minus(it)
-                        })
+                        ListItemComp(title = it,
+                            onIconClick = {
+                                selectedEditTypeList = RecordTypeList.PRODUCT
+                                selectedEditValue = it
+                            }, onDeletClick = {
+                                products = products.minus(it)
+                            })
                     }
                 }
-                if (recordType == RecordType.BILLBOARD_INFO) {
+                if (recordType == RecordType.BILLBOARD_STRUCTURE) {
                     Text(
-                        text = "Billboard information",
+                        text = "Billboard structure",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(top = 16.dp)
                     )
-                    Text(
-                        "Billboard owner",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier
-                            .padding(bottom = 2.dp, top = 8.dp)
-                            .align(Alignment.Start)
-                    )
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground
-                        ),
-                        contentPadding = PaddingValues(14.dp),
-                        state = billboardOwner,
-                        placeholder = { Text("Billboard owner") })
-                    LargeDropdownMenu(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        label = "Billboard type",
-                        items = billboardTypes,
-                        selectedIndex = billboardTypes.indexOf(billboardType),
-                        onItemSelected = { index, item ->
-                            billboardType = item
-                        },
+                    SubTitleComp(
+                        "Billboard measurement",
 
                         )
-
-
                     Row(
                         modifier = Modifier.padding(vertical = 8.dp)
                     ) {
@@ -582,53 +600,32 @@ fun EditRecordMain(
                                 .weight(1f)
                                 .padding(end = 2.dp)
                         ) {
-                            Text(
+                            SubTitleComp(
                                 "Width",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontWeight = FontWeight.Medium,
-                                modifier = Modifier
-                                    .padding(bottom = 2.dp, top = 8.dp)
-                                    .align(Alignment.Start)
+
+                                )
+                            ExtractedInfoEditText(
+                                keyboardType = KeyboardType.Number,
+                                textState = billboardWidth,
+                                placeholder = "Width"
                             )
-                            OutlinedTextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(50.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground
-                                ),
-                                contentPadding = PaddingValues(14.dp),
-                                state = billboardWidth,
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                placeholder = { Text("Width") })
+
                         }
                         Column(
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(start = 2.dp)
                         ) {
-                            Text(
+                            SubTitleComp(
                                 "Height",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontWeight = FontWeight.Medium,
-                                modifier = Modifier
-                                    .padding(bottom = 2.dp, top = 8.dp)
-                                    .align(Alignment.Start)
                             )
-                            OutlinedTextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(50.dp),
-                                contentPadding = PaddingValues(14.dp),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                state = billboardLength,
-                                placeholder = { Text("Height") })
+                            ExtractedInfoEditText(
+                                keyboardType = KeyboardType.Number,
+                                textState = billboardLength,
+                                placeholder = "Height"
+                            )
                         }
                     }
-
                     LargeDropdownMenu(
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -638,8 +635,137 @@ fun EditRecordMain(
                         onItemSelected = { index, item ->
                             selectedUnitOfMeasurement = item
                         },
+                    )
+                    LargeDropdownMenu(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        label = "Structure",
+                        items = structureTypes,
+                        selectedIndex = structureTypes.indexOf(selectedStructureType),
+                        onItemSelected = { index, item ->
+                            selectedStructureType = item
+                        },
+                    )
+
+                    LargeDropdownMenu(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        label = "Material",
+                        items = materialTypes,
+                        selectedIndex = materialTypes.indexOf(selectedMaterialType),
+                        onItemSelected = { index, item ->
+                            selectedMaterialType = item
+                        },
+                    )
+
+                    LargeDropdownMenu(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        label = "Illumination",
+                        items = illuminationTypes,
+                        selectedIndex = illuminationTypes.indexOf(selectedIlluminationType),
+                        onItemSelected = { index, item ->
+                            selectedIlluminationType = item
+                        },
+                    )
+
+                    LargeDropdownMenu(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        label = "Visibility",
+                        items = visibilityTypes,
+                        selectedIndex = visibilityTypes.indexOf(selectedVisibilityType),
+                        onItemSelected = { index, item ->
+                            selectedVisibilityType = item
+                        },
+                    )
+
+                    LargeDropdownMenu(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        label = "Angle",
+                        items = angleType,
+                        selectedIndex = angleType.indexOf(selectedAngleType),
+                        onItemSelected = { index, item ->
+                            selectedAngleType = item
+                        },
+                    )
+
+                }
+                if (recordType == RecordType.BILLBOARD_INFO) {
+                    Text(
+                        text = "Billboard information",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
+                    SubTitleComp(
+                        "Billboard owner",
 
                         )
+                    ExtractedInfoEditText(
+                        textState = billboardOwner,
+                        placeholder = "Billboard owner"
+                    )
+                    SubTitleComp(
+                        "Is occupied",
+                    )
+                    Row {
+                        BillboardSideCountComp(
+                            "Yes",
+                            isOccupied == true,
+                            onClick = {
+                                isOccupied = true
+                            }
+                        )
+                        BillboardSideCountComp(
+                            "No",
+                            isOccupied == false,
+                            onClick = {
+                                isOccupied = false
+                            }
+                        )
+
+                    }
+                    LargeDropdownMenu(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        label = "Billboard type",
+                        items = billboardTypes,
+                        selectedIndex = billboardTypes.indexOf(billboardType),
+                        onItemSelected = { index, item ->
+                            billboardType = item
+                        },
+                    )
+                    GroupHeader(title = "Phone numbers", onIconClick = {
+                        selectedEditTypeList = RecordTypeList.OWNNER_PHONE
+                        selectedEditValue = null
+                    })
+                    ownerPhone.forEach {
+                        ListItemComp(title = it.toString(), onIconClick = {
+                            selectedEditTypeList = RecordTypeList.OWNNER_PHONE
+                            selectedEditValue = it.toString()
+                        }, onDeletClick = {
+                            ownerPhone = ownerPhone.minus(it)
+                        })
+                    }
+
+                    GroupHeader(title = "Emails", onIconClick = {
+                        selectedEditTypeList = RecordTypeList.OWNNER_EMAIL
+                        selectedEditValue = null
+                    })
+                    ownerEmail.forEach {
+                        ListItemComp(title = it, onIconClick = {
+                            selectedEditTypeList = RecordTypeList.OWNNER_EMAIL
+                            selectedEditValue = it
+                        }, onDeletClick = {
+                            ownerEmail = ownerEmail.minus(it)
+                        })
+                    }
+                    ExtractedInfoEditText(
+                        textState = ownerWebsite,
+                        placeholder = "Owner website"
+                    )
 
 
                 }
@@ -690,7 +816,7 @@ fun EditRecordMain(
                             selectedEditTypeList = RecordTypeList.SOCIAL_MEDIA
                             selectedEditValue = it
                         }, onDeletClick = {
-                          socialMedias = socialMedias.minus(it)
+                            socialMedias = socialMedias.minus(it)
                         })
                     }
 
@@ -734,6 +860,15 @@ fun EditRecordMain(
                                         ?: currentData.targetGender,
                                     targetAge = targetAge.text.toString().ifEmptySetNull()
                                         ?: currentData.targetAge,
+                                    ownerWebsite = ownerWebsite.text.toString().ifEmptySetNull() ?: currentData.ownerWebsite,
+                                    ownerContacts = ownerPhone,
+                                    ownerEmail = ownerEmail,
+                                    structure = selectedStructureType.ifEmptySetNull() ?: currentData.structure,
+                                    material = selectedMaterialType.ifEmptySetNull() ?: currentData.material,
+                                    angle = selectedAngleType.ifEmptySetNull() ?: currentData.angle,
+                                    visibility = selectedVisibilityType.ifEmptySetNull() ?: currentData.visibility,
+                                    illumination = selectedIlluminationType.ifEmptySetNull() ?: currentData.illumination,
+                                    isOccupied = isOccupied ?: currentData.isOccupied,
                                 ) ?: BillboardExtractedInfo(
                                     brandName = campaignBrand.text.toString().ifEmptySetNull()
                                         ?: currentData?.brandName,
@@ -801,6 +936,28 @@ fun GroupHeader(
     }
 }
 
+
+@Composable
+fun ExtractedInfoEditText(
+    textState: TextFieldState,
+    placeholder: String = "",
+    keyboardType: KeyboardType = KeyboardType.Text,
+    modifier: Modifier = Modifier
+        .fillMaxWidth()
+) {
+    OutlinedTextField(
+        modifier = modifier
+            .height(50.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = MaterialTheme.colorScheme.onBackground,
+            unfocusedTextColor = MaterialTheme.colorScheme.onBackground
+        ),
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        contentPadding = PaddingValues(14.dp),
+        state = textState,
+        placeholder = { Text(placeholder) })
+}
+
 @Composable
 fun ListItemComp(
     title: String,
@@ -844,4 +1001,6 @@ fun ListItemComp(
 
     }
 }
+
+
 

@@ -37,6 +37,7 @@ data class BillboardExtractedInfo(
     val targetGender: String? = null,
     val targetAge: String? = null,
     val status: Boolean? = null,
+    val isOccupied: Boolean? = null,
     val billboardLocation: UserLocationEntity? = null,
     val distanceFromBillboard: Double? = null,
     val isDistanceValid: Boolean? = null,

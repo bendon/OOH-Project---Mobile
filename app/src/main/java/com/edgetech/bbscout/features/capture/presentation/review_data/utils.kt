@@ -21,6 +21,8 @@ enum class RecordTypeList {
     WEBSITE,
     SOCIAL_MEDIA,
     PRODUCT,
+    OWNNER_PHONE,
+    OWNNER_EMAIL,
 
 }
 
