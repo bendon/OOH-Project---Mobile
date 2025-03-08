@@ -23,6 +23,7 @@ data class BillboardDataEntity(
     val remoteFileName: String? = null,
     val remoteCloseUpFileName: String? = null,
     val city: String? = null,
+    val occupied : Boolean? = null,
     val ownerContacts: String? = null,
     val ownerEmail: String? = null,
     val structure: String? = null,

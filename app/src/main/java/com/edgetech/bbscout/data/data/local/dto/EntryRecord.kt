@@ -60,7 +60,8 @@ data class EntryRecord(
                 angle = entryRecord.billboardData?.angle,
                 visibility = entryRecord.billboardData?.visibility,
                 illumination = entryRecord.billboardData?.illumination,
-                parentBoardCode = entryRecord.billboardData?.parentBoardCode
+                parentBoardCode = entryRecord.billboardData?.parentBoardCode,
+                occupied = entryRecord.billboardData?.occupied
             ),
             imageId = entryRecord.entryEntity.remoteFileId,
             location = entryRecord.location?.locationName,
@@ -102,6 +103,7 @@ data class EntryRecord(
                 height = billboardResponse.height,
                 width = billboardResponse.width,
                 type = billboardResponse.type,
+                occupied = billboardResponse.occupied,
                 unitOfMeasurement = billboardResponse.unit,
                 objectType = billboardResponse.objectType,
                 closeUpImageId = billboardResponse.closeUpImageId,
@@ -156,6 +158,7 @@ data class EntryRecord(
                 structure = campaignResponse.billboard?.structure,
                 material = campaignResponse.billboard?.structure,
                 angle = campaignResponse.billboard?.angle,
+                occupied = campaignResponse.billboard?.occupied,
                 visibility = campaignResponse.billboard?.visibility,
                 illumination = campaignResponse.billboard?.illumination,
                 parentBoardCode = campaignResponse.billboard?.parentBoardCode,

@@ -27,6 +27,7 @@ data class BillboardResponse(
     val staff: UserResponse? = null,
     val type: String? = null,
     val unit: String? = null,
+    val occupied: Boolean? = null,
     val closeUpImageId: String? = null,
     val city: String? = null,
     val ownerContacts: StringList? = null,

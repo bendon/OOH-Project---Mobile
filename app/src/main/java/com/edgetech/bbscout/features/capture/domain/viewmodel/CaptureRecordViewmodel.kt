@@ -1303,6 +1303,7 @@ class CaptureRecordViewmodel @Inject constructor(
                 ownerEmail = StringList.fromList(info.ownerEmail)?.toJson(),
                 structure = info.structure,
                 material = info.material,
+                occupied = info.isOccupied,
                 angle = info.angle,
                 unitOfMeasurement = info.unitOfMeasurement,
                 imageId = info.remoteFileId,
