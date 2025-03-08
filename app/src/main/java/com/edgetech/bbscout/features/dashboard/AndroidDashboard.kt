@@ -66,7 +66,7 @@ import kotlin.time.Duration.Companion.seconds
 @Composable
 fun HomeDashboard(
     appState: BBScoutAppState?,
-    captureRecordViewmodel: CaptureRecordViewmodel = hiltViewModel(),
+    captureRecordViewmodel: CaptureRecordViewmodel,
     onPageTap: (DashboardScreenOption) -> Unit = {},
 ) {
     HomeDashboard(
@@ -574,6 +574,6 @@ fun RecentActivity(recentCaptures: List<EntryRecord>, appState: BBScoutAppState?
 @Composable
 fun AndroidDashboardPreview() {
     BBScoutTheme {
-        HomeDashboard(null)
+        HomeDashboard(null, CaptureRecordUiModel())
     }
 }

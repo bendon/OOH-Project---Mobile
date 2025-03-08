@@ -1,6 +1,7 @@
 package com.edgetech.bbscout.features.navigation
 
 import android.os.Parcelable
+import androidx.activity.compose.LocalActivity
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
@@ -22,6 +23,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.diracks.app.app.app_state.BBScoutAppState
+import com.edgetech.bbscout.MainActivity
 import com.edgetech.bbscout.components.utils.getPreference
 import com.edgetech.bbscout.features.auth.domain.viewmodel.AuthViewmodel
 import com.edgetech.bbscout.features.auth.presentation.ChangePasswordScreen
@@ -56,12 +58,15 @@ fun DirackAppNavigation(
     modifier: Modifier = Modifier
 ) {
 
+    val activity = LocalActivity.current as MainActivity
     val context = LocalContext.current
     val navController = appState?.navController
 
+    val captureRecordViewmodel = activity.captureRecordViewmodel
+
     val hasShownOnboarding = getPreference(context, "ONBOARDING_SHOWN", Boolean::class.java )
 
-    val captureRecordViewmodel = viewModel<CaptureRecordViewmodel>()
+
     val authViewModel = viewModel<AuthViewmodel>()
 
 
@@ -159,9 +164,12 @@ fun BBScoutDashboardNavigation(
     onPageTap: (DashboardScreenOption) -> Unit = {},
 ){
 
+    val activity = LocalActivity.current as MainActivity
+
     appState?.dashboardNavController = rememberNavController()
     val navController = appState?.dashboardNavController
     val authViewModel = hiltViewModel<AuthViewmodel>()
+    val captureRecordViewmodel = activity.captureRecordViewmodel
     NavHost(
         modifier = modifier,
         navController = navController!!,
@@ -170,7 +178,7 @@ fun BBScoutDashboardNavigation(
         composable(
             route = DashboardScreenOption.HOME.name
         ) {
-            HomeDashboard(appState, onPageTap = onPageTap)
+            HomeDashboard(captureRecordViewmodel = captureRecordViewmodel, appState = appState, onPageTap = onPageTap)
         }
 
 //        composable(

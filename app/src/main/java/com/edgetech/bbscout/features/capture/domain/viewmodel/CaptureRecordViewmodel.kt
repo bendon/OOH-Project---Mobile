@@ -557,22 +557,11 @@ class CaptureRecordViewmodel @Inject constructor(
 
     private fun resetCreatingCapture() {
         _captureUiState.update {
-            it.copy(
-                selectedRecord = null,
-                selectedRecordMainImage = null,
-                selectedRecordBillboardImage = null,
-                newCaptureSelectedSide = BillboardSides.MAIN,
-                sideOneExtractedInfo = null,
-                sideTwoExtractedInfo = null,
-                sideThreeExtractedInfo = null,
-                sideFourExtractedInfo = null,
-                billboardData = null,
-                selectedLocation = null,
-                newBillboardType = null,
-                newCaptureCurrentStep = 1,
-                newCaptureNumberOfSteps = null,
-                newCaptureNextText = "Next",
-                newCaptureSelectedScreen = NewCaptureDestinations.BillboardLocation
+            CaptureRecordUiState().copy(
+                userStat = it.userStat,
+                selectedRecord = it.selectedRecord,
+                recentCaptures = it.recentCaptures,
+                allCaptures = it.allCaptures
             )
         }
     }

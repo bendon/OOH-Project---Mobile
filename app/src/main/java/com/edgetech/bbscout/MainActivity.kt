@@ -5,6 +5,7 @@ import com.edgetech.bbscout.screens.HistoryScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
@@ -31,7 +32,9 @@ import com.edgetech.bbscout.screens.BillboardCapture
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.diracks.app.app.app_state.rememberBBScoutAppState
+import com.edgetech.bbscout.features.capture.domain.viewmodel.CaptureRecordViewmodel
 import com.edgetech.bbscout.features.capture.presentation.camera_capture.CaptureBillboardScreen
 import com.edgetech.bbscout.features.navigation.DirackAppNavigation
 import com.example.core.core.utils.components.LocationAwareActivity
@@ -41,6 +44,8 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : LocationAwareActivity() {
+
+    val captureRecordViewmodel by viewModels<CaptureRecordViewmodel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
