@@ -222,13 +222,13 @@ fun BillboardSideCountComp(
 
 enum class  BillboardType(val displayName: String, val description: String, val icon: Int){
 
-    StaticBillboard("Static Billboard", "Large outdoor advertising structure", R.drawable.ic_billboard),
-    DigitalBillboard("Digital Billboard", "Electronic display for advertising", R.drawable.ic_billboard),
-    BannerAds("Banner Ads", "Rectangular advertisements on websites", R.drawable.ic_billboard),
-    Wallscapes("Wallscapes", "Large murals or paintings on walls", R.drawable.ic_billboard),
-    MobileBillboards("Mobile Billboards", "Advertising vehicles on wheels", R.drawable.ic_billboard),
-    LampPosts("Lamp Posts", "Advertising affixed to streetlights", R.drawable.ic_billboard),
-    InteractiveBillboards("Interactive Billboards", "Billboards with interactive features", R.drawable.ic_billboard);
+    StaticBillboard("Static Billboard", "Large outdoor advertising structure", R.drawable.billboard_svgrepo_com),
+    DigitalBillboard("Digital Billboard", "Electronic display for advertising", R.drawable.window_digital),
+  //  BannerAds("Banner Ads", "Rectangular advertisements on websites", R.drawable.ic_billboard),
+    Wallscapes("Wallscapes", "Large murals or paintings on walls", R.drawable.mural_ad),
+    MobileBillboards("Mobile Billboards", "Advertising vehicles on wheels", R.drawable.mobile_ad),
+    LampPosts("Lamp Posts", "Advertising affixed to streetlights", R.drawable.sign_advertising_post),
+    InteractiveBillboards("Interactive Billboards", "Billboards with interactive features", R.drawable.interactive_ad);
 
 
 
