@@ -2,6 +2,9 @@ package com.edgetech.bbscout.features.navigation
 
 import android.os.Parcelable
 import androidx.activity.compose.LocalActivity
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FileCopy
 import androidx.compose.material.icons.filled.History
@@ -77,7 +80,31 @@ fun DirackAppNavigation(
     NavHost(
         modifier = modifier,
         navController = navController!!,
-        startDestination = if (hasShownOnboarding == true) AppDestinations.Loading else AppDestinations.OnboardingPage
+        startDestination = if (hasShownOnboarding == true) AppDestinations.Loading else AppDestinations.OnboardingPage,
+        enterTransition = {
+            slideInHorizontally(
+                initialOffsetX = { fullWidth -> fullWidth },
+                animationSpec = tween(durationMillis = 300)
+            )
+        },
+        exitTransition = {
+            slideOutHorizontally(
+                targetOffsetX = { fullWidth -> -fullWidth },
+                animationSpec = tween(durationMillis = 300)
+            )
+        },
+        popEnterTransition = {
+            slideInHorizontally(
+                initialOffsetX = { fullWidth -> -fullWidth },
+                animationSpec = tween(durationMillis = 300)
+            )
+        },
+        popExitTransition = {
+            slideOutHorizontally(
+                targetOffsetX = { fullWidth -> fullWidth },
+                animationSpec = tween(durationMillis = 300)
+            )
+        }
     ){
         composable<AppDestinations.Dashboard>{
             BBScoutDashboard(appState = appState)

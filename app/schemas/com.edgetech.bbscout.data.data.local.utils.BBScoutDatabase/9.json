@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 9,
-    "identityHash": "cbad15deb95ad4d27bec042117a1c951",
+    "identityHash": "14f80a8aac2e41be33a6b00665beb7b3",
     "entities": [
       {
         "tableName": "EntryEntity",
@@ -212,7 +212,7 @@
       },
       {
         "tableName": "UserLocationEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `entryId` INTEGER NOT NULL, `locationId` TEXT, `latitude` REAL, `longitude` REAL, `locationPrecision` REAL, `locationName` TEXT, `locationCountry` TEXT, `locationCity` TEXT, `mainAdminArea` TEXT, `subAdminArea` TEXT, `building` TEXT, `createdAt` INTEGER, `updatedAt` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `entryId` INTEGER NOT NULL, `locationId` TEXT, `latitude` REAL, `longitude` REAL, `locationPrecision` REAL, `locationName` TEXT, `locationCountry` TEXT, `locationCity` TEXT, `mainAdminArea` TEXT, `subAdminArea` TEXT, `building` TEXT, `isLocationLocked` INTEGER NOT NULL, `createdAt` INTEGER, `updatedAt` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -285,6 +285,12 @@
             "columnName": "building",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "isLocationLocked",
+            "columnName": "isLocationLocked",
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
             "fieldPath": "createdAt",
@@ -542,7 +548,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cbad15deb95ad4d27bec042117a1c951')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '14f80a8aac2e41be33a6b00665beb7b3')"
     ]
   }
 }

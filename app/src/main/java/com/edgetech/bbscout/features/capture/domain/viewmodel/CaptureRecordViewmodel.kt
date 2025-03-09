@@ -7,7 +7,9 @@ import com.edgetech.bbscout.components.di.IoDispatcher
 import com.edgetech.bbscout.components.di.MainDispatcher
 import com.edgetech.bbscout.components.file_saver.FileSaver
 import com.edgetech.bbscout.components.location.GetLocationInfo
+import com.edgetech.bbscout.components.utils.isDebug
 import com.edgetech.bbscout.components.utils.logD
+import com.edgetech.bbscout.components.utils.roundToFourDecimalPlaces
 import com.edgetech.bbscout.components.utils.toJson
 import com.edgetech.bbscout.components.utils.toLong
 import com.edgetech.bbscout.data.data.local.dto.EntryRecord
@@ -37,6 +39,7 @@ import com.edgetech.bbscout.features.capture.domain.model.closeUpDistance
 import com.edgetech.bbscout.features.capture.domain.model.longShotDistance
 import com.edgetech.bbscout.features.capture.domain.use_cases.isBillboardValid
 import com.edgetech.bbscout.features.capture.presentation.capture_flow.create_new_record.NewCaptureDestinations
+import com.example.core.core.utils.components.toLatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
@@ -153,6 +156,15 @@ class CaptureRecordViewmodel @Inject constructor(
                     )
                 }
             }
+
+            CaptureRecordEventSink.OnLockBillboardLocation -> {
+                _captureUiState.update {
+                    it.copy(
+                        selectedLocation = it.selectedLocation?.copy(isLocationLocked = true)
+                    )
+                }
+                checkBillboardStatus()
+            }
         }
     }
 
@@ -163,7 +175,8 @@ class CaptureRecordViewmodel @Inject constructor(
                 it.copy(
                     billboardData = it.billboardData?.copy(
                         closedUpUri = null,
-                        billboardImage = null
+                        billboardImage = null,
+                        billboardLocation = it.billboardData.billboardLocation?.copy(isLocationLocked = false)
                     ),
                     sideOneExtractedInfo = it.sideOneExtractedInfo?.copy(
                         fileUri = null
@@ -171,11 +184,13 @@ class CaptureRecordViewmodel @Inject constructor(
                 )
             }
         } else if (uiState.newCaptureSelectedScreen == NewCaptureDestinations.BillboardCloseUpShot) {
-            val info = getBillboardSideToUpdate().copy(
+            val bill = getBillboardSideToUpdate()
+            val info = bill.copy(
                 closedUpUri = null,
                 billboardImage = null,
                 objectType = null,
-                billboardType = null
+               // billboardType = null,
+                billboardLocation = bill.billboardLocation?.copy(isLocationLocked = false)
             )
 
             updateBillBoardState(info)
@@ -185,79 +200,47 @@ class CaptureRecordViewmodel @Inject constructor(
 
     private fun onSetLocation(eventSink: CaptureRecordEventSink.OnSetLocation) {
         val state = _captureUiState.value
+        var distanceFromBillboard: Double? = null
         if (state.selectedLocation?.latitude != null && state.selectedLocation.longitude != null) {
-            val distanceFromBillboard = calculateDistance(
+            distanceFromBillboard = calculateDistance(
                 state.selectedLocation.latitude!!,
                 state.selectedLocation.longitude!!,
-                eventSink.location.latitude,
-                eventSink.location.longitude
-            )
-            when (state.newCaptureSelectedScreen) {
-                NewCaptureDestinations.BillboardCloseUpShot -> {
-                    when (state.newCaptureSelectedSide) {
-                        BillboardSides.SIDE_ONE -> {
-                            _captureUiState.update {
-                                it.copy(
-                                    sideOneExtractedInfo = it.sideOneExtractedInfo?.copy(
-                                        distanceFromBillboard = distanceFromBillboard.toDouble(),
-                                        isDistanceValid = distanceFromBillboard.toDouble() in closeUpDistance
-                                    )
-                                )
-                            }
-                        }
+                eventSink.location.latitude ?: 0.0,
+                eventSink.location.longitude ?: 0.0
+            ).toDouble().roundToFourDecimalPlaces()
+        }
+        if (state.newCaptureSelectedScreen == NewCaptureDestinations.BillboardLocation && state.selectedLocation?.isLocationLocked != true){
+            _captureUiState.update {
+                it.copy(
+                    selectedLocation = UserLocationEntity(
+                        latitude = eventSink.location.latitude,
+                        longitude = eventSink.location.longitude,
+                        locationPrecision = eventSink.location.accuracy
+                    )
+                )
+            }
 
-                        BillboardSides.SIDE_TWO -> {
-                            _captureUiState.update {
-                                it.copy(
-                                    sideTwoExtractedInfo = it.sideTwoExtractedInfo?.copy(
-                                        distanceFromBillboard = distanceFromBillboard.toDouble(),
-                                        isDistanceValid = distanceFromBillboard.toDouble() in closeUpDistance
-                                    )
-                                )
-                            }
-                        }
-
-                        BillboardSides.SIDE_THREE -> {
-                            _captureUiState.update {
-                                it.copy(
-                                    sideThreeExtractedInfo = it.sideThreeExtractedInfo?.copy(
-                                        distanceFromBillboard = distanceFromBillboard.toDouble(),
-                                        isDistanceValid = distanceFromBillboard.toDouble() in closeUpDistance
-                                    )
-                                )
-                            }
-                        }
-
-                        BillboardSides.SIDE_FOUR -> {
-                            _captureUiState.update {
-                                it.copy(
-                                    sideFourExtractedInfo = it.sideFourExtractedInfo?.copy(
-                                        distanceFromBillboard = distanceFromBillboard.toDouble(),
-                                        isDistanceValid = distanceFromBillboard.toDouble() in closeUpDistance
-                                    )
-                                )
-                            }
-                        }
-
-                        BillboardSides.MAIN -> {}
-                    }
-                }
-
-                NewCaptureDestinations.BillboardLongShot -> {
-                    _captureUiState.update {
-                        it.copy(
-                            billboardData = it.billboardData?.copy(
-                                distanceFromBillboard = distanceFromBillboard.toDouble(),
-                                isDistanceValid = distanceFromBillboard.toDouble() in longShotDistance
-                            )
-                        )
-                    }
-                }
-
-                else -> {}
+        }
+        else if (state.newCaptureSelectedScreen == NewCaptureDestinations.BillboardLongShot && state.billboardData?.billboardLocation?.isLocationLocked != true){
+            _captureUiState.update {
+                it.copy(
+                    billboardData = it.billboardData?.copy(
+                        billboardLocation = UserLocationEntity(
+                            latitude = eventSink.location.latitude,
+                            longitude = eventSink.location.longitude,
+                            locationPrecision = eventSink.location.accuracy
+                        ),
+                        distanceFromBillboard = distanceFromBillboard?.toDouble(),
+                        isDistanceValid = (distanceFromBillboard?.toDouble() ?: 0.0) in longShotDistance
+                    )
+                )
             }
         }
-        locationInfo.getLocationInfo(eventSink.location) { loc ->
+
+        if (eventSink.location.toLatLng() != null && state.newCaptureSelectedScreen == NewCaptureDestinations.BillboardCloseUpShot)
+        locationInfo.getLocationInfo(eventSink.location.toLatLng()!!) { loc ->
+            val info = getBillboardSideToUpdate()
+            if (info.billboardLocation?.isLocationLocked != true)
             when (state.newCaptureSelectedScreen) {
                 NewCaptureDestinations.BillboardCloseUpShot -> {
                     when (state.newCaptureSelectedSide) {
@@ -265,7 +248,12 @@ class CaptureRecordViewmodel @Inject constructor(
                             _captureUiState.update {
                                 it.copy(
                                     sideOneExtractedInfo = it.sideOneExtractedInfo?.copy(
-                                        billboardLocation = loc
+                                        billboardLocation = loc.copy(
+                                            locationPrecision = eventSink.location.accuracy
+                                        ),
+                                        distanceFromBillboard = distanceFromBillboard?.toDouble(),
+                                        isDistanceValid = (distanceFromBillboard?.toDouble()
+                                            ?: 0.0) in closeUpDistance
                                     )
                                 )
                             }
@@ -275,7 +263,12 @@ class CaptureRecordViewmodel @Inject constructor(
                             _captureUiState.update {
                                 it.copy(
                                     sideTwoExtractedInfo = it.sideTwoExtractedInfo?.copy(
-                                        billboardLocation = loc
+                                        billboardLocation = loc.copy(
+                                            locationPrecision = eventSink.location.accuracy
+                                        ),
+                                        distanceFromBillboard = distanceFromBillboard?.toDouble(),
+                                        isDistanceValid = (distanceFromBillboard?.toDouble()
+                                            ?: 0.0) in closeUpDistance
                                     )
                                 )
                             }
@@ -285,7 +278,12 @@ class CaptureRecordViewmodel @Inject constructor(
                             _captureUiState.update {
                                 it.copy(
                                     sideThreeExtractedInfo = it.sideThreeExtractedInfo?.copy(
-                                        billboardLocation = loc
+                                        billboardLocation = loc.copy(
+                                            locationPrecision = eventSink.location.accuracy
+                                        ),
+                                        distanceFromBillboard = distanceFromBillboard?.toDouble(),
+                                        isDistanceValid = (distanceFromBillboard?.toDouble()
+                                            ?: 0.0) in closeUpDistance
                                     )
                                 )
                             }
@@ -295,7 +293,12 @@ class CaptureRecordViewmodel @Inject constructor(
                             _captureUiState.update {
                                 it.copy(
                                     sideFourExtractedInfo = it.sideFourExtractedInfo?.copy(
-                                        billboardLocation = loc
+                                        billboardLocation = loc.copy(
+                                            locationPrecision = eventSink.location.accuracy
+                                        ),
+                                        distanceFromBillboard = distanceFromBillboard?.toDouble(),
+                                        isDistanceValid = (distanceFromBillboard?.toDouble()
+                                            ?: 0.0) in closeUpDistance
                                     )
                                 )
                             }
@@ -303,25 +306,6 @@ class CaptureRecordViewmodel @Inject constructor(
 
                         else -> {}
                     }
-                }
-
-                NewCaptureDestinations.BillboardLocation -> {
-                    _captureUiState.update {
-                        it.copy(
-                            selectedLocation = loc
-                        )
-                    }
-                }
-
-                NewCaptureDestinations.BillboardLongShot -> {
-                    _captureUiState.update {
-                        it.copy(
-                            billboardData = it.billboardData?.copy(
-                                billboardLocation = loc
-                            )
-                        )
-                    }
-                    logD("billboad  viewmodel is ${_captureUiState.value.billboardData} and loc is $loc")
                 }
 
                 else -> {
@@ -334,6 +318,11 @@ class CaptureRecordViewmodel @Inject constructor(
 
     private fun onUiNext() {
         val state = _captureUiState.value
+        _captureUiState.update {
+            it.copy(
+                nextWasTapped = true
+            )
+        }
         if (state.newCaptureSelectedScreen == NewCaptureDestinations.BillboardLocation) {
             _captureUiState.update {
                 it.copy(
@@ -443,6 +432,11 @@ class CaptureRecordViewmodel @Inject constructor(
 
     private fun onUiBack() {
         val state = _captureUiState.value
+        _captureUiState.update {
+            it.copy(
+                nextWasTapped = false
+            )
+        }
         when (state.newCaptureSelectedScreen) {
             NewCaptureDestinations.BillboardCloseUpShot -> {
                 when (state.newCaptureSelectedSide) {
@@ -978,7 +972,8 @@ class CaptureRecordViewmodel @Inject constructor(
                         it.copy(
                             billboardData = it.billboardData?.copy(
                                 billboardImage = fileBitMap.data!!,
-                                closedUpUri = eventSink.fileUri
+                                closedUpUri = eventSink.fileUri,
+                                billboardLocation = it.billboardData.billboardLocation?.copy(isLocationLocked = true)
                             ),
                             sideOneExtractedInfo = it.sideOneExtractedInfo?.copy(
                                 fileUri = eventSink.fileUri
@@ -987,9 +982,12 @@ class CaptureRecordViewmodel @Inject constructor(
                     }
                     checkBillboardStatus()
                 } else {
-                    val billboard = getBillboardSideToUpdate().copy(
+                    val  bill = getBillboardSideToUpdate()
+                    val billboard = bill.copy(
                         billboardImage = fileBitMap.data!!,
-                        closedUpUri = eventSink.fileUri
+                        closedUpUri = eventSink.fileUri,
+                        billboardLocation = bill.billboardLocation?.copy(isLocationLocked = true)
+
                     )
                     updateBillBoardState(billboard)
                     onAnalyseImage(CaptureRecordEventSink.OnAnalyseImage)
@@ -1019,6 +1017,7 @@ class CaptureRecordViewmodel @Inject constructor(
             repository.analyzeFile(fileMultipart)
                 .onSuccess { res ->
 
+                    if (!isDebug)
                     if (res?.object_type == null || res.billboard_type == null) {
                         _captureUiEvent.update {
                             CaptureRecordUiEvent.Error(
@@ -1026,7 +1025,7 @@ class CaptureRecordViewmodel @Inject constructor(
                             )
                         }
                         val bill = getBillboardSideToUpdate()
-                        updateBillBoardState(bill.copy(closedUpUri = null, billboardImage = null))
+                        updateBillBoardState(bill.copy(closedUpUri = null, billboardImage = null, billboardLocation = bill.billboardLocation?.copy(isLocationLocked = false)))
 
                     }
 
@@ -1222,7 +1221,7 @@ class CaptureRecordViewmodel @Inject constructor(
             NewCaptureDestinations.BillboardLocation -> {
                 _captureUiState.update {
                     it.copy(
-                        newCaptureNextIsEnabled = state.selectedLocation != null,
+                        newCaptureNextIsEnabled = state.selectedLocation != null && state.selectedLocation.isLocationLocked,
                         newCaptureBackEnabled = false,
                     )
                 }
@@ -1231,7 +1230,7 @@ class CaptureRecordViewmodel @Inject constructor(
             NewCaptureDestinations.BillboardLongShot -> {
                 _captureUiState.update {
                     it.copy(
-                        newCaptureNextIsEnabled = it.billboardData?.isDistanceValid == true && it.billboardData.billboardLocation != null && it.billboardData.closedUpUri != null
+                        newCaptureNextIsEnabled = it.billboardData?.isDistanceValid == true && it.billboardData.billboardLocation != null && it.billboardData.closedUpUri != null && it.billboardData.billboardLocation.isLocationLocked
                     )
                 }
             }

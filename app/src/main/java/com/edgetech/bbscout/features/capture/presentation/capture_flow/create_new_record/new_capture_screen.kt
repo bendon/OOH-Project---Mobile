@@ -1,5 +1,6 @@
 package com.edgetech.bbscout.features.capture.presentation.capture_flow.create_new_record
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -61,6 +62,9 @@ fun NewCaptureParentMain(
     appState: BBScoutAppState?,
     captureRecordUiModel: CaptureRecordUiModel
 ){
+    BackHandler {
+        appState?.navController?.popBackStack(AppDestinations.Dashboard, false)
+    }
 
     val uiState by captureRecordUiModel.captureUiState.collectAsState()
 
@@ -117,7 +121,7 @@ fun NewCaptureParentMain(
                 captureRecordUiModel.captureEventSink(
                     CaptureRecordEventSink.ResetCreatingCapture
                 )
-                appState?.navController?.navigateUp()
+                appState?.navController?.popBackStack(AppDestinations.Dashboard, false)
             },
             posText = "Ok",
             onConfirmation = {
@@ -135,7 +139,7 @@ fun NewCaptureParentMain(
                 title = { Text(text = "New capture") },
                 navigationIcon = {
                     IconButton(onClick = {
-                        appState?.navController?.navigateUp()
+                        appState?.navController?.popBackStack(AppDestinations.Dashboard, false)
                     }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,

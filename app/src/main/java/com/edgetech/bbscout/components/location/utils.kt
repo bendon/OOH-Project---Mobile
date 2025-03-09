@@ -13,7 +13,7 @@ val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 3
     .build()
 
 data class AppLocation(
-    val accuracy: Int? = null,
+    val accuracy: Double? = null,
     val latitude: Double? = null,
     val longitude: Double? = null
 )

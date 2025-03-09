@@ -19,6 +19,7 @@ data class UserLocationEntity(
     var mainAdminArea: String? = null,
     var subAdminArea: String? = null,
     var building: String? = null,
+    val isLocationLocked: Boolean = false,
     override var createdAt: Long? = null,
     override var updatedAt: Long? = null
 ): BaseEntity()

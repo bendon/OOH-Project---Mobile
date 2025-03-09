@@ -2,6 +2,7 @@ package com.edgetech.bbscout.features.capture.domain.model
 
 import android.graphics.Bitmap
 import com.edgetech.bbscout.components.domain_util.AppEventSink
+import com.edgetech.bbscout.components.location.AppLocation
 import com.edgetech.bbscout.data.data.local.dto.EntryRecord
 import com.edgetech.bbscout.data.data.local.enities.BillboardDataEntity
 import com.edgetech.bbscout.data.data.local.enities.UserLocationEntity
@@ -49,6 +50,7 @@ data class CaptureRecordUiState(
     val newCaptureSelectedScreen: NewCaptureDestinations = NewCaptureDestinations.BillboardLocation,
     val newCaptureSelectedSide: BillboardSides = BillboardSides.MAIN,
 
+    val nextWasTapped: Boolean? = null,
     val newCaptureNextIsEnabled: Boolean = false,
     val newCaptureBackEnabled: Boolean = false,
     val newCaptureNextText: String = "Next",
@@ -132,7 +134,7 @@ sealed class CaptureRecordEventSink : AppEventSink {
 
     data class OnGetCapture(val captureId: String): CaptureRecordEventSink()
 
-    data class OnSetLocation(val location: LatLng) : CaptureRecordEventSink()
+    data class OnSetLocation(val location: AppLocation) : CaptureRecordEventSink()
 
     data object OnUiNext : CaptureRecordEventSink()
 
@@ -141,6 +143,8 @@ sealed class CaptureRecordEventSink : AppEventSink {
     data object OnRecapture :  CaptureRecordEventSink()
 
     data class OnStartSideContentVerification(val side: BillboardSides):  CaptureRecordEventSink()
+
+    data object OnLockBillboardLocation: CaptureRecordEventSink()
 }
 
 

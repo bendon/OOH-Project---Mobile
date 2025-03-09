@@ -390,7 +390,7 @@ fun GetLocationComp(
 
 @Composable
 fun GetLocation(
-    onLocation: (LatLng) -> Unit
+    onLocation: (AppLocation) -> Unit
 ) {
     val context = LocalActivity.current as LocationAwareActivity
     val currentLocation by context.appLocation.observeAsState(AppLocation())
@@ -407,8 +407,8 @@ fun GetLocation(
 //            context.stopLocationUpdates()
 //        }
 //    }
-    if (currentLocation?.toLatLng() != null) {
+    if (currentLocation.latitude != null) {
         logD("Location: ${currentLocation?.toLatLng()}")
-        onLocation(currentLocation!!.toLatLng()!!)
+        onLocation(currentLocation)
     }
 }

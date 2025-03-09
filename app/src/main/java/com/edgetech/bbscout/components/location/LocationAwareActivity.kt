@@ -32,9 +32,9 @@ abstract class LocationAwareActivity : ComponentActivity() {
 
                     if (loc == null) {
 
-                        appLocation.postValue(AppLocation(location.accuracy.toInt(), location.latitude, location.longitude))
+                        appLocation.postValue(AppLocation(location.accuracy.toDouble(), location.latitude, location.longitude))
                         loc = AppLocation(
-                            location.accuracy.toInt(),
+                            location.accuracy.toDouble(),
                             location.latitude,
                             location.longitude
                         )

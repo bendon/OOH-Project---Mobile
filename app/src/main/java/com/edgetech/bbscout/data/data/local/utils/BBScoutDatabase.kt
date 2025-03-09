@@ -17,7 +17,7 @@ import com.edgetech.bbscout.data.data.local.enities.UserLocationEntity
         UserLocationEntity::class,
         BillboardDataEntity::class,
         AuthEntity::class
-    ], version = 9
+    ], version = 10
 )
 abstract class BBScoutDatabase : RoomDatabase() {
     abstract val bbScoutDao: BBScoutDao
