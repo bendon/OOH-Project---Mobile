@@ -28,7 +28,7 @@ val mainOrange = Color(0xFFFF6B6B)
 val lightOrange = Color(0xFFFFBFB9)
 val litherOrange = Color(0xFFFF6B6B).copy(alpha = 0.1f)
 
-val mainGreen = Color(0xFF008000).copy(alpha = 0.8f)
+val mainGreen = Color(0xFF23c55e)
 
 
 // Dark Theme Colors

@@ -23,13 +23,13 @@ fun InfoComposableContainer(
         modifier = modifier,
         color = when(type){
             InfoComposableType.GREEN -> {
-                mainGreen.copy(alpha = 0.2f)
+                Color(0xFFf0fdf4)
             }
             InfoComposableType.BLUE -> {
                 lightBlue
             }
             InfoComposableType.ALL_GRAY -> {
-                MaterialTheme.colorScheme.surface
+                MaterialTheme.colorScheme.surfaceContainer
             }
             InfoComposableType.BORDER_GRAY -> {
                 MaterialTheme.colorScheme.background

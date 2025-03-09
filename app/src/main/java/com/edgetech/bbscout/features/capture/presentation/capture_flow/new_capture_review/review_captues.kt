@@ -3,6 +3,8 @@ package com.edgetech.bbscout.features.capture.presentation.capture_flow.new_capt
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -11,12 +13,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.InsertDriveFile
 import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -62,33 +66,41 @@ fun ReviewCaptures(
                         Column(
                             modifier = Modifier.padding(8.dp)
                         ) {
-                            CreateCaptureGroupHeading(
-                                Icons.Outlined.InsertDriveFile,
-                                "Captures summary",
-                                modifier = Modifier.padding(bottom = 8.dp)
-                            )
+
+                            Row(
+                                modifier = Modifier.padding(8.dp),
+                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                            ) {
+                                Icon(imageVector = Icons.Outlined.InsertDriveFile, contentDescription = null, tint = Color.Gray)
+                                Text(
+                                    text = "Captures summary",
+                                    fontSize = 16.sp, fontWeight = FontWeight.Bold,
+                                    color = Color.Gray,
+                                    modifier = Modifier.weight(1f).padding(4.dp),
+                                )
+                            }
                             Text(buildAnnotatedString {
                                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                    append("Type:")
+                                    append("Type: ")
                                 }
-                                withStyle(style = SpanStyle(fontWeight = FontWeight.Normal)) {
+                                withStyle(style = SpanStyle(fontWeight = FontWeight.Normal, color = Color.Gray)) {
                                     append(uiState.newBillboardType ?: "")
                                 }
                             }, fontSize = 16.sp, modifier = Modifier.padding(bottom = 8.dp))
                             Text(buildAnnotatedString {
                                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                    append("Sides:")
+                                    append("Sides: ")
                                 }
-                                withStyle(style = SpanStyle(fontWeight = FontWeight.Normal)) {
+                                withStyle(style = SpanStyle(fontWeight = FontWeight.Normal, color = Color.Gray)) {
                                     append(uiState.createBillboardSideCount.toString() ?: "")
                                 }
                             }, fontSize = 16.sp, modifier = Modifier.padding(bottom = 8.dp))
 
                             Text(buildAnnotatedString {
                                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                    append("Long short GPS:")
+                                    append("Long short GPS: ")
                                 }
-                                withStyle(style = SpanStyle(fontWeight = FontWeight.Normal)) {
+                                withStyle(style = SpanStyle(fontWeight = FontWeight.Normal, color = Color.Gray)) {
                                     append("${uiState.billboardData?.billboardLocation?.latitude}, ${uiState.billboardData?.billboardLocation?.longitude}")
                                 }
                             }, fontSize = 16.sp, modifier = Modifier.padding(bottom = 8.dp))

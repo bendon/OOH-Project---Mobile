@@ -3,10 +3,13 @@ package com.edgetech.bbscout.features.navigation
 import android.os.Parcelable
 import androidx.activity.compose.LocalActivity
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FileCopy
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.FileCopy
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.PhotoCamera
@@ -208,7 +211,7 @@ fun BBScoutDashboardNavigation(
 enum class DashboardScreenOption(val route: String, val iconUnselected: ImageVector, val iconSelected: ImageVector, val label: String) {
     HOME("home", Icons.Outlined.Home, Icons.Filled.Home, "Home"),
    // CAPTURE("capture", Icons.Outlined.PhotoCamera, Icons.Filled.PhotoCamera,"Capture"),
-    HISTORY("history", Icons.Outlined.History, Icons.Filled.History, "History"),
+    HISTORY("history", Icons.Outlined.FileCopy, Icons.Filled.FileCopy, "History"),
     SETTINGS("settings", Icons.Outlined.Settings, Icons.Filled.Settings, "Settings")
 }
 

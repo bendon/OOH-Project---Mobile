@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.edgetech.bbscout.R
+import com.edgetech.bbscout.ui.theme.mainBlue
 import com.edgetech.bbscout.ui.theme.mainGreen
 
 
@@ -62,7 +63,7 @@ fun InPageAlert(
                     Icon(
                         imageVector = if (isError) Icons.Outlined.Error else Icons.Outlined.Info,
                         contentDescription = null,
-                        tint = if (isError) Color.Red else MaterialTheme.colorScheme.primary,
+                        tint = if (isError) Color.Red else mainBlue,
                         modifier = Modifier.size(24.dp)
                     )
                 Column(
@@ -76,14 +77,14 @@ fun InPageAlert(
                             text = title,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (isSuccess) mainGreen else if (isError) Color.Red else MaterialTheme.colorScheme.onBackground,
+                            color = if (isSuccess) mainGreen else if (isError) Color.Red else mainBlue,
                             modifier = Modifier.fillMaxWidth(),
                         )
                     if (!message.isNullOrEmpty())
                         Text(
                             text = message,
                             fontSize = 14.sp,
-                            color = if (isSuccess) mainGreen else if (isError) Color.Red else MaterialTheme.colorScheme.onBackground,
+                            color = if (isSuccess) mainGreen else if (isError) Color.Red else mainBlue,
                             modifier = Modifier
                                 .padding(top = 4.dp)
                                 .fillMaxWidth(),

@@ -149,7 +149,7 @@ fun SelectCaptureTypeMain(
                                 .fillMaxWidth(),
                         )
                         Row(
-                            modifier = Modifier.padding(top = 16.dp)
+                            modifier = Modifier.padding(vertical = 16.dp)
                                 .horizontalScroll(
                                     rememberScrollState()
                                 )

@@ -139,7 +139,7 @@ fun ReviewRecordMain(
     }
 
     var selectedTab by rememberSaveable { mutableStateOf(0) }
-    val tabs = listOf("Billboard", "Campain", "Location")
+    val tabs = listOf("Billboard", "Campaign", "Location")
 
 
 

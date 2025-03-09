@@ -56,7 +56,7 @@ fun DistanceComposable(
                    if (isValid == true) Icons.Outlined.Check else Icons.Outlined.WarningAmber,
                    contentDescription = null,
                    tint = if (isValid == true) mainGreen else Color.Red,
-                   modifier = Modifier.padding(end = 2.dp).size(16.dp)
+                   modifier = Modifier.padding(end = 4.dp).size(16.dp)
                )
                Text(
                    text = "Distance: ${distance ?: "0"} $unit(Target: ${minDistance ?: "0"}-${maxDistance ?: 0}$unit)",

@@ -29,6 +29,7 @@ private val LightColors = lightColorScheme(
     background = Color.White,
     onBackground = Color.Black,
     surface = Color.LightGray.copy(alpha = 0.2f),
+    surfaceContainer = Color(0xFFf9fafc),
     onSurface = Color.Black,
     tertiary = darkerBlue
 )
@@ -46,6 +47,7 @@ private val DarkColors = darkColorScheme(
     onBackground = Color.White,
     surface = Color.DarkGray,
     onSurface = Color.White,
+    surfaceContainer = Color.Black.copy(alpha = 0.8f),
     tertiary = lightBlue
 )
 

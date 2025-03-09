@@ -131,7 +131,7 @@ fun LoadingButton(
     timeOut: Duration = 2.minutes,
     onTap: () -> Unit,
     shape: Shape = ButtonDefaults.shape,
-    colors: ButtonColors = ButtonDefaults.buttonColors(),
+    colors: ButtonColors = ButtonDefaults.buttonColors(disabledContainerColor = lightBlue, disabledContentColor = lightBlue),
     elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
     border: BorderStroke? = null,
     isEnabled: Boolean = true,
