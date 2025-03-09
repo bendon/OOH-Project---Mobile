@@ -995,9 +995,9 @@ class CaptureRecordViewmodel @Inject constructor(
                     onAnalyseImage(CaptureRecordEventSink.OnAnalyseImage)
 
                 }
-                _captureUiEvent.update {
-                    CaptureRecordUiEvent.CaptureAdded
-                }
+//                _captureUiEvent.update {
+//                    CaptureRecordUiEvent.CaptureAdded
+//                }
             }
 
 
@@ -1019,16 +1019,16 @@ class CaptureRecordViewmodel @Inject constructor(
             repository.analyzeFile(fileMultipart)
                 .onSuccess { res ->
 
-//                    if (res?.object_type == null || res.billboard_type == null) {
-//                        _captureUiEvent.update {
-//                            CaptureRecordUiEvent.Error(
-//                                NoBillboardFoundException, eventSink
-//                            )
-//                        }
-//                        val bill = getBillboardSideToUpdate()
-//                        updateBillBoardState(bill.copy(closedUpUri = null, billboardImage = null))
-//
-//                    }
+                    if (res?.object_type == null || res.billboard_type == null) {
+                        _captureUiEvent.update {
+                            CaptureRecordUiEvent.Error(
+                                NoBillboardFoundException, eventSink
+                            )
+                        }
+                        val bill = getBillboardSideToUpdate()
+                        updateBillBoardState(bill.copy(closedUpUri = null, billboardImage = null))
+
+                    }
 
                     val billboard = getBillboardSideToUpdate()
                     val updatedBillboard = updateBillboardSideAiData(billboard, res)

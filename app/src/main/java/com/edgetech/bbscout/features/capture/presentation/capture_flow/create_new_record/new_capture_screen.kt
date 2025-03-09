@@ -31,6 +31,7 @@ import com.edgetech.bbscout.components.ui.MainLoadingButton
 import com.edgetech.bbscout.components.ui.NonLoadingSecButton
 import com.edgetech.bbscout.components.ui.StatusDialog
 import com.edgetech.bbscout.components.ui.SuccessIcon
+import com.edgetech.bbscout.components.utils.logD
 import com.edgetech.bbscout.features.capture.domain.model.BillboardTypeErrorException
 import com.edgetech.bbscout.features.capture.domain.model.BrandDescriptionErrorException
 import com.edgetech.bbscout.features.capture.domain.model.CaptureRecordEventSink
@@ -66,7 +67,9 @@ fun NewCaptureParentMain(
     val uiEvent by captureRecordUiModel.captureUiEvent.collectAsState()
 
     if (uiEvent is CaptureRecordUiEvent.Error) {
+
         val request = (uiEvent as CaptureRecordUiEvent.Error)
+
         if (request.exception is BillboardTypeErrorException){
             appState?.navController?.navigate(
                 AppDestinations.EditCapture(
@@ -155,19 +158,24 @@ fun NewCaptureParentMain(
                     fontSize = 14.sp,
                     color = Color.Gray,
                     modifier = Modifier
-                        .padding(top = 4.dp, ).padding(horizontal = 16.dp)
+                        .padding(top = 4.dp,)
+                        .padding(horizontal = 16.dp)
                         .fillMaxWidth(),
                 )
                 BBScoutStepper(
                     numberOfSteps = uiState.newCaptureNumberOfSteps!!,
                     currentStep = uiState.newCaptureCurrentStep,
-                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp).fillMaxWidth()
+                    modifier = Modifier
+                        .padding(vertical = 4.dp, horizontal = 16.dp)
+                        .fillMaxWidth()
                 )
             }
             NewCaptureNavHost(
                 appState,
                 captureRecordUiModel,
-                modifier = Modifier.weight(1f).padding(horizontal = 16.dp)
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 16.dp)
             )
             HorizontalDivider(
                 thickness = 2.dp,
